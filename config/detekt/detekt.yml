@@ -18,11 +18,29 @@ naming:
       - Composable
 
 complexity:
+  TooManyFunctions:
+    thresholdInInterfaces: 16
+    thresholdInClasses: 16
+    ignoreOverridden: true
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
   LongParameterList:
     # Composables expose many optional parameters with defaults.
     ignoreDefaultParameters: true
 
 style:
+  MaxLineLength:
+    # Test fixtures embed long JSON literals.
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
+  ThrowsCount:
+    # Parsers and validators reject input in many distinct ways.
+    max: 8
+  ReturnCount:
+    max: 4
+    excludeGuardClauses: true
   UnusedPrivateMember:
     # Private @Preview functions are only referenced by the IDE.
     ignoreAnnotated:

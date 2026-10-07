@@ -4,6 +4,7 @@
 plugins {
     base
     alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.serialization) apply false
 }
 
 dependencies {

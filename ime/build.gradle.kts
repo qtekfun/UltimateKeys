@@ -8,3 +8,8 @@ plugins {
 android {
     namespace = "com.qtekfun.ultimatekeys.ime"
 }
+
+dependencies {
+    api(projects.core)
+    api(projects.layouts)
+}

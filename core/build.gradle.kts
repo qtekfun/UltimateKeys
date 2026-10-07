@@ -8,3 +8,8 @@ plugins {
 android {
     namespace = "com.qtekfun.ultimatekeys.core"
 }
+
+dependencies {
+    api(libs.kotlinx.coroutines.core)
+    api(libs.androidx.datastore.preferences)
+}
