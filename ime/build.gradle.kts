@@ -3,8 +3,20 @@
 
 plugins {
     id("uk.android.library")
+    id("uk.android.compose")
 }
 
 android {
     namespace = "com.qtekfun.ultimatekeys.ime"
+}
+
+dependencies {
+    api(projects.core)
+    api(projects.layouts)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.savedstate)
+    implementation(libs.kotlinx.coroutines.android)
 }

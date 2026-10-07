@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.qtekfun.ultimatekeys.MainActivity">
+    <subtype
+        android:imeSubtypeLocale="es"
+        android:imeSubtypeMode="keyboard"
+        android:label="@string/subtype_es"
+        android:languageTag="es" />
+    <subtype
+        android:imeSubtypeLocale="en"
+        android:imeSubtypeMode="keyboard"
+        android:label="@string/subtype_en"
+        android:languageTag="en" />
+</input-method>

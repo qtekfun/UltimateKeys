@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<resources>
+    <string name="app_name">UltimateKeys</string>
+    <string name="setup_title">Configura el teclado</string>
+    <string name="step_enable">1. Activar UltimateKeys</string>
+    <string name="step_enabled">1. Activado</string>
+    <string name="step_select">2. Elegir UltimateKeys como teclado</string>
+    <string name="step_selected">2. Seleccionado</string>
+    <string name="try_it_here">Pruébalo aquí</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="setting_height">Altura del teclado (%)</string>
+    <string name="setting_long_press">Retardo de pulsación larga (ms)</string>
+    <string name="setting_haptics">Vibración al pulsar</string>
+    <string name="setting_sound">Volumen del sonido de teclas</string>
+    <string name="setting_number_row">Fila de números</string>
+    <string name="setting_auto_capitalize">Mayúscula automática</string>
+    <string name="setting_double_space">Doble espacio inserta un punto</string>
+    <string name="setting_smart_punctuation">Espaciado inteligente de puntuación</string>
+</resources>

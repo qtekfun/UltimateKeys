@@ -3,7 +3,21 @@
   SPDX-FileCopyrightText: 2026 UltimateKeys contributors
   SPDX-License-Identifier: GPL-3.0-or-later
 -->
-
 <resources>
     <string name="app_name">UltimateKeys</string>
+    <string name="setup_title">Set up the keyboard</string>
+    <string name="step_enable">1. Enable UltimateKeys</string>
+    <string name="step_enabled">1. Enabled</string>
+    <string name="step_select">2. Choose UltimateKeys as your keyboard</string>
+    <string name="step_selected">2. Selected</string>
+    <string name="try_it_here">Try it here</string>
+    <string name="settings_title">Settings</string>
+    <string name="setting_height">Keyboard height (%)</string>
+    <string name="setting_long_press">Long-press delay (ms)</string>
+    <string name="setting_haptics">Haptic feedback</string>
+    <string name="setting_sound">Key sound volume</string>
+    <string name="setting_number_row">Number row</string>
+    <string name="setting_auto_capitalize">Auto-capitalization</string>
+    <string name="setting_double_space">Double space inserts a period</string>
+    <string name="setting_smart_punctuation">Smart punctuation spacing</string>
 </resources>
