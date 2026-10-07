@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,9 +91,10 @@ private fun HomeScreen(repository: SettingsRepository) {
     ) {
         Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
         SetupSteps(status)
+        var sample by rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = sample,
+            onValueChange = { sample = it },
             label = { Text(stringResource(R.string.try_it_here)) },
             keyboardOptions = KeyboardOptions.Default,
             modifier = Modifier.fillMaxWidth()

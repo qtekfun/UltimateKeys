@@ -23,6 +23,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 targetSdk = TARGET_SDK
                 versionCode = versionCodeOf(appVersion)
                 versionName = appVersion
+                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
             flavorDimensions += "distribution"
             productFlavors {

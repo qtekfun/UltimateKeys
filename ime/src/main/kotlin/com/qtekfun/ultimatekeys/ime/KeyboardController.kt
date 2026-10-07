@@ -27,6 +27,7 @@ class KeyboardController(
     private val repository: SettingsRepository,
     private val scope: CoroutineScope,
     private val feedback: Feedback?,
+    private val logLatency: ((String) -> Unit)? = null,
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
@@ -59,6 +60,18 @@ class KeyboardController(
         feedback?.keyDown(action, s.hapticIntensity, s.soundVolume)
     }
 
+    fun recordLatency(nanos: Long) {
+        latency.record(nanos)
+        val log = logLatency ?: return
+        if (latency.size() % LOG_EVERY == 0) {
+            log(
+                "key-to-commit p50=${latency.percentileMs(
+                    P50
+                )}ms p95=${latency.percentileMs(P95)}ms n=${latency.size()}"
+            )
+        }
+    }
+
     fun onText(text: String) = logic.onText(text)
 
     fun onAction(action: KeyAction) {
@@ -84,5 +97,11 @@ class KeyboardController(
                 it.copy(letterLayoutId = next)
             }
         }
+    }
+
+    private companion object {
+        const val LOG_EVERY = 20
+        const val P50 = 50.0
+        const val P95 = 95.0
     }
 }

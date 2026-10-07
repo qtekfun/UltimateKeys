@@ -201,7 +201,7 @@ class SurfaceGestures(
         press.cancelJob()
         val started = System.nanoTime()
         val committed = release(press)
-        if (committed) controller.latency.record(System.nanoTime() - started)
+        if (committed) controller.recordLatency(System.nanoTime() - started)
         publishState()
     }
 

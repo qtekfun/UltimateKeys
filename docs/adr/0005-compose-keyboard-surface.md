@@ -18,3 +18,7 @@ Draw the key grid on a single Compose Canvas with custom hit testing; panels and
 ## Consequences
 
 No per-key composables. Latency is measured from Phase 1.
+
+## Update (Phase 1)
+
+Implemented as one `Canvas` per keyboard (`SurfaceRenderer`) with a pointer handler (`SurfaceGestures`) that does multi-touch and hit testing on pure geometry (`KeyGeometry`). Characters are committed on key release, so keys with long-press alternatives never type the wrong character first. The delete key drag selects text (characters first, then words) and release deletes it; this is also the "swipe to delete words" gesture.

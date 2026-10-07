@@ -33,15 +33,15 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 **Goal:** a usable keyboard that types correctly in any app, without suggestions yet.
 
-- [ ] 1.1 `InputMethodService` + IME declaration (`method.xml`, subtypes `es`, `en`); onboarding screens in `:app` to enable and select the keyboard.
-- [ ] 1.2 Input connection layer: commit/composing text, batch edits, selection tracking, restarts, password fields; heavily unit-tested with a fake `InputConnection`.
-- [ ] 1.3 `:layouts`: data format + parser; layouts ES QWERTY (with `ñ`), EN QWERTY, symbols (2 pages), numeric, phone, number-row variant; long-press alternatives per layout.
-- [ ] 1.4 Keyboard surface in Compose: Canvas-based key grid, hit testing with touch-area correction, multi-touch, key popups, long-press chooser with slide-to-select. Uses a temporary default style (real style engine in Phase 3).
-- [ ] 1.5 Shift/caps lock, auto-capitalization, double-space period, smart punctuation spacing, enter key editor actions.
-- [ ] 1.6 Delete repeat with acceleration, swipe-left delete word; spacebar cursor control; delete-drag selection.
-- [ ] 1.7 Haptics and sound with settings; keyboard height and number row settings; settings in DataStore.
-- [ ] 1.8 Macrobenchmark/tracing harness for key-press latency; record first numbers in `docs/PERFORMANCE.md`.
-- [ ] 1.9 Emulator smoke test: enable IME, type into an `EditText`, verify text.
+- [x] 1.1 `InputMethodService` + IME declaration (`method.xml`, subtypes `es`, `en`); onboarding screens in `:app` to enable and select the keyboard.
+- [x] 1.2 Input connection layer: commit/composing text, batch edits, selection tracking, restarts, password fields; heavily unit-tested with a fake `InputConnection`.
+- [x] 1.3 `:layouts`: data format + parser; layouts ES QWERTY (with `ñ`), EN QWERTY, symbols (2 pages), numeric, phone, number-row variant; long-press alternatives per layout.
+- [x] 1.4 Keyboard surface in Compose: Canvas-based key grid, hit testing with touch-area correction, multi-touch, key popups, long-press chooser with slide-to-select. Uses a temporary default style (real style engine in Phase 3).
+- [x] 1.5 Shift/caps lock, auto-capitalization, double-space period, smart punctuation spacing, enter key editor actions.
+- [x] 1.6 Delete repeat with acceleration, swipe-left delete word; spacebar cursor control; delete-drag selection.
+- [x] 1.7 Haptics and sound with settings; keyboard height and number row settings; settings in DataStore.
+- [x] 1.8 Macrobenchmark/tracing harness for key-press latency; record first numbers in `docs/PERFORMANCE.md`.
+- [x] 1.9 Emulator smoke test: enable IME, type into an `EditText`, verify text.
 
 **DoD:** types correctly in ES/EN layouts in the emulator test; latency harness in place; release `v0.2.0`.
 

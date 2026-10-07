@@ -31,10 +31,6 @@ import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 
-private const val BASE_ROW_DP = 54f
-private const val STRIP_DP = 44f
-private const val BOTTOM_PADDING_DP = 6f
-
 /** The keyboard: a strip reserved for suggestions (Phase 2) above a single-canvas key grid. */
 @Composable
 fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifier) {
@@ -51,26 +47,19 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
-    val rowDp = BASE_ROW_DP * settings.heightPercent / PERCENT
+    val rowDp = SurfaceSpec.rowDp(settings.heightPercent)
     val dimens = with(density) {
         SurfaceDimens(
-            gapX = 4.dp.toPx(),
-            gapY = 6.dp.toPx(),
+            gapX = SurfaceSpec.GAP_X_DP.dp.toPx(),
+            gapY = SurfaceSpec.GAP_Y_DP.dp.toPx(),
             corner = 8.dp.toPx(),
             labelSize = (rowDp * LABEL_RATIO).dp.toPx(),
             hintSize = 10.dp.toPx(),
             previewHeight = (rowDp * PREVIEW_RATIO).dp.toPx()
         )
     }
-    val geometry = remember(layout, widthPx, rowDp, density) {
-        KeyGeometry(
-            layout,
-            width = widthPx,
-            rowHeight = with(density) { rowDp.dp.toPx() },
-            gapX = dimens.gapX,
-            gapY = dimens.gapY,
-            top = with(density) { STRIP_DP.dp.toPx() }
-        )
+    val geometry = remember(layout, widthPx, settings.heightPercent, density) {
+        SurfaceSpec.geometry(layout, widthPx, density.density, settings.heightPercent)
     }
 
     val scope = rememberCoroutineScope()
@@ -90,7 +79,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height((STRIP_DP + rowDp * layout.rows.size + BOTTOM_PADDING_DP).dp)
+            .height(SurfaceSpec.totalHeightDp(layout.rows.size, settings.heightPercent).dp)
             .onSizeChanged { widthPx = it.width.toFloat() }
             .semantics { contentDescription = description }
             .pointerInput(gestures) { trackPointers(gestures) }
@@ -144,6 +133,5 @@ private fun rememberLabels(): SurfaceLabels {
     )
 }
 
-private const val PERCENT = 100f
 private const val LABEL_RATIO = 0.4f
 private const val PREVIEW_RATIO = 1.0f

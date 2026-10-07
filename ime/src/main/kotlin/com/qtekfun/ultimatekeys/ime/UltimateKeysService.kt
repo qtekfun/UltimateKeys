@@ -3,8 +3,10 @@
 
 package com.qtekfun.ultimatekeys.ime
 
+import android.content.pm.ApplicationInfo
 import android.inputmethodservice.InputMethodService
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -51,6 +53,7 @@ class UltimateKeysService :
         super.onCreate()
         savedStateController.performRestore(null as Bundle?)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
+        val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         controller = KeyboardController(
             logic = InputLogic(),
             repository = settingsRepository(),
@@ -58,7 +61,8 @@ class UltimateKeysService :
             feedback = Feedback(this),
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
-            }
+            },
+            logLatency = if (debuggable) { msg -> Log.d("UKLatency", msg) } else null
         )
     }
 
@@ -75,11 +79,18 @@ class UltimateKeysService :
         }
     }
 
+    /** The system can still call us after onDestroy; a destroyed lifecycle cannot move. */
+    private fun moveTo(state: Lifecycle.State) {
+        if (lifecycleRegistry.currentState != Lifecycle.State.DESTROYED) {
+            lifecycleRegistry.currentState = state
+        }
+    }
+
     override fun onEvaluateFullscreenMode(): Boolean = false
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        moveTo(Lifecycle.State.RESUMED)
         val ic = currentInputConnection ?: return
         controller.logic.onStartInput(
             AndroidEditorConnection(ic),
@@ -91,7 +102,7 @@ class UltimateKeysService :
 
     override fun onFinishInputView(finishingInput: Boolean) {
         controller.logic.onFinishInput()
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        moveTo(Lifecycle.State.STARTED)
         super.onFinishInputView(finishingInput)
     }
 

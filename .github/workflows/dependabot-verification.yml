@@ -48,7 +48,7 @@ jobs:
         run: >-
           ./gradlew --write-verification-metadata sha256
           --no-build-cache --rerun-tasks --no-configuration-cache
-          clean check assembleDebug assembleRelease
+          clean check assembleDebug assembleRelease assembleFullDebugAndroidTest
 
       - name: Commit refreshed checksums
         run: |
