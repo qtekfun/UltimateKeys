@@ -390,3 +390,119 @@ class InputLogicTest {
         assertEquals("", e.text.toString())
     }
 }
+
+class AutoCorrectTest {
+    private class Hook(var correction: String? = null) : SuggestionHook {
+        val composings = mutableListOf<String>()
+        val finished = mutableListOf<Triple<String, String, Boolean>>()
+        val rejected = mutableListOf<String>()
+
+        override fun onComposingChanged(composing: String, contextBefore: String) {
+            composings += composing
+        }
+
+        override fun autoCorrectFor(composing: String) = correction.takeIf { composing == "teh" }
+
+        override fun onWordFinished(word: String, contextBefore: String, corrected: Boolean) {
+            finished += Triple(word, contextBefore, corrected)
+        }
+
+        override fun onAutoCorrectRejected(original: String) {
+            rejected += original
+        }
+    }
+
+    private fun rig(
+        correction: String? = "the",
+        options: InputOptions = InputOptions(composeWords = true)
+    ): Triple<InputLogic, FakeEditorConnection, Hook> {
+        val e = FakeEditorConnection()
+        val hook = Hook(correction)
+        val logic = InputLogic { 1_000L }
+        logic.options = options
+        logic.suggestionHook = hook
+        logic.onStartInput(
+            e,
+            EditorContext.from(InputType.TYPE_CLASS_TEXT, 0),
+            restarting = false,
+            initialCursor = 0
+        )
+        return Triple(logic, e, hook)
+    }
+
+    private fun InputLogic.type(s: String) = s.forEach { onText(it.toString()) }
+
+    @Test
+    fun `space applies the autocorrection and backspace undoes it`() {
+        val (l, e, hook) = rig()
+        l.type("teh")
+        assertEquals(listOf("t", "te", "teh"), hook.composings)
+        l.onSpace()
+        assertEquals("the ", e.text.toString())
+        assertEquals(Triple("the", "", true), hook.finished.last())
+        l.onDelete()
+        assertEquals("teh", e.text.toString())
+        assertEquals("teh", l.composingText)
+        assertEquals(listOf("teh"), hook.rejected)
+        // The rejected word is not corrected again.
+        l.onSpace()
+        assertEquals("teh ", e.text.toString())
+    }
+
+    @Test
+    fun `punctuation also corrects and is kept`() {
+        val (l, e, _) = rig()
+        l.type("teh")
+        l.onText(",")
+        assertEquals("the,", e.text.toString())
+        l.onDelete()
+        assertEquals("teh", e.text.toString())
+    }
+
+    @Test
+    fun `no correction when off or not offered`() {
+        val (off, e1, _) = rig(options = InputOptions(composeWords = true, autoCorrect = false))
+        off.type("teh")
+        off.onSpace()
+        assertEquals("teh ", e1.text.toString())
+        val (none, e2, hook) = rig(correction = null)
+        none.type("teh")
+        none.onEnter()
+        assertEquals("teh", e2.text.toString())
+        assertEquals(Triple("teh", "", false), hook.finished.last())
+    }
+
+    @Test
+    fun `undo only works right after the correction`() {
+        val (l, e, _) = rig()
+        l.type("teh")
+        l.onSpace()
+        l.type("x")
+        l.onDelete()
+        l.onDelete()
+        assertEquals("the", e.text.toString())
+    }
+
+    @Test
+    fun `picking a suggestion replaces the composing word and adds a space`() {
+        val (l, e, hook) = rig()
+        l.type("hol")
+        l.commitWithAutoSpace("hola")
+        assertEquals("hola ", e.text.toString())
+        assertEquals("", l.composingText)
+        assertEquals("hola", hook.finished.last().first)
+        l.onText(",")
+        assertEquals("hola,", e.text.toString())
+    }
+
+    @Test
+    fun `cursor moves and deletions tell the hook that composing ended`() {
+        val (l, _, hook) = rig()
+        l.type("ab")
+        l.moveCursor(-1)
+        assertEquals("", hook.composings.last())
+        l.type("c")
+        l.onSelectionChanged(0, 0, -1, -1)
+        assertEquals("", hook.composings.last())
+    }
+}

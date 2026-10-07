@@ -20,4 +20,6 @@
     <string name="setting_auto_capitalize">Mayúscula automática</string>
     <string name="setting_double_space">Doble espacio inserta un punto</string>
     <string name="setting_smart_punctuation">Espaciado inteligente de puntuación</string>
+    <string name="setting_suggestions">Mostrar sugerencias</string>
+    <string name="setting_autocorrect">Autocorrección</string>
 </resources>

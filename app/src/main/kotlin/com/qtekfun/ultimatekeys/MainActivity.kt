@@ -158,6 +158,12 @@ private fun SettingsSection(
             settings.soundVolume,
             KeyboardSettings.PERCENT_RANGE
         ) { v -> update { it.copy(soundVolume = v) } }
+        SwitchSetting(R.string.setting_suggestions, settings.showSuggestions) { v ->
+            update { it.copy(showSuggestions = v) }
+        }
+        SwitchSetting(R.string.setting_autocorrect, settings.autoCorrect) { v ->
+            update { it.copy(autoCorrect = v) }
+        }
         SwitchSetting(R.string.setting_number_row, settings.numberRow) { v ->
             update { it.copy(numberRow = v) }
         }

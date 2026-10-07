@@ -4,13 +4,14 @@
 - None. Signing secrets (`UK_*`) are pending on the owner (see `docs/HUMAN_TASKS.md`); not a blocker.
 
 ## Current phase / branch / open PR
-Phase 1 — IME core. Branch `phase/1-ime-core`; PR to be opened. Phase 0 released as v0.1.0.
+Phase 2 — Suggestion engine. Branch `phase/2-suggestions` (no PR yet). v0.1.0 and v0.2.0 are released.
+Two subagents work in parallel in worktrees: `agent/engine-jni` (2.1-2.3 vendored AOSP engine + JNI) and `agent/dictionaries-mixed` (2.4-2.5 dictionaries + mixed ES/EN merge). Merge their branches into `phase/2-suggestions` when they report.
 
 ## Last completed task
-1.9 — Smoke test passes on the owner's Pixel 8 (`./gradlew :app:connectedFullDebugAndroidTest`, device only, never emulators locally).
+2.6 (UI-side) — suggestion strip, autocorrect with backspace undo, next-word prediction wiring, against the `SuggestionEngine` interface (fake engines in tests).
 
 ## Next task
-Open the Phase 1 PR, merge when CI is green, release v0.2.0 (see CI_CD "Making a release"), then Phase 2.
+Merge the two agent branches; wire the real engine in the service (2.3/2.4); 2.7 user dictionary screen; 2.8 on-device engine test + latency; 2.8b reproducible-build CI job; then PR + release v0.3.0.
 
 ## Build & check commands
 `./gradlew spotlessApply check assembleFullDebug assembleLiteDebug`

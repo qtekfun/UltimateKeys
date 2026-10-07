@@ -13,6 +13,8 @@ data class KeyboardSettings(
     val autoCapitalize: Boolean = true,
     val doubleSpacePeriod: Boolean = true,
     val smartPunctuation: Boolean = true,
+    val showSuggestions: Boolean = true,
+    val autoCorrect: Boolean = true,
     val letterLayoutId: String = "es_qwerty"
 ) {
     fun sanitized(): KeyboardSettings = copy(

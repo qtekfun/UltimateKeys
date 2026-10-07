@@ -35,6 +35,7 @@ import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 @Composable
 fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifier) {
     val state by controller.logic.state.collectAsState()
+    val strip by controller.suggestions.state.collectAsState()
     val settings by controller.settings.collectAsState()
     val density = LocalDensity.current
     val style = if (isSystemInDarkTheme()) TempStyle.Dark else TempStyle.Light
@@ -84,7 +85,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             .semantics { contentDescription = description }
             .pointerInput(gestures) { trackPointers(gestures) }
     ) {
-        renderer.draw(this, geometry, state, presses, style, labels, dimens)
+        renderer.draw(this, geometry, state, presses, style, labels, dimens, strip.slots)
     }
 }
 
@@ -103,7 +104,7 @@ private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.trackPoi
                         change.position.y
                     )
 
-                    change.changedToUp() -> gestures.up(id)
+                    change.changedToUp() -> gestures.up(id, change.position.x)
 
                     change.pressed -> gestures.move(id, change.position.x, change.position.y)
                 }

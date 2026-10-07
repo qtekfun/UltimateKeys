@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Suggestion strip with up to three words, auto-correction on space and punctuation (backspace right after restores what you typed) and next-word prediction. Both can be turned off in settings.
+
 ## [0.2.0] - 2026-10-07
 
 The keyboard can now be used to type, without suggestions yet.

@@ -55,9 +55,11 @@ class SurfaceRenderer {
         presses: List<PressView>,
         style: TempStyle,
         labels: SurfaceLabels,
-        dimens: SurfaceDimens
+        dimens: SurfaceDimens,
+        strip: List<String> = emptyList()
     ) {
         scope.drawRect(style.background)
+        drawStrip(scope, geometry, strip, style, dimens)
         val pressedKeys = presses.map { it.key }.toSet()
         geometry.keys.forEach { placed ->
             drawKey(scope, placed, state, placed in pressedKeys, style, labels, dimens)
@@ -69,6 +71,38 @@ class SurfaceRenderer {
             } else if (press.key.key is CharKey && press.mode == PressMode.NORMAL) {
                 drawPreview(scope, press.key, state, style, dimens)
             }
+        }
+    }
+
+    private fun drawStrip(
+        scope: DrawScope,
+        geometry: KeyGeometry,
+        strip: List<String>,
+        style: TempStyle,
+        dimens: SurfaceDimens
+    ) {
+        if (strip.isEmpty() || geometry.top <= 0f) return
+        val cell = geometry.width / strip.size
+        strip.forEachIndexed { index, word ->
+            if (index > 0) {
+                scope.drawLine(
+                    style.hint.copy(alpha = DIVIDER_ALPHA),
+                    Offset(cell * index, geometry.top * DIVIDER_INSET),
+                    Offset(cell * index, geometry.top * (1f - DIVIDER_INSET)),
+                    1f
+                )
+            }
+            text.isFakeBoldText = index == 1
+            val baseline = geometry.top / 2f + dimens.labelSize * STRIP_BASELINE
+            drawText(
+                scope,
+                word,
+                cell * index + cell / 2f,
+                baseline,
+                dimens.labelSize * STRIP_TEXT,
+                style.text
+            )
+            text.isFakeBoldText = false
         }
     }
 
@@ -357,6 +391,10 @@ class SurfaceRenderer {
 
     private companion object {
         const val ICON_SCALE = 0.4f
+        const val DIVIDER_ALPHA = 0.4f
+        const val DIVIDER_INSET = 0.25f
+        const val STRIP_TEXT = 0.9f
+        const val STRIP_BASELINE = 0.35f
         const val SMALL_LABEL = 0.7f
         const val SPACE_ALPHA = 0.6f
         const val STROKE = 0.1f

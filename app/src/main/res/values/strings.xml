@@ -20,4 +20,6 @@
     <string name="setting_auto_capitalize">Auto-capitalization</string>
     <string name="setting_double_space">Double space inserts a period</string>
     <string name="setting_smart_punctuation">Smart punctuation spacing</string>
+    <string name="setting_suggestions">Show suggestions</string>
+    <string name="setting_autocorrect">Auto-correction</string>
 </resources>

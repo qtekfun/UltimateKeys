@@ -30,6 +30,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
             autoCapitalize = this[AUTO_CAP] ?: d.autoCapitalize,
             doubleSpacePeriod = this[DOUBLE_SPACE] ?: d.doubleSpacePeriod,
             smartPunctuation = this[SMART_PUNCT] ?: d.smartPunctuation,
+            showSuggestions = this[SHOW_SUGGESTIONS] ?: d.showSuggestions,
+            autoCorrect = this[AUTO_CORRECT] ?: d.autoCorrect,
             letterLayoutId = this[LAYOUT] ?: d.letterLayoutId
         ).sanitized()
     }
@@ -43,6 +45,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[AUTO_CAP] = s.autoCapitalize
         this[DOUBLE_SPACE] = s.doubleSpacePeriod
         this[SMART_PUNCT] = s.smartPunctuation
+        this[SHOW_SUGGESTIONS] = s.showSuggestions
+        this[AUTO_CORRECT] = s.autoCorrect
         this[LAYOUT] = s.letterLayoutId
     }
 
@@ -55,6 +59,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val AUTO_CAP = booleanPreferencesKey("auto_capitalize")
         val DOUBLE_SPACE = booleanPreferencesKey("double_space_period")
         val SMART_PUNCT = booleanPreferencesKey("smart_punctuation")
+        val SHOW_SUGGESTIONS = booleanPreferencesKey("show_suggestions")
+        val AUTO_CORRECT = booleanPreferencesKey("auto_correct")
         val LAYOUT = stringPreferencesKey("letter_layout_id")
     }
 }
