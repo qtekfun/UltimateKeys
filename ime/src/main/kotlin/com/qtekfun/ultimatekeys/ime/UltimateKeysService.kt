@@ -24,11 +24,12 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.qtekfun.ultimatekeys.core.settingsRepository
+import com.qtekfun.ultimatekeys.core.userWordsRepository
 import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
 import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
-import com.qtekfun.ultimatekeys.engine.SwappableSuggestionEngine
+import com.qtekfun.ultimatekeys.engine.SharedEngine
 import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
@@ -51,7 +52,7 @@ class UltimateKeysService :
     private val savedStateController = SavedStateRegistryController.create(this)
     private val store = ViewModelStore()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val engine = SwappableSuggestionEngine()
+    private val engine = SharedEngine.instance
     private lateinit var controller: KeyboardController
 
     override val lifecycle: Lifecycle get() = lifecycleRegistry

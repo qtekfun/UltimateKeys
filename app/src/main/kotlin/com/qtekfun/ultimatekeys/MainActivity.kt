@@ -99,6 +99,11 @@ private fun HomeScreen(repository: SettingsRepository) {
             keyboardOptions = KeyboardOptions.Default,
             modifier = Modifier.fillMaxWidth()
         )
+        Button(onClick = {
+            context.startActivity(Intent(context, UserDictionaryActivity::class.java))
+        }) {
+            Text(stringResource(R.string.user_dictionary_open))
+        }
         SettingsSection(settings, ::update)
     }
 }

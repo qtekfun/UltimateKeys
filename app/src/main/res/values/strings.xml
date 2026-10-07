@@ -22,4 +22,15 @@
     <string name="setting_smart_punctuation">Smart punctuation spacing</string>
     <string name="setting_suggestions">Show suggestions</string>
     <string name="setting_autocorrect">Auto-correction</string>
+    <string name="user_dictionary_open">My dictionary and learned words</string>
+    <string name="user_dictionary_title">My dictionary</string>
+    <string name="user_dictionary_add">New word</string>
+    <string name="user_dictionary_add_button">Add</string>
+    <string name="user_dictionary_import">Import</string>
+    <string name="user_dictionary_export">Export</string>
+    <string name="user_dictionary_empty">No words yet.</string>
+    <string name="user_dictionary_remove">Remove</string>
+    <string name="clear_learned">Clear learned data</string>
+    <string name="clear_learned_message">This forgets everything the keyboard learned and your added words. It cannot be undone.</string>
+    <string name="clear_learned_confirm">Clear</string>
 </resources>

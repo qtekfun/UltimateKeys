@@ -11,3 +11,17 @@ private val Context.keyboardSettingsStore by preferencesDataStore(name = "keyboa
 /** The settings repository backed by the app's single DataStore file. */
 fun Context.settingsRepository(): SettingsRepository =
     DataStoreSettingsRepository(applicationContext.keyboardSettingsStore)
+
+private object UserWordsHolder {
+    @Volatile
+    private var repository: UserWordsRepository? = null
+
+    fun get(context: Context): UserWordsRepository = repository ?: synchronized(this) {
+        repository ?: UserWordsRepository(
+            java.io.File(context.applicationContext.filesDir, "user_words.txt")
+        ).also { repository = it }
+    }
+}
+
+/** The user's own words (one repository per process). */
+fun Context.userWordsRepository(): UserWordsRepository = UserWordsHolder.get(this)
