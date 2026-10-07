@@ -1,0 +1,27 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# Local configuration
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing
+*.jks
+*.keystore
+
+# Models and large downloaded assets (never committed)
+*.gguf
+*.ggml
+*.bin
+/models/
+**/src/*/assets/models/
+/.dict-cache/
