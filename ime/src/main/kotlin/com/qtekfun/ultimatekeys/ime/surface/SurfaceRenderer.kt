@@ -1,0 +1,366 @@
+// SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.qtekfun.ultimatekeys.ime.surface
+
+import android.graphics.Paint
+import android.graphics.Typeface
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.logic.KeyboardState
+import com.qtekfun.ultimatekeys.ime.logic.ShiftState
+import com.qtekfun.ultimatekeys.layouts.ActionKey
+import com.qtekfun.ultimatekeys.layouts.CharKey
+import com.qtekfun.ultimatekeys.layouts.KeyAction
+
+/** Texts the renderer needs, resolved from resources by the composable. */
+data class SurfaceLabels(
+    val enter: Map<EnterKind, String>,
+    val space: String,
+    val symbols: String,
+    val letters: String,
+    val moreSymbols: String
+)
+
+/** Sizes in pixels. */
+data class SurfaceDimens(
+    val gapX: Float,
+    val gapY: Float,
+    val corner: Float,
+    val labelSize: Float,
+    val hintSize: Float,
+    val previewHeight: Float
+)
+
+/** Draws the key surface with plain canvas calls: one pass, no per-key composables. */
+class SurfaceRenderer {
+    private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+        typeface = Typeface.DEFAULT
+    }
+
+    fun draw(
+        scope: DrawScope,
+        geometry: KeyGeometry,
+        state: KeyboardState,
+        presses: List<PressView>,
+        style: TempStyle,
+        labels: SurfaceLabels,
+        dimens: SurfaceDimens
+    ) {
+        scope.drawRect(style.background)
+        val pressedKeys = presses.map { it.key }.toSet()
+        geometry.keys.forEach { placed ->
+            drawKey(scope, placed, state, placed in pressedKeys, style, labels, dimens)
+        }
+        presses.forEach { press ->
+            val chooser = press.chooser
+            if (chooser != null) {
+                drawChooser(scope, chooser, style, dimens)
+            } else if (press.key.key is CharKey && press.mode == PressMode.NORMAL) {
+                drawPreview(scope, press.key, state, style, dimens)
+            }
+        }
+    }
+
+    private fun drawKey(
+        scope: DrawScope,
+        placed: PlacedKey,
+        state: KeyboardState,
+        pressed: Boolean,
+        style: TempStyle,
+        labels: SurfaceLabels,
+        dimens: SurfaceDimens
+    ) {
+        val key = placed.key
+        val isEnter = key is ActionKey && key.action == KeyAction.ENTER
+        val fill = when {
+            pressed -> style.pressed
+            isEnter -> style.actionKey
+            key is CharKey -> style.letterKey
+            else -> style.functionKey
+        }
+        scope.drawRoundRect(
+            color = fill,
+            topLeft = Offset(placed.left, placed.top),
+            size = Size(placed.width, placed.height),
+            cornerRadius = CornerRadius(dimens.corner)
+        )
+        val ink = if (isEnter) Color.White else style.text
+        when (key) {
+            is CharKey -> drawCharKey(scope, placed, key, state, style, dimens)
+            is ActionKey -> drawActionKey(scope, placed, key, state, ink, labels, dimens)
+        }
+    }
+
+    private fun drawCharKey(
+        scope: DrawScope,
+        placed: PlacedKey,
+        key: CharKey,
+        state: KeyboardState,
+        style: TempStyle,
+        dimens: SurfaceDimens
+    ) {
+        val upper =
+            state.shift != ShiftState.OFF &&
+                state.page == com.qtekfun.ultimatekeys.ime.logic.Page.LETTERS
+        val label = if (upper) key.label.uppercase() else key.label
+        drawText(
+            scope,
+            label,
+            placed.centerX,
+            placed.top + placed.height / 2f + dimens.labelSize / 3f,
+            dimens.labelSize,
+            style.text
+        )
+        key.hint?.let {
+            drawText(
+                scope,
+                it,
+                placed.right - dimens.hintSize,
+                placed.top + dimens.hintSize * 1.2f,
+                dimens.hintSize,
+                style.hint
+            )
+        }
+    }
+
+    private fun drawActionKey(
+        scope: DrawScope,
+        placed: PlacedKey,
+        key: ActionKey,
+        state: KeyboardState,
+        ink: Color,
+        labels: SurfaceLabels,
+        dimens: SurfaceDimens
+    ) {
+        val cx = placed.centerX
+        val cy = placed.top + placed.height / 2f
+        val unit = minOf(placed.height, placed.width) * ICON_SCALE
+        val small = dimens.labelSize * SMALL_LABEL
+        when (key.action) {
+            KeyAction.SHIFT -> drawShift(scope, cx, cy, unit, ink, state.shift)
+
+            KeyAction.DELETE -> drawBackspace(scope, cx, cy, unit, ink)
+
+            KeyAction.ENTER -> drawEnter(scope, placed, state.enterKind, ink, labels, dimens, unit)
+
+            KeyAction.SPACE -> drawText(
+                scope,
+                labels.space,
+                cx,
+                cy + small / 3f,
+                small,
+                ink.copy(alpha = SPACE_ALPHA)
+            )
+
+            KeyAction.GLOBE -> drawGlobe(scope, cx, cy, unit, ink)
+
+            KeyAction.SWITCH_LETTERS -> drawText(
+                scope,
+                key.label ?: labels.letters,
+                cx,
+                cy + small / 3f,
+                small,
+                ink
+            )
+
+            KeyAction.SWITCH_SYMBOLS -> drawText(
+                scope,
+                key.label ?: labels.symbols,
+                cx,
+                cy + small / 3f,
+                small,
+                ink
+            )
+
+            KeyAction.SWITCH_SYMBOLS_2 -> drawText(
+                scope,
+                key.label ?: labels.moreSymbols,
+                cx,
+                cy + small / 3f,
+                small,
+                ink
+            )
+        }
+    }
+
+    private fun drawEnter(
+        scope: DrawScope,
+        placed: PlacedKey,
+        kind: EnterKind,
+        ink: Color,
+        labels: SurfaceLabels,
+        dimens: SurfaceDimens,
+        unit: Float
+    ) {
+        val cx = placed.centerX
+        val cy = placed.top + placed.height / 2f
+        if (kind == EnterKind.ENTER) {
+            val p = Path().apply {
+                moveTo(cx + unit * 0.5f, cy - unit * 0.5f)
+                lineTo(cx + unit * 0.5f, cy)
+                lineTo(cx - unit * 0.5f, cy)
+                moveTo(cx - unit * 0.1f, cy - unit * 0.4f)
+                lineTo(cx - unit * 0.5f, cy)
+                lineTo(cx - unit * 0.1f, cy + unit * 0.4f)
+            }
+            scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
+        } else {
+            val size = dimens.labelSize * SMALL_LABEL
+            drawText(scope, labels.enter.getValue(kind), cx, cy + size / 3f, size, ink)
+        }
+    }
+
+    private fun drawShift(
+        scope: DrawScope,
+        cx: Float,
+        cy: Float,
+        unit: Float,
+        ink: Color,
+        shift: ShiftState
+    ) {
+        val p = Path().apply {
+            moveTo(cx, cy - unit * 0.55f)
+            lineTo(cx + unit * 0.5f, cy)
+            lineTo(cx + unit * 0.2f, cy)
+            lineTo(cx + unit * 0.2f, cy + unit * 0.45f)
+            lineTo(cx - unit * 0.2f, cy + unit * 0.45f)
+            lineTo(cx - unit * 0.2f, cy)
+            lineTo(cx - unit * 0.5f, cy)
+            close()
+        }
+        if (shift == ShiftState.OFF) {
+            scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
+        } else {
+            scope.drawPath(p, ink)
+        }
+        if (shift == ShiftState.LOCKED) {
+            scope.drawLine(
+                ink,
+                Offset(cx - unit * 0.3f, cy + unit * 0.65f),
+                Offset(
+                    cx + unit * 0.3f,
+                    cy + unit * 0.65f
+                ),
+                unit * STROKE
+            )
+        }
+    }
+
+    private fun drawBackspace(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
+        val p = Path().apply {
+            moveTo(cx - unit * 0.6f, cy)
+            lineTo(cx - unit * 0.25f, cy - unit * 0.4f)
+            lineTo(cx + unit * 0.6f, cy - unit * 0.4f)
+            lineTo(cx + unit * 0.6f, cy + unit * 0.4f)
+            lineTo(cx - unit * 0.25f, cy + unit * 0.4f)
+            close()
+        }
+        scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
+        val d = unit * 0.18f
+        val x = cx + unit * 0.12f
+        scope.drawLine(ink, Offset(x - d, cy - d), Offset(x + d, cy + d), unit * STROKE)
+        scope.drawLine(ink, Offset(x - d, cy + d), Offset(x + d, cy - d), unit * STROKE)
+    }
+
+    private fun drawGlobe(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
+        val r = unit * 0.5f
+        val stroke = Stroke(width = unit * STROKE)
+        scope.drawCircle(ink, r, Offset(cx, cy), style = stroke)
+        scope.drawOval(ink, Offset(cx - r * 0.45f, cy - r), Size(r * 0.9f, r * 2f), style = stroke)
+        scope.drawLine(ink, Offset(cx - r, cy), Offset(cx + r, cy), unit * STROKE)
+    }
+
+    private fun drawPreview(
+        scope: DrawScope,
+        placed: PlacedKey,
+        state: KeyboardState,
+        style: TempStyle,
+        dimens: SurfaceDimens
+    ) {
+        val key = placed.key as CharKey
+        val upper =
+            state.shift != ShiftState.OFF &&
+                state.page == com.qtekfun.ultimatekeys.ime.logic.Page.LETTERS
+        val label = if (upper) key.label.uppercase() else key.label
+        val h = dimens.previewHeight
+        val w = placed.width * PREVIEW_WIDEN
+        val left = (placed.centerX - w / 2f).coerceAtLeast(0f)
+        val top = (placed.top - h - dimens.gapY).coerceAtLeast(0f)
+        scope.drawRoundRect(style.popup, Offset(left, top), Size(w, h), CornerRadius(dimens.corner))
+        drawText(
+            scope,
+            label,
+            left + w / 2f,
+            top + h / 2f + dimens.labelSize * 0.45f,
+            dimens.labelSize * PREVIEW_TEXT,
+            style.text
+        )
+    }
+
+    private fun drawChooser(
+        scope: DrawScope,
+        chooser: ChooserView,
+        style: TempStyle,
+        dimens: SurfaceDimens
+    ) {
+        scope.drawRoundRect(
+            style.popup,
+            Offset(chooser.left, chooser.top),
+            Size(chooser.right - chooser.left, chooser.cellHeight),
+            CornerRadius(dimens.corner)
+        )
+        chooser.items.forEachIndexed { index, item ->
+            val x = chooser.left + index * chooser.cellWidth
+            if (index == chooser.selected) {
+                scope.drawRoundRect(
+                    style.popupSelected,
+                    Offset(x + 2f, chooser.top + 2f),
+                    Size(chooser.cellWidth - 4f, chooser.cellHeight - 4f),
+                    CornerRadius(dimens.corner)
+                )
+            }
+            val ink = if (index == chooser.selected) Color.White else style.text
+            drawText(
+                scope,
+                item,
+                x + chooser.cellWidth / 2f,
+                chooser.top + chooser.cellHeight / 2f + dimens.labelSize / 3f,
+                dimens.labelSize,
+                ink
+            )
+        }
+    }
+
+    private fun drawText(
+        scope: DrawScope,
+        value: String,
+        x: Float,
+        baseline: Float,
+        size: Float,
+        color: Color
+    ) {
+        text.textSize = size
+        text.color = color.toArgb()
+        scope.drawIntoCanvas { it.nativeCanvas.drawText(value, x, baseline, text) }
+    }
+
+    private companion object {
+        const val ICON_SCALE = 0.4f
+        const val SMALL_LABEL = 0.7f
+        const val SPACE_ALPHA = 0.6f
+        const val STROKE = 0.1f
+        const val PREVIEW_WIDEN = 1.3f
+        const val PREVIEW_TEXT = 1.3f
+    }
+}

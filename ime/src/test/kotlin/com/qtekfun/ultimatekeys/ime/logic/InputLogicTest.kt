@@ -294,15 +294,28 @@ class InputLogicTest {
     }
 
     @Test
-    fun `delete drag selects and deletes`() {
+    fun `delete drag selects, shrinks and deletes`() {
         val e = FakeEditorConnection("hola mundo")
         val (l, _) = logic(editor = e)
         val anchor = 10
-        assertEquals(5, l.selectBefore(5, anchor))
+        assertEquals(5, l.extendSelectionLeft(5, anchor))
         assertEquals("mundo", e.selectedText().toString())
+        l.shrinkSelection(2, anchor)
+        assertEquals("ndo", e.selectedText().toString())
         l.deleteSelection()
-        assertEquals("hola ", e.text.toString())
+        assertEquals("hola mu", e.text.toString())
+    }
+
+    @Test
+    fun `delete drag stops at the start of the text and by words`() {
+        val e = FakeEditorConnection("hola mundo")
+        val (l, _) = logic(editor = e)
         assertEquals(5, l.wordLengthBeforeCursor())
+        assertEquals(5, l.extendSelectionLeft(l.wordLengthBeforeCursor(), 10))
+        assertEquals(5, l.extendSelectionLeft(50, 10))
+        assertEquals(0, l.extendSelectionLeft(1, 10))
+        l.shrinkSelection(100, 10)
+        assertEquals("", e.selectedText().toString())
     }
 
     @Test

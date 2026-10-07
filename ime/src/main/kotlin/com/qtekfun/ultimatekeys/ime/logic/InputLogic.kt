@@ -159,7 +159,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         afterTyping()
     }
 
-    /** One backspace: removes the selection, or the last composing char, or the previous character. */
+    /** One backspace: removes the selection, the last composing char or the previous character. */
     fun onDelete() {
         val ed = editor ?: return
         ed.beginBatchEdit()
@@ -243,13 +243,29 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         cursor = target
     }
 
-    /** Selects [count] characters before the cursor (delete-key drag) and returns how many were selected. */
-    fun selectBefore(count: Int, anchor: Int): Int {
+    /**
+     * Grows the selection leftwards by up to [chars] characters while keeping its end at [anchor]
+     * (delete-key drag). Returns how many characters were added.
+     */
+    fun extendSelectionLeft(chars: Int, anchor: Int): Int {
         val ed = editor ?: return 0
+        if (cursor < 0) return 0
         finishComposing(ed)
-        val available = ed.textBeforeCursor(count).length
-        ed.setSelection(anchor - available, anchor)
+        val available = ed.textBeforeCursor(chars).length
+        if (available == 0) return 0
+        val start = cursor - available
+        ed.setSelection(start, anchor)
+        cursor = start
         return available
+    }
+
+    /** Shrinks the selection from the left by up to [chars] characters, never past [anchor]. */
+    fun shrinkSelection(chars: Int, anchor: Int) {
+        val ed = editor ?: return
+        if (cursor < 0) return
+        val start = minOf(anchor, cursor + chars)
+        ed.setSelection(start, anchor)
+        cursor = start
     }
 
     fun wordLengthBeforeCursor(): Int {

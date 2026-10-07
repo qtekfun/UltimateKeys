@@ -28,6 +28,11 @@ complexity:
   LongParameterList:
     # Composables expose many optional parameters with defaults.
     ignoreDefaultParameters: true
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
+      # Canvas drawing helpers pass the scope, the key and the look explicitly.
+      - '**/surface/SurfaceRenderer.kt'
 
 style:
   MaxLineLength:
@@ -50,3 +55,7 @@ style:
       - '**/test/**'
       - '**/androidTest/**'
       - '**/*.kts'
+      # Icon geometry and color tokens are literal values by nature.
+      - '**/surface/SurfaceRenderer.kt'
+      - '**/surface/TempStyle.kt'
+      - '**/surface/KeyboardSurface.kt'

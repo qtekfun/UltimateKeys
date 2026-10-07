@@ -18,7 +18,19 @@ kover {
                 // Generated code, vendored third-party code and pure Compose UI are not measured.
                 classes("*.R", "*.R\$*", "*.BuildConfig", "*ComposableSingletons*", "*\$DefaultImpls")
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview", "*Generated*")
-                classes("com.qtekfun.ultimatekeys.MainActivity*")
+                // Android glue and pure Compose UI, covered by emulator tests instead.
+                classes(
+                    "com.qtekfun.ultimatekeys.MainActivity*",
+                    "com.qtekfun.ultimatekeys.ImeStatus*",
+                    "com.qtekfun.ultimatekeys.ime.UltimateKeysService*",
+                    "com.qtekfun.ultimatekeys.ime.AndroidEditorConnection",
+                    "com.qtekfun.ultimatekeys.ime.Feedback",
+                    "com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface*",
+                    "com.qtekfun.ultimatekeys.ime.surface.SurfaceRenderer*",
+                    "com.qtekfun.ultimatekeys.ime.surface.TempStyle*",
+                    "com.qtekfun.ultimatekeys.core.SettingsStoreKt*",
+                )
+                
             }
         }
         verify {
