@@ -49,3 +49,9 @@ with a license compatible with GPL-3.0 and F-Droid, reproducible to fetch, and l
   a verified license is found.
 - The Spanish list marks 195 words `possibly_offensive` and flags such as `abbreviation`; the converter step
   decides how those map to engine flags (for example, hide offensive words from suggestions by default).
+
+## Update: on-device building rejected, pre-build with AOSP's dictionary tool
+
+First attempt: build the main dictionaries on the first run by adding every word to a native updatable dictionary (`DictionaryBuilder`). Measured on a Pixel 8: the Spanish build stops after one word and the English build crashes the process with SIGSEGV near 40,000 words (`DynamicPtReadingUtils::getParentPtNodePosOffset`, "buffer overflow after secondary allocation"). A native crash takes the keyboard down, so this path is not used (`ENGINE_ENABLED = false` until the new one lands) and the builder stays only as a tested helper.
+
+Decision: produce the read-only binary dictionaries at build time with AOSP's own `dicttoolkit` (C++, same upstream commit as the engine, vendored under `third_party/aosp-latinime/dicttoolkit`), built for the host by a Gradle task and run on the pinned word lists. The read-only mmap path is the one AOSP has used for years. The build needs a host C++ toolchain and CMake (present on CI; F-Droid adds them in `sudo`).

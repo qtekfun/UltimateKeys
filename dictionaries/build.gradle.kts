@@ -17,6 +17,10 @@ android {
     namespace = "com.qtekfun.ultimatekeys.dictionaries"
 }
 
+dependencies {
+    api(projects.engine)
+}
+
 /**
  * Materialises the pinned word lists as generated assets.
  *
@@ -49,7 +53,8 @@ abstract class FetchDictionariesTask : DefaultTask() {
         for (language in languages) {
             val sha = props.getProperty("$language.sha256").lowercase()
             val bytes = verifiedBytes(props, language, sha)
-            val name = "$language.combined.gz"
+            // Not ".gz": the Android asset packager would silently unzip such files and break the checksum.
+            val name = "$language.wordlist.bin"
             out.resolve(name).writeBytes(bytes)
             index.append("$language.file=").append(name).append('\n')
             index.append("$language.sha256=").append(sha).append('\n')

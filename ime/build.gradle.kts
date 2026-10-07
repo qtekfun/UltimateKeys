@@ -14,6 +14,7 @@ dependencies {
     api(projects.core)
     api(projects.layouts)
     api(projects.engine)
+    implementation(projects.dictionaries)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.lifecycle.runtime)

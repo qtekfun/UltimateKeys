@@ -7,7 +7,13 @@ import java.io.File
 import java.util.Locale
 
 /** A main dictionary in AOSP binary format: [length] bytes at [offset] of the file [path]. */
-data class DictionaryFile(val path: String, val offset: Long, val length: Long) {
+data class DictionaryFile(
+    val path: String,
+    val offset: Long,
+    val length: Long,
+    /** True when [path] is a directory written by [DictionaryBuilder] (opened as updatable). */
+    val isDirectory: Boolean = false
+) {
     companion object {
         /** The whole of [file]. */
         fun of(file: File) = DictionaryFile(file.absolutePath, 0L, file.length())
@@ -185,7 +191,14 @@ class AospSuggestionEngine internal constructor(
         val language = languageKey(locale)
         return states.getOrPut(language) {
             val main = dictionaries.mainDictionary(locale)?.let { file ->
-                open(file.path, file.offset, file.length, locale, directory = null)
+                open(
+                    file.path,
+                    file.offset,
+                    file.length,
+                    locale,
+                    directory = null,
+                    updatable = file.isDirectory
+                )
             }
             LanguageState(
                 proximityInfo = bridge.newProximityInfo(geometryFor(locale)),
@@ -201,9 +214,10 @@ class AospSuggestionEngine internal constructor(
         offset: Long,
         length: Long,
         locale: Locale,
-        directory: File?
+        directory: File?,
+        updatable: Boolean = directory != null
     ): Opened? {
-        val handle = bridge.openDictionary(path, offset, length, updatable = directory != null)
+        val handle = bridge.openDictionary(path, offset, length, updatable = updatable)
         if (handle == 0L) return null
         val session = bridge.newSession(locale.toString(), length)
         return Opened(handle, session, directory)
