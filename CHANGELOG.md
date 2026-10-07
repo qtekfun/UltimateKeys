@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-07
+
+The keyboard can now be used to type, without suggestions yet.
+
 ### Added
 
 - The keyboard now types: Spanish and English QWERTY layouts (with `ñ`), two symbol pages, numeric and phone layouts, and an optional number row.
@@ -26,5 +30,6 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/qtekfun/UltimateKeys/releases/tag/v0.1.0

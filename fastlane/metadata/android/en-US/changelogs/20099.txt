@@ -1,0 +1,1 @@
+You can now type with the Spanish and English keyboards: accents on long press, shift and caps lock, cursor control on the space bar and delete-drag selection.
