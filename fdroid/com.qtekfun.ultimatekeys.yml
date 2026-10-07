@@ -1,0 +1,33 @@
+Categories:
+  - System
+License: GPL-3.0-or-later
+AuthorName: qtekfun
+SourceCode: https://github.com/qtekfun/UltimateKeys
+IssueTracker: https://github.com/qtekfun/UltimateKeys/issues
+Changelog: https://github.com/qtekfun/UltimateKeys/blob/HEAD/CHANGELOG.md
+
+AutoName: UltimateKeys
+
+RepoType: git
+Repo: https://github.com/qtekfun/UltimateKeys.git
+Binaries: https://github.com/qtekfun/UltimateKeys/releases/download/v%v/UltimateKeys-%v-lite.apk
+
+Builds:
+  - versionName: 0.1.0
+    versionCode: 10099
+    commit: v0.1.0
+    submodules: true
+    sudo:
+      - apt-get update
+      - apt-get install -y openjdk-21-jdk-headless
+      - update-java-alternatives -a
+    gradle:
+      - lite
+    ndk: r28c
+
+AllowedAPKSigningKeys: 59989c4961dc6f7b8c7534491180640416af454b2c0860e490fbc31d7fac98bd
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$
+CurrentVersion: 0.1.0
+CurrentVersionCode: 10099

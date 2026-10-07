@@ -1,0 +1,1 @@
+Teclado privado y sin conexión, con aspecto configurable y dictado por voz

@@ -12,17 +12,17 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 **Goal:** an empty but complete multi-module project with both flavors, full CI and automatic releases.
 
 - [x] 0.1 Initialize the repo `qtekfun/UltimateKeys`; move this spec package (`CLAUDE.md`, `SPEC.md`, `PLAN.md`, `KICKOFF.md`, `docs/*`) into the root; create `PROGRESS.md`.
-- [ ] 0.2 Gradle (Kotlin DSL) with version catalog, latest stable AGP/Kotlin/Compose BOM, JDK 21, `minSdk 31`, compile/target latest stable. Convention plugins in `build-logic/` for Android library, Compose, native and test setup.
-- [ ] 0.3 Modules from `SPEC.md` §11 (except `:gesture`), each compiling with a placeholder.
-- [ ] 0.4 Product flavors `full` and `lite` (dimension `distribution`), same `applicationId` `com.qtekfun.ultimatekeys`.
-- [ ] 0.5 Gradle task `verifyFullHasNoInternet` on merged manifests of all `full` variants; hooked into `check`.
-- [ ] 0.6 `appVersion` in `gradle.properties` and derived `versionCode` (unit-tested), release signing from `UK_*` env vars, Gradle dependency verification, detekt — all mirroring UltimateDeck; no secrets in the repo.
-- [ ] 0.7 Spotless + ktlint, clang-format for own C++, Kover coverage, Dependabot, `.editorconfig`, `.gitignore` (models, keystores, `local.properties`).
-- [ ] 0.8 Workflows `ci.yml`, `dependabot-verification.yml` and `release.yml` as in `docs/CI_CD.md` (actions pinned by SHA); `CHANGELOG.md` (Keep a Changelog) and `RELEASING.md`.
-- [ ] 0.9 Repo files: `README.md`, `LICENSE` (GPL-3.0), `CONTRIBUTING.md`, `SECURITY.md`, `docs/THIRD_PARTY.md`, issue/PR templates, labels (`blocked`, `privacy`, `voice`, `ui`, `engine`, `style`).
-- [ ] 0.10 F-Droid: metadata skeleton `fastlane/metadata/android/en-US/` and `es-ES/`, and draft `fdroid/com.qtekfun.ultimatekeys.yml` mirroring UltimateDeck's.
-- [ ] 0.11 ADRs: `0001-from-scratch-with-aosp-engine.md`, `0002-module-layout.md`, `0003-dependency-injection.md`, `0004-versioning-and-releases.md`, `0005-compose-keyboard-surface.md`.
-- [ ] 0.12 Assess F-Droid acceptance of the `full` flavor; write `docs/DISTRIBUTION.md`.
+- [x] 0.2 Gradle (Kotlin DSL) with version catalog, latest stable AGP/Kotlin/Compose BOM, JDK 21, `minSdk 31`, compile/target latest stable. Convention plugins in `build-logic/` for Android library, Compose, native and test setup.
+- [x] 0.3 Modules from `SPEC.md` §11 (except `:gesture`), each compiling with a placeholder.
+- [x] 0.4 Product flavors `full` and `lite` (dimension `distribution`), same `applicationId` `com.qtekfun.ultimatekeys`.
+- [x] 0.5 Gradle task `verifyFullHasNoInternet` on merged manifests of all `full` variants; hooked into `check`.
+- [x] 0.6 `appVersion` in `gradle.properties` and derived `versionCode` (unit-tested), release signing from `UK_*` env vars, Gradle dependency verification, detekt — all mirroring UltimateDeck; no secrets in the repo.
+- [x] 0.7 Spotless + ktlint, clang-format for own C++, Kover coverage, Dependabot, `.editorconfig`, `.gitignore` (models, keystores, `local.properties`).
+- [x] 0.8 Workflows `ci.yml`, `dependabot-verification.yml` and `release.yml` as in `docs/CI_CD.md` (actions pinned by SHA); `CHANGELOG.md` (Keep a Changelog) and `RELEASING.md`.
+- [x] 0.9 Repo files: `README.md`, `LICENSE` (GPL-3.0), `CONTRIBUTING.md`, `SECURITY.md`, `docs/THIRD_PARTY.md`, issue/PR templates, labels (`blocked`, `privacy`, `voice`, `ui`, `engine`, `style`).
+- [x] 0.10 F-Droid: metadata skeleton `fastlane/metadata/android/en-US/` and `es-ES/`, and draft `fdroid/com.qtekfun.ultimatekeys.yml` mirroring UltimateDeck's.
+- [x] 0.11 ADRs: `0001-from-scratch-with-aosp-engine.md`, `0002-module-layout.md`, `0003-dependency-injection.md`, `0004-versioning-and-releases.md`, `0005-compose-keyboard-surface.md`.
+- [x] 0.12 Assess F-Droid acceptance of the `full` flavor; write `docs/DISTRIBUTION.md`.
 - [ ] 0.13 Add branch protection on `master` (required check `CI / check`, linear history) via `gh api`; if not permitted, add it to `docs/HUMAN_VERIFICATION.md`.
 
 **DoD:** CI green on both flavors; tag `v0.1.0` pushed; Release workflow published both APKs (or failed only for missing signing secrets, noted in `PROGRESS.md`).
