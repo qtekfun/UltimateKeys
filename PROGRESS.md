@@ -7,15 +7,18 @@
 Phase 0 — Bootstrap, CI and releases. Branch `phase/0-bootstrap`; no PR yet.
 
 ## Last completed task
-0.1 — Spec package moved into the repo (CLAUDE.md, SPEC.md, PLAN.md in root; the rest under docs/).
+0.12 — Phase 0 files done locally (build, CI workflows, docs, ADRs, F-Droid draft).
 
 ## Next task
-0.2 — Gradle (Kotlin DSL) with version catalog and convention plugins.
+0.13 — open PR, wait for CI, add branch protection, then release 0.1.0.
 
 ## Build & check commands
-`./gradlew spotlessCheck lint testFullDebugUnitTest testLiteDebugUnitTest assembleFullDebug assembleLiteDebug verifyFullHasNoInternet`
-(Gradle does not exist yet; this list will be updated in Phase 0.)
+`./gradlew spotlessApply check assembleFullDebug assembleLiteDebug`
+Full local gate: `./gradlew spotlessCheck check assembleDebug assembleRelease` (check includes lint, detekt, unit tests, koverVerify, verifyFullHasNoInternet).
 
 ## Decisions since last update (link ADRs)
 - Repo settings applied via `gh api`: squash-merge only, auto-delete head branches.
 - Tooling on this machine: JDK 21 (Temurin), Android SDK at `~/Android/Sdk`.
+- Release cert SHA-256 (from owner): 59989c4961dc6f7b8c7534491180640416af454b2c0860e490fbc31d7fac98bd (use in fdroid AllowedAPKSigningKeys, no space)
+- ADRs 0001-0006 in docs/adr (manual DI, toolchain pins).
+- `originalityCheck` task is due in Phase 3 (3.10); CI_CD lists it in `check` from then.

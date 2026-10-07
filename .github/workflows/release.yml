@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Builds the signed release APKs (full and lite) for a version tag (vX.Y.Z or vX.Y.Z-rc.N) and
+# publishes them as a GitHub Release, with the notes of that version from CHANGELOG.md.
+# See RELEASING.md.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Check that the tag matches appVersion
+        run: |
+          version=$(grep '^appVersion=' gradle.properties | cut -d= -f2)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match appVersion $version"; exit 1; }
+
+      - name: Check and build the signed release APKs
+        env:
+          UK_KEYSTORE_BASE64: ${{ secrets.UK_KEYSTORE_BASE64 }}
+          UK_KEYSTORE_PASSWORD: ${{ secrets.UK_KEYSTORE_PASSWORD }}
+          UK_KEY_ALIAS: ${{ secrets.UK_KEY_ALIAS }}
+          UK_KEY_PASSWORD: ${{ secrets.UK_KEY_PASSWORD }}
+        run: |
+          for name in UK_KEYSTORE_BASE64 UK_KEYSTORE_PASSWORD UK_KEY_ALIAS UK_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Signing secrets missing — see docs/HUMAN_TASKS.md"
+              exit 1
+            fi
+          done
+          export UK_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          echo "$UK_KEYSTORE_BASE64" | base64 -d > "$UK_KEYSTORE_FILE"
+          ./gradlew check assembleFullRelease assembleLiteRelease
+
+      - name: Delete the keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '$0 ~ "^## \\[" v "\\]" {found=1; next} found && /^## \[/ {exit} found {print}' CHANGELOG.md > notes.md
+          for flavor in full lite; do
+            cp "app/build/outputs/apk/$flavor/release/app-$flavor-release.apk" "UltimateKeys-$version-$flavor.apk"
+          done
+          sha256sum UltimateKeys-"$version"-*.apk > SHA256SUMS.txt
+          prerelease=""
+          case "$version" in *-rc.*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" UltimateKeys-"$version"-full.apk UltimateKeys-"$version"-lite.apk SHA256SUMS.txt \
+            --title "UltimateKeys $version" --notes-file notes.md $prerelease

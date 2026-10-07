@@ -1,0 +1,9 @@
+UltimateKeys es un teclado moderno que funciona totalmente sin conexión.
+
+Desarrollo temprano: esta versión todavía no sirve para escribir.
+
+Objetivos:
+• Aspecto totalmente configurable: cada detalle visual es un ajuste.
+• Español e inglés sin cambiar de teclado.
+• Modo privado, sin telemetría y sin nube.
+• Dictado por voz sin conexión.

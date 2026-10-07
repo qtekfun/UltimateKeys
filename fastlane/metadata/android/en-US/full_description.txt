@@ -1,0 +1,9 @@
+UltimateKeys is a modern keyboard that works entirely offline.
+
+Early development: this version cannot be used to type yet.
+
+Goals:
+• A fully configurable look: every visual aspect is a setting.
+• Spanish and English without switching.
+• Private mode, no telemetry, no cloud.
+• Offline voice dictation.
