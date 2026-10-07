@@ -12,7 +12,7 @@ data class Suggestion(
     val score: Int,
     /** True when it is safe to apply automatically (autocorrect) on space or punctuation. */
     val autoCorrect: Boolean = false,
-    val locale: Locale? = null,
+    val locale: Locale? = null
 )
 
 /**
