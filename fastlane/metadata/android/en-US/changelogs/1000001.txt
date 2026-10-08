@@ -1,0 +1,1 @@
+First release candidate of 1.0: nine styles, gesture typing, offline dictation, clipboard and emoji, private mode, redesigned settings and screen reader support.

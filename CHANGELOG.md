@@ -9,15 +9,20 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-10-08
+
+First release candidate of 1.0.0.
+
+### Changed
+
+- Dictation frees the speech model after two minutes without use, when the system is short of memory and when the keyboard stops, and loads it ahead of time while the microphone permission is requested.
+- Store texts and the README describe the nine built-in styles and the current state of the app.
+
 ## [0.9.2] - 2026-10-08
 
 ### Added
 
 - The microphone under the keys can also sit in the centre (Dictation settings, Microphone position: left, centre or right).
-
-### Changed
-
-- Dictation frees the speech model after two minutes without use, when the system is short of memory and when the keyboard stops, and loads it ahead of time while the microphone permission is requested.
 
 
 ## [0.9.1] - 2026-10-08
@@ -129,7 +134,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...HEAD
+[1.0.0-rc.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.2...v1.0.0-rc.1
 [0.9.2]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.8.1...v0.9.0

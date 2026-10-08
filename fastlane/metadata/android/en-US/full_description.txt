@@ -1,7 +1,7 @@
 UltimateKeys is a modern keyboard that works entirely offline. There are no analytics, no ads and no cloud, and you can make it look exactly the way you want.
 
 <b>Make it yours</b>
-• Seven original built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), each with a light and a dark variant.
+• Nine built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper, Dracula, OLED). Most have a light and a dark variant; Midnight, Dracula and OLED are always dark.
 • A style editor with a live preview: key shape, gaps, borders, shadows, fonts, colors, gradients, popups, suggestion bar, bottom row and panels are all settings.
 • Material You colors, and a warning when text would be hard to read.
 • Export, import and share your styles as .ukstyle files.
