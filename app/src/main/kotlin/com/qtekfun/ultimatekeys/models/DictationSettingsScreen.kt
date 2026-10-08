@@ -44,7 +44,9 @@ internal fun DictationSettingsScreen(
         Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text(stringResource(R.string.models_back)) }
+        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+            Text(stringResource(R.string.models_back))
+        }
         Text(
             stringResource(R.string.dictation_title),
             style = MaterialTheme.typography.headlineSmall
@@ -66,12 +68,12 @@ internal fun DictationSettingsScreen(
         )
         val ms = settings.dictationSilenceMs
         val seconds = "${ms / MS_PER_SECOND}.${ms % MS_PER_SECOND / TENTH_MS}"
+        val silenceRange = KeyboardSettings.DICTATION_SILENCE_RANGE
         LabeledSlider(
             label = stringResource(R.string.dictation_silence_label),
             valueText = stringResource(R.string.dictation_silence_value, seconds),
             value = ms.toFloat(),
-            range = KeyboardSettings.DICTATION_SILENCE_RANGE.first.toFloat()..
-                KeyboardSettings.DICTATION_SILENCE_RANGE.last.toFloat(),
+            range = silenceRange.first.toFloat()..silenceRange.last.toFloat(),
             onChange = { v ->
                 val stepped = (v / SILENCE_STEP_MS).roundToInt() * SILENCE_STEP_MS
                 update { it.copy(dictationSilenceMs = stepped) }

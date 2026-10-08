@@ -52,7 +52,9 @@ internal fun ModelsScreen(
         Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text(stringResource(R.string.models_back)) }
+        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+            Text(stringResource(R.string.models_back))
+        }
         Heading(stringResource(R.string.models_title), MaterialTheme.typography.headlineSmall)
         Text(
             stringResource(
@@ -60,7 +62,9 @@ internal fun ModelsScreen(
             ),
             style = MaterialTheme.typography.bodyMedium
         )
-        Button(onClick = onSettings, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text(stringResource(R.string.dictation_settings_open)) }
+        Button(onClick = onSettings, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+            Text(stringResource(R.string.dictation_settings_open))
+        }
         if (state.usesNetwork) {
             LabeledSwitch(stringResource(R.string.model_wifi_only), state.wifiOnly, onWifiOnly)
             Text(
@@ -69,7 +73,9 @@ internal fun ModelsScreen(
             )
         }
         state.rows.forEach { row -> ModelCard(row, state.wifiOnly, state.usesNetwork, controller) }
-        OutlinedButton(onClick = onImport, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text(stringResource(R.string.model_action_import)) }
+        OutlinedButton(onClick = onImport, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+            Text(stringResource(R.string.model_action_import))
+        }
         ImportMessage(state.import, controller)
     }
 }
@@ -124,7 +130,9 @@ private fun Actions(
     val busy = row.download is DownloadState.Queued || row.download is DownloadState.Downloading ||
         row.download is DownloadState.Verifying
     when {
-        busy -> OutlinedButton(onClick = { controller.cancel(row.id) }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+        busy -> OutlinedButton(onClick = {
+            controller.cancel(row.id)
+        }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
             Text(stringResource(R.string.model_action_cancel))
         }
 
@@ -135,12 +143,16 @@ private fun Actions(
                     modifier = Modifier.heightIn(min = MinTouchTarget)
                 ) { Text(stringResource(R.string.model_action_use)) }
             }
-            OutlinedButton(onClick = { controller.delete(row.id) }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+            OutlinedButton(onClick = {
+                controller.delete(row.id)
+            }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
                 Text(stringResource(R.string.model_action_delete))
             }
         }
 
-        row.canProvide -> Button(onClick = { controller.download(row.id, wifiOnly) }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+        row.canProvide -> Button(onClick = {
+            controller.download(row.id, wifiOnly)
+        }, modifier = Modifier.heightIn(min = MinTouchTarget)) {
             val label = when {
                 row.download is DownloadState.Failed -> R.string.model_action_retry
                 usesNetwork -> R.string.model_action_download
@@ -224,12 +236,18 @@ private fun ImportMessage(import: ImportUiState, controller: ModelsController) {
                 )
             },
             confirmButton = {
-                TextButton(onClick = controller::confirmImport, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+                TextButton(
+                    onClick = controller::confirmImport,
+                    modifier = Modifier.heightIn(min = MinTouchTarget)
+                ) {
                     Text(stringResource(R.string.model_unknown_confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = controller::dismissImport, modifier = Modifier.heightIn(min = MinTouchTarget)) {
+                TextButton(
+                    onClick = controller::dismissImport,
+                    modifier = Modifier.heightIn(min = MinTouchTarget)
+                ) {
                     Text(stringResource(R.string.model_action_cancel))
                 }
             }
@@ -247,7 +265,12 @@ private fun ImportMessage(import: ImportUiState, controller: ModelsController) {
 private fun Message(text: Int, controller: ModelsController) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(text), Modifier.weight(1f))
-        TextButton(onClick = controller::dismissImport, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text("OK") }
+        TextButton(
+            onClick = controller::dismissImport,
+            modifier = Modifier.heightIn(min = MinTouchTarget)
+        ) {
+            Text("OK")
+        }
     }
 }
 
