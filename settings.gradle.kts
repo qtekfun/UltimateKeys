@@ -26,6 +26,7 @@ include(
     ":app",
     ":core",
     ":ime",
+    ":gesture",
     ":layouts",
     ":style",
     ":screenshots",
