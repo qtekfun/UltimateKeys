@@ -1,0 +1,1 @@
+Modelos de voz: la versión full incluye el modelo Base y dicta sin conexión desde el primer arranque; la lite descarga Base o Small (reanudable, solo con Wi-Fi si quieres) y se pueden importar modelos desde un archivo. El micrófono pasa al margen bajo las teclas. Compatibilidad con lectores de pantalla, pantalla de licencias y la versión en la pantalla principal.

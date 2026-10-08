@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-08
+
 ### Changed
 
 - The dictation microphone now sits in the margin under the keys, at the right (the margin is at least 40 dp tall when it is shown), instead of replacing the period key. Styles can still put it in the suggestion bar or in the bottom row.
@@ -85,7 +87,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.4.0...v0.5.0
