@@ -183,10 +183,6 @@ internal object JniNativeBridge : NativeBridge {
             NativeEngine.flushNative(dictionary, path)
         }
 
-    override fun compactIfNeeded(dictionary: Long, path: String): Boolean =
-        !NativeEngine.needsToRunGCNative(dictionary, true) ||
-            NativeEngine.flushWithGCNative(dictionary, path)
-
     override fun normalizedScore(typed: String, candidate: String, score: Int): Float =
         NativeEngine.calcNormalizedScoreNative(
             typed.codePoints().toArray(),

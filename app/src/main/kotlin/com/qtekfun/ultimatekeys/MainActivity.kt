@@ -149,6 +149,11 @@ private fun SettingsSection(
             KeyboardSettings.HEIGHT_RANGE
         ) { v -> update { it.copy(heightPercent = v) } }
         SliderSetting(
+            R.string.setting_bottom_margin,
+            settings.bottomMarginDp,
+            KeyboardSettings.BOTTOM_MARGIN_RANGE
+        ) { v -> update { it.copy(bottomMarginDp = v) } }
+        SliderSetting(
             R.string.setting_long_press,
             settings.longPressDelayMs,
             KeyboardSettings.LONG_PRESS_RANGE

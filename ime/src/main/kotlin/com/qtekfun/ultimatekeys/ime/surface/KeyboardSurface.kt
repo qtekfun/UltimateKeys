@@ -4,9 +4,12 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -77,15 +80,29 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     DisposableEffect(layout) { onDispose { gestures.cancelAll() } }
 
     val renderer = remember { SurfaceRenderer() }
-    Canvas(
+    // The system bar area below the keys carries the keyboard's own background, like a margin.
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(SurfaceSpec.totalHeightDp(layout.rows.size, settings.heightPercent).dp)
-            .onSizeChanged { widthPx = it.width.toFloat() }
-            .semantics { contentDescription = description }
-            .pointerInput(gestures) { trackPointers(gestures) }
+            .background(style.background)
+            .navigationBarsPadding()
     ) {
-        renderer.draw(this, geometry, state, presses, style, labels, dimens, strip.slots)
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(
+                    SurfaceSpec.totalHeightDp(
+                        layout.rows.size,
+                        settings.heightPercent,
+                        settings.bottomMarginDp
+                    ).dp
+                )
+                .onSizeChanged { widthPx = it.width.toFloat() }
+                .semantics { contentDescription = description }
+                .pointerInput(gestures) { trackPointers(gestures) }
+        ) {
+            renderer.draw(this, geometry, state, presses, style, labels, dimens, strip.slots)
+        }
     }
 }
 

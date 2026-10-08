@@ -114,8 +114,6 @@ internal class FakeNativeBridge : NativeBridge {
     override fun words(dictionary: Long): List<String> =
         dictionaries.getValue(dictionary).probabilities.keys.toList()
 
-    override fun compactIfNeeded(dictionary: Long, path: String): Boolean = true
-
     override fun flush(dictionary: Long, path: String): Boolean {
         dictionaries.getValue(dictionary).flushes++
         return true

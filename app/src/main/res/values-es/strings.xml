@@ -13,6 +13,7 @@
     <string name="try_it_here">Pruébalo aquí</string>
     <string name="settings_title">Ajustes</string>
     <string name="setting_height">Altura del teclado (%)</string>
+    <string name="setting_bottom_margin">Margen inferior (dp)</string>
     <string name="setting_long_press">Retardo de pulsación larga (ms)</string>
     <string name="setting_haptics">Vibración al pulsar</string>
     <string name="setting_sound">Volumen del sonido de teclas</string>

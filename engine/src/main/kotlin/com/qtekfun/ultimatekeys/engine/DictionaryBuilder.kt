@@ -56,8 +56,7 @@ class DictionaryBuilder internal constructor(
             return false
         }
         val ok = try {
-            addAll(handle, directory.absolutePath, words) &&
-                bridge.flush(handle, directory.absolutePath)
+            addAll(handle, words) && bridge.flush(handle, directory.absolutePath)
         } finally {
             bridge.closeDictionary(handle)
         }
@@ -68,7 +67,7 @@ class DictionaryBuilder internal constructor(
         return ok
     }
 
-    private fun addAll(handle: Long, path: String, words: Sequence<WordFrequency>): Boolean {
+    private fun addAll(handle: Long, words: Sequence<WordFrequency>): Boolean {
         val now = (System.currentTimeMillis() / MILLIS_PER_SECOND).toInt()
         var added = 0
         for (entry in words) {
@@ -82,12 +81,6 @@ class DictionaryBuilder internal constructor(
                 )
             ) {
                 added++
-                // The write buffer is small: compact it often or the native side overruns it.
-                if (added % COMPACT_EVERY == 0 &&
-                    !bridge.compactIfNeeded(handle, path)
-                ) {
-                    return false
-                }
             }
         }
         return added > 0
@@ -95,7 +88,6 @@ class DictionaryBuilder internal constructor(
 
     private companion object {
         const val MAX_FREQUENCY = 255
-        const val COMPACT_EVERY = 256
         const val PROGRESS_EVERY = 2000
         const val MILLIS_PER_SECOND = 1000L
     }

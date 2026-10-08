@@ -16,8 +16,8 @@ object SurfaceSpec {
 
     fun rowDp(heightPercent: Int): Float = BASE_ROW_DP * heightPercent / PERCENT
 
-    fun totalHeightDp(rows: Int, heightPercent: Int): Float =
-        STRIP_DP + rowDp(heightPercent) * rows + BOTTOM_PADDING_DP
+    fun totalHeightDp(rows: Int, heightPercent: Int, bottomMarginDp: Int = 0): Float =
+        STRIP_DP + rowDp(heightPercent) * rows + BOTTOM_PADDING_DP + bottomMarginDp
 
     fun geometry(layout: KeyboardLayout, widthPx: Float, density: Float, heightPercent: Int) =
         KeyGeometry(

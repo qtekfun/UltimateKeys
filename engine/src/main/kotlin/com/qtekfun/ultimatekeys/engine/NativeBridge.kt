@@ -87,12 +87,6 @@ internal interface NativeBridge {
     /** Writes an updatable dictionary to the directory [path], compacting it when needed. */
     fun flush(dictionary: Long, path: String): Boolean
 
-    /**
-     * Garbage-collects the updatable dictionary into the directory [path] when its write buffer is nearly full.
-     * Must be called regularly while adding many words. Returns false when a needed collection failed.
-     */
-    fun compactIfNeeded(dictionary: Long, path: String): Boolean
-
     /** The engine's own 0..1 confidence that [candidate] is what the user meant by [typed]. */
     fun normalizedScore(typed: String, candidate: String, score: Int): Float
 
