@@ -1,9 +1,32 @@
-UltimateKeys es un teclado moderno que funciona totalmente sin conexión.
+UltimateKeys es un teclado moderno que funciona totalmente sin conexión. No hay analíticas, ni anuncios, ni nube, y puedes dejarlo exactamente como quieras.
 
-Desarrollo temprano: esta versión todavía no sirve para escribir.
+<b>Hazlo tuyo</b>
+• Siete estilos originales incluidos (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), cada uno con variante clara y oscura.
+• Un editor de estilos con vista previa en directo: forma de las teclas, separación, bordes, sombras, fuentes, colores, degradados, globos, barra de sugerencias, fila inferior y paneles son ajustes.
+• Colores Material You y un aviso cuando un texto sería difícil de leer.
+• Exporta, importa y comparte tus estilos como archivos .ukstyle.
 
-Objetivos:
-• Aspecto totalmente configurable: cada detalle visual es un ajuste.
-• Español e inglés sin cambiar de teclado.
-• Modo privado, sin telemetría y sin nube.
-• Dictado por voz sin conexión.
+<b>Escribe rápido, en dos idiomas</b>
+• Teclados en español e inglés (con ñ), símbolos, números y fila de números opcional.
+• Sugerencias, autocorrección y predicción de la palabra siguiente que mezclan español e inglés sin cambiar de teclado.
+• Escritura por gestos: desliza el dedo sobre las letras y aparece la palabra.
+• Acentos y alternativas con pulsación larga, bloqueo de mayúsculas, control del cursor en la barra espaciadora y selección arrastrando sobre borrar.
+• Tu propio diccionario, con importación y exportación.
+
+<b>Privado por diseño</b>
+• El modo privado se activa solo en pestañas de incógnito y campos de contraseña, o a mano. Mientras está activo no se aprende nada y nada pasa al historial del portapapeles.
+• Sin analíticas, sin informes de fallos, sin anuncios, sin cuentas, sin nube.
+• La versión "full" ni siquiera declara el permiso de Internet. La versión "lite" usa la red solo para descargar un modelo de voz cuando tú lo pides.
+• Borra todo lo que el teclado ha aprendido con un toque.
+
+<b>Portapapeles y emoji</b>
+• Historial del portapapeles bajo tu control: consérvalo una hora, un día, una semana o para siempre, fija lo que necesites y borra el resto. Lo que las aplicaciones marcan como sensible no se guarda nunca.
+• Emoji por categorías, recientes, tonos de piel y búsqueda por nombre en español e inglés, todo sin conexión.
+
+<b>Dictado sin conexión</b>
+• Toca el micrófono y habla: el texto se reconoce en tu teléfono con Whisper (whisper.cpp), en español o inglés.
+• El audio se queda en memoria y nunca se guarda en disco ni se envía a ningún sitio.
+• Elige el modelo que mejor va con tu teléfono: uno pequeño y rápido, o uno mayor y más preciso.
+
+<b>Software libre</b>
+UltimateKeys se distribuye bajo la GPL-3.0-or-later. Se apoya en el motor de sugerencias y las listas de palabras del Android Open Source Project (Apache-2.0) y en whisper.cpp (MIT). Los créditos y licencias están en la aplicación y en el repositorio del código fuente.
