@@ -33,8 +33,10 @@ All edits are marked with the text "UltimateKeys" or are the replacement of a cl
 | `native/jni/com_android_inputmethod_keyboard_ProximityInfo.cpp` | Registration class path now `kNativeEngineClassName`. | Class adaptation. |
 | `native/jni/com_android_inputmethod_latin_DicTraverseSession.cpp` | Registration class path now `kNativeEngineClassName`. | Class adaptation. |
 | `native/jni/com_android_inputmethod_latin_BinaryDictionaryUtils.cpp` | Registration class path now `kNativeEngineClassName`. | Class adaptation. |
+| `native/jni/src/dictionary/structure/v4/ver4_dict_constants.cpp` | `MAX_DICTIONARY_SIZE` 8 MB to 32 MB, `MAX_DICT_EXTENDED_REGION_SIZE` 1 MB to 8 MB. | The limits were sized for small user-history dictionaries. Building a main dictionary of ~160,000 words fails at ~39,700 words with them (ADR 0008). |
+| `native/jni/src/dictionary/utils/buffer_with_extendable_buffer.cpp` | `DEFAULT_MAX_ADDITIONAL_BUFFER_SIZE` 1 MB to 8 MB. | Same reason. |
 
-The remaining files under `native/jni/src/` are byte-identical to the pinned upstream commit.
+Apart from the two files above, the files under `native/jni/src/` are byte-identical to the pinned upstream commit.
 
 `jni_common.cpp` (the `JNI_OnLoad` entry point) is unchanged: it calls the four `register_*`
 functions above, which now all target `NativeEngine`. `RegisterNatives` fails if a table entry has

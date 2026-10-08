@@ -22,10 +22,10 @@ const char *const Ver4DictConstants::BODY_FILE_EXTENSION = ".body";
 const char *const Ver4DictConstants::HEADER_FILE_EXTENSION = ".header";
 
 // Version 4 dictionary size is implicitly limited to 8MB due to 3-byte offsets.
-const int Ver4DictConstants::MAX_DICTIONARY_SIZE = 8 * 1024 * 1024;
+const int Ver4DictConstants::MAX_DICTIONARY_SIZE = 32 * 1024 * 1024;
 // Extended region size, which is not GCed region size in dict file + additional buffer size, is
 // limited to 1MB to prevent from inefficient traversing.
-const int Ver4DictConstants::MAX_DICT_EXTENDED_REGION_SIZE = 1 * 1024 * 1024;
+const int Ver4DictConstants::MAX_DICT_EXTENDED_REGION_SIZE = 8 * 1024 * 1024;
 
 // NUM_OF_BUFFERS_FOR_SINGLE_DICT_CONTENT for Trie and TerminalAddressLookupTable.
 // NUM_OF_BUFFERS_FOR_LANGUAGE_MODEL_DICT_CONTENT for language model.

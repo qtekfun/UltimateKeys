@@ -179,10 +179,9 @@ class UltimateKeysService :
 
     private companion object {
         /**
-         * Off until the dictionaries are pre-built at build time (docs/adr/0008): building them on the
-         * device through the native updatable-dictionary API crashes (SIGSEGV), and a native crash
-         * would take the whole keyboard down.
+         * Kill switch for the native suggestion engine. A native crash would take the whole keyboard
+         * down, so keep the engine behind this flag (see docs/adr/0008).
          */
-        const val ENGINE_ENABLED = false
+        const val ENGINE_ENABLED = true
     }
 }
