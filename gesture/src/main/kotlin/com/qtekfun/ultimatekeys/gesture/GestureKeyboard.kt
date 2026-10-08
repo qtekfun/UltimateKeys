@@ -71,17 +71,20 @@ class GestureKeyboard(keys: List<GestureKey>) {
     /** Gives every letter without a key the position of its base letter's key, when the layout has that. */
     private fun addAliases() {
         for (index in 0 until GestureAlphabet.size) {
-            if (byIndex[index] != null) continue
-            var base = GestureAlphabet.fallbackIndex(index)
-            var steps = 0
-            while (base >= 0 && byIndex[base] == null && steps++ < MAX_FALLBACK_STEPS) {
-                base = GestureAlphabet.fallbackIndex(base)
-            }
-            val target = base.takeIf { it >= 0 && byIndex[it] != null } ?: continue
-            centerX[index] = centerX[target]
-            centerY[index] = centerY[target]
-            aliases[target] += index
+            if (byIndex[index] == null) aliasToBase(index)
         }
+    }
+
+    private fun aliasToBase(index: Int) {
+        var base = GestureAlphabet.fallbackIndex(index)
+        var steps = 0
+        while (base >= 0 && byIndex[base] == null && steps++ < MAX_FALLBACK_STEPS) {
+            base = GestureAlphabet.fallbackIndex(base)
+        }
+        if (base < 0 || byIndex[base] == null) return
+        centerX[index] = centerX[base]
+        centerY[index] = centerY[base]
+        aliases[base] += index
     }
 
     val isEmpty: Boolean get() = byIndex.all { it == null }

@@ -155,7 +155,8 @@ class UltimateKeysService :
             scope = scope,
             dispatcher = Dispatchers.IO.limitedParallelism(1),
             host = host,
-            mutableStatus = SharedLanguageStatus.flow
+            mutableStatus = SharedLanguageStatus.flow,
+            onError = { message, error -> Log.e("UltimateKeys", message, error) }
         ).also {
             languages = it
             it.start(settingsRepository().settings)

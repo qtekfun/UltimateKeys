@@ -68,7 +68,9 @@ class LanguageEngineManager(
     private val dispatcher: CoroutineDispatcher,
     private val host: LanguageHost,
     private val mutableStatus: MutableStateFlow<Map<String, LanguageStatus>> =
-        MutableStateFlow(emptyMap())
+        MutableStateFlow(emptyMap()),
+    /** Told about a failure that is otherwise absorbed (typing must go on without suggestions). */
+    private val onError: (String, Throwable) -> Unit = { _, _ -> }
 ) {
     private data class Wish(
         val enabled: List<String>,
@@ -151,6 +153,7 @@ class LanguageEngineManager(
         val ready = try {
             host.prepare(enabled)
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            onError("languages unavailable", e)
             emptySet()
         }
         prepared += ready
@@ -171,6 +174,7 @@ class LanguageEngineManager(
             usable.toSet()
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             // Gesture typing is optional: typing must keep working without it.
+            onError("gesture typing unavailable", e)
             emptySet()
         }
     }

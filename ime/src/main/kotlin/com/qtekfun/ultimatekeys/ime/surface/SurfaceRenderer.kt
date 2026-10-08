@@ -339,6 +339,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun drawActionKey(
         scope: DrawScope,
         placed: PlacedKey,

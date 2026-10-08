@@ -138,19 +138,20 @@ class LanguageLayoutsTest {
 
     @Test
     fun `every character of a language is reachable on its layouts`() {
-        LanguageCatalog.all.forEach { language ->
-            language.layoutIds.forEach { id ->
-                val reachable = charKeys(id).flatMap { listOf(it.output) + it.alternatives }.toSet()
-                val needed = required.getValue(language.tag)
-                needed.forEach { c ->
-                    // Only the default layout has to type every special character; variants need the base alphabet.
-                    if (id == language.defaultLayoutId || c.code < 128) {
-                        assertTrue(c.toString() in reachable, "${language.tag}/$id lacks '$c'")
-                    }
+        for (language in LanguageCatalog.all) {
+            for (id in language.layoutIds) {
+                // Only the default layout has to type every special character; variants need the base alphabet.
+                val needed = required.getValue(language.tag).filter {
+                    id == language.defaultLayoutId || it.code < ASCII
                 }
+                val lacking = needed.filter { it.toString() !in reachable(id) }
+                assertTrue(lacking.isEmpty(), "${language.tag}/$id lacks '$lacking'")
             }
         }
     }
+
+    private fun reachable(id: String): Set<String> =
+        charKeys(id).flatMap { listOf(it.output) + it.alternatives }.toSet()
 
     @Test
     fun `the number row variant works for every layout`() {
@@ -195,5 +196,9 @@ class LanguageLayoutsTest {
         val tr = java.util.Locale.forLanguageTag("tr")
         assertEquals("İ", "i".uppercase(tr))
         assertEquals("I", "ı".uppercase(tr))
+    }
+
+    private companion object {
+        const val ASCII = 128
     }
 }

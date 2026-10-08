@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.logic.Page
+import com.qtekfun.ultimatekeys.languages.Script
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.style.MotionStyle
 import com.qtekfun.ultimatekeys.style.PanelTransition
@@ -95,8 +96,11 @@ private fun EmojiHost(controller: KeyboardController, theme: PanelTheme) {
     val query by panels.query.collectAsState()
     val results by panels.results.collectAsState()
     val settings by controller.settings.collectAsState()
+    // Emoji are searched by English and Spanish names: a Cyrillic or Greek layout types them on a Latin one.
     val rows = remember(settings.letterLayoutId) {
-        PanelLetters.rows(controller.layoutFor(Page.LETTERS, settings))
+        val latin = settings.activeLanguage.script == Script.LATIN
+        val searchSettings = if (latin) settings else settings.copy(letterLayoutId = "en_qwerty")
+        PanelLetters.rows(controller.layoutFor(Page.LETTERS, searchSettings))
     }
     val actions = remember(controller) {
         EmojiActions(
