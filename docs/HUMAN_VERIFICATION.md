@@ -78,6 +78,15 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Both screens in light and dark, large font size and a narrow screen: nothing is cut off; Spanish and English texts read well.
 - [ ] Check the merged APKs once with `aapt2 dump permissions`: `full` has no INTERNET or ACCESS_NETWORK_STATE; `lite` has INTERNET.
 
+## Settings redesign (app screens)
+
+- [ ] On Android 15 or later: open every app screen (home, each sub-screen, styles gallery and editor, dictation settings and models, my dictionary, licenses). No title or button sits under the status bar and the last row is not under the gesture bar; rotate to landscape on a phone with a camera cutout.
+- [ ] Type in a text field of a screen (Setup "Try it here", my dictionary, a style name or a color code): the field stays visible above the keyboard.
+- [ ] Switch the phone between light and dark, and change the wallpaper colors: the screens follow, text stays readable and the selected segment of a choice is easy to see.
+- [ ] TalkBack: the home rows read as "Typing, button" with their state ("Suggestions, On"); a switch row reads once with its state; a slider row reads its label and value ("Keyboard height, 100%") and adjusts with swipe up and down; headings can be jumped to.
+- [ ] Largest font size: no row is cut off; segmented choices wrap their labels; Spanish texts read well.
+- [ ] Back: the system back and the bar's back button return one screen at a time (sub-screen, then home, then leave); in the style editor, back from a group returns to the overview and from the overview leaves the editor.
+
 ## Phase 9 — Acceptance criteria of SPEC.md section 14 (see `docs/ACCEPTANCE.md`)
 
 - [ ] Airplane mode: with the `full` APK and airplane mode on, dictate a sentence in Spanish and one in English; both are inserted.

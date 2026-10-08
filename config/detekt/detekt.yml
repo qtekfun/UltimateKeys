@@ -65,3 +65,5 @@ style:
       - '**/style/Style.kt'
       - '**/style/Presets.kt'
       - '**/surface/KeyboardSurface.kt'
+      # Glyph geometry is a set of coordinates on a 24-unit grid.
+      - '**/ui/UkGlyph.kt'

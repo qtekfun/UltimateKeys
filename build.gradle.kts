@@ -26,7 +26,13 @@ kover {
                     "com.qtekfun.ultimatekeys.ImeStatus*",
                     // Compose screens of the app; the data they show is tested (LicenseCatalog).
                     "com.qtekfun.ultimatekeys.LicensesActivity*",
-                    "com.qtekfun.ultimatekeys.AccessibleControlsKt*",
+                    "com.qtekfun.ultimatekeys.UserDictionaryActivity*",
+                    // The design system and the app's settings screens: Compose glue, covered by the
+                    // Robolectric layout and screenshot tests; their logic is in tested classes.
+                    "com.qtekfun.ultimatekeys.ui.*Kt*",
+                    "com.qtekfun.ultimatekeys.ui.Uk*",
+                    "com.qtekfun.ultimatekeys.ui.ScreenInsets*",
+                    "com.qtekfun.ultimatekeys.settings.*Kt*",
                     "com.qtekfun.ultimatekeys.ime.surface.KeyboardAccessibilityLayerKt*",
                     "com.qtekfun.ultimatekeys.ime.UltimateKeysService*",
                     "com.qtekfun.ultimatekeys.ime.AndroidEditorConnection",

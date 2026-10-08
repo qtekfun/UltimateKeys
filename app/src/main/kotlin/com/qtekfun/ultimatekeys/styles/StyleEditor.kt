@@ -1,26 +1,21 @@
 // SPDX-FileCopyrightText: 2026 UltimateKeys contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+@file:Suppress("TooManyFunctions")
+
 package com.qtekfun.ultimatekeys.styles
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,9 +27,16 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview
+import com.qtekfun.ultimatekeys.ime.surface.PreviewContent
+import com.qtekfun.ultimatekeys.settings.ValueFormat
+import com.qtekfun.ultimatekeys.settings.choiceOf
+import com.qtekfun.ultimatekeys.settings.floatSlider
+import com.qtekfun.ultimatekeys.settings.intSlider
+import com.qtekfun.ultimatekeys.settings.opt
+import com.qtekfun.ultimatekeys.settings.rememberRouteStack
+import com.qtekfun.ultimatekeys.settings.toggle
 import com.qtekfun.ultimatekeys.style.Appearance
 import com.qtekfun.ultimatekeys.style.ArgbColor
 import com.qtekfun.ultimatekeys.style.BackgroundKind
@@ -47,7 +49,9 @@ import com.qtekfun.ultimatekeys.style.KeyShape
 import com.qtekfun.ultimatekeys.style.LabelStyle
 import com.qtekfun.ultimatekeys.style.LetterCase
 import com.qtekfun.ultimatekeys.style.MicPlacement
+import com.qtekfun.ultimatekeys.style.MotionStyle
 import com.qtekfun.ultimatekeys.style.Palette
+import com.qtekfun.ultimatekeys.style.PanelStyle
 import com.qtekfun.ultimatekeys.style.PanelTransition
 import com.qtekfun.ultimatekeys.style.PopupKind
 import com.qtekfun.ultimatekeys.style.PressAnimation
@@ -55,358 +59,475 @@ import com.qtekfun.ultimatekeys.style.ShadowKind
 import com.qtekfun.ultimatekeys.style.Style
 import com.qtekfun.ultimatekeys.style.SuggestionBarStyle
 import com.qtekfun.ultimatekeys.style.ToolIcons
+import com.qtekfun.ultimatekeys.ui.ScreenInsets
+import com.qtekfun.ultimatekeys.ui.UkActionRow
+import com.qtekfun.ultimatekeys.ui.UkBarButton
+import com.qtekfun.ultimatekeys.ui.UkGroupScope
+import com.qtekfun.ultimatekeys.ui.UkNavRow
+import com.qtekfun.ultimatekeys.ui.UkOption
+import com.qtekfun.ultimatekeys.ui.UkScreen
+import com.qtekfun.ultimatekeys.ui.UkSegmented
+import com.qtekfun.ultimatekeys.ui.UkSpacing
+import com.qtekfun.ultimatekeys.ui.UkTextField
+import com.qtekfun.ultimatekeys.ui.UkTheme
+import com.qtekfun.ultimatekeys.ui.group
+
+private val LOOK_SECTIONS = listOf(
+    EditorSection.Appearance,
+    EditorSection.Keys,
+    EditorSection.Labels,
+    EditorSection.Background,
+    EditorSection.Feedback,
+    EditorSection.SuggestionBar,
+    EditorSection.BottomRow,
+    EditorSection.Panels,
+    EditorSection.Motion
+)
+
+private val COLOR_SECTIONS = listOf(EditorSection.ColorsLight, EditorSection.ColorsDark)
+
+/** Keeps the preview a keyboard-like strip, short enough to leave room for the controls. */
+private const val EDITOR_PREVIEW_PERCENT = 70
 
 /**
- * Edits [initial] with a live preview on top. [onSave] gets the edited style; the editor never
+ * Edits [initial] with the live preview pinned under the bar, so every change shows at once
+ * whichever group is open. The overview lists the groups; each opens as a screen of its own and
+ * back returns to the overview, then leaves. [onSave] gets the edited style; the editor never
  * writes anything itself, so cancelling is just leaving.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StyleEditor(
     initial: Style,
     onSave: (Style) -> Unit,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    insets: ScreenInsets = ScreenInsets.current(),
+    startAt: EditorSection = EditorSection.Overview
 ) {
     var draft by remember(initial) { mutableStateOf(initial) }
     var previewDark by rememberSaveable { mutableStateOf(false) }
+    var stack by rememberRouteStack(
+        EditorSection.Overview,
+        EditorSection.entries,
+        listOf(EditorSection.Overview, startAt).distinct()
+    )
+    BackHandler(enabled = stack.canGoBack) { stack = stack.back() }
+    val section = stack.current
     val warnings = remember(draft) { ContrastCheck.warnings(draft) }
+    val back = stringResource(R.string.nav_back)
 
-    Column(modifier.fillMaxSize()) {
-        val previewLabel = stringResource(R.string.style_preview, draft.name)
-        Box(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
-            KeyboardPreview(draft, previewDark)
+    UkScreen(
+        title = stringResource(section.title),
+        modifier = modifier,
+        insets = insets,
+        onBack = { if (stack.canGoBack) stack = stack.back() else onBack() },
+        backText = back,
+        backDescription = back,
+        actions = {
+            UkBarButton(stringResource(R.string.style_save), onClick = {
+                onSave(draft.sanitized())
+            })
+        },
+        pinned = { EditorPreview(draft, previewDark) { previewDark = it } },
+        listState = key(section) { rememberLazyListState() },
+        largeTitle = false
+    ) {
+        if (section == EditorSection.Overview) {
+            overview(
+                draft = draft,
+                initial = initial,
+                warn = warnings.isNotEmpty(),
+                onName = { draft = draft.copy(name = it.take(Style.MAX_NAME)) },
+                onOpen = { stack = stack.open(it) },
+                onReset = { draft = initial }
+            )
+        } else {
+            sectionContent(section, draft) { draft = it }
         }
-        FlowRow(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            FilterChip(
-                selected = !previewDark,
-                onClick = { previewDark = false },
-                label = { Text(stringResource(R.string.style_preview_light)) }
-            )
-            FilterChip(
-                selected = previewDark,
-                onClick = { previewDark = true },
-                label = { Text(stringResource(R.string.style_preview_dark)) }
-            )
-        }
-        Column(
-            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedTextField(
-                value = draft.name,
-                onValueChange = { draft = draft.copy(name = it.take(Style.MAX_NAME)) },
-                label = { Text(stringResource(R.string.style_name)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (warnings.isNotEmpty()) {
-                Text(
-                    stringResource(R.string.style_contrast_warning),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+    }
+}
+
+@Composable
+private fun EditorPreview(style: Style, dark: Boolean, onDark: (Boolean) -> Unit) {
+    val previewLabel = stringResource(R.string.style_preview, style.name)
+    val options = listOf(
+        UkOption(false, stringResource(R.string.style_preview_light)),
+        UkOption(true, stringResource(R.string.style_preview_dark))
+    )
+    Box(Modifier.fillMaxWidth()) {
+        androidx.compose.foundation.layout.Column {
+            Box(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
+                KeyboardPreview(
+                    style,
+                    dark,
+                    content = PreviewContent(heightPercent = EDITOR_PREVIEW_PERCENT)
                 )
             }
-            AppearanceControls(draft) { draft = it }
-            KeyControls(draft) { draft = it }
-            LabelControls(draft) { draft = it }
-            BackgroundControls(draft) { draft = it }
-            FeedbackControls(draft) { draft = it }
-            BarControls(draft) { draft = it }
-            BottomRowControls(draft) { draft = it }
-            PanelAndMotionControls(draft) { draft = it }
-            PaletteControls(R.string.group_colors_light, draft.light) {
-                draft =
-                    draft.copy(light = it)
-            }
-            PaletteControls(R.string.group_colors_dark, draft.dark) {
-                draft = draft.copy(dark = it)
-            }
-        }
-        FlowRow(
-            Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            OutlinedButton(onClick = onBack) { Text(stringResource(R.string.style_back)) }
-            OutlinedButton(onClick = { draft = initial }, enabled = draft != initial) {
-                Text(stringResource(R.string.style_reset))
-            }
-            Button(onClick = { onSave(draft.sanitized()) }) {
-                Text(stringResource(R.string.style_save))
-            }
+            UkSegmented(
+                options,
+                dark,
+                onDark,
+                Modifier.padding(horizontal = UkSpacing.md, vertical = UkSpacing.sm)
+            )
         }
     }
 }
 
-@Composable
-private fun AppearanceControls(style: Style, onChange: (Style) -> Unit) {
-    StyleSection(R.string.style_appearance, initiallyOpen = true) {
-        ChoiceRow(
-            R.string.style_appearance,
-            listOf(
-                Choice(Appearance.FOLLOW_SYSTEM, stringResource(R.string.appearance_system)),
-                Choice(Appearance.LIGHT, stringResource(R.string.appearance_light)),
-                Choice(Appearance.DARK, stringResource(R.string.appearance_dark))
-            ),
-            style.appearance
-        ) { onChange(style.copy(appearance = it)) }
-        SwitchRow(R.string.style_dynamic_colors, style.dynamicColors) {
-            onChange(style.copy(dynamicColors = it))
+@Suppress("LongParameterList")
+private fun LazyListScope.overview(
+    draft: Style,
+    initial: Style,
+    warn: Boolean,
+    onName: (String) -> Unit,
+    onOpen: (EditorSection) -> Unit,
+    onReset: () -> Unit
+) {
+    group(key = "name") {
+        row {
+            UkTextField(
+                value = draft.name,
+                onValueChange = onName,
+                label = stringResource(R.string.style_name),
+                singleLine = true
+            )
+        }
+    }
+    if (warn) {
+        item(key = "contrast") {
+            Text(
+                stringResource(R.string.style_contrast_warning),
+                modifier = Modifier
+                    .padding(horizontal = UkSpacing.lg, vertical = UkSpacing.sm)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
+                style = UkTheme.typography.footnote,
+                color = UkTheme.colors.destructive
+            )
+        }
+    }
+    group(key = "look", header = null) { sectionRows(LOOK_SECTIONS, onOpen) }
+    group(key = "colors", header = null) { sectionRows(COLOR_SECTIONS, onOpen) }
+    group(key = "reset") {
+        row {
+            UkActionRow(
+                stringResource(R.string.style_reset),
+                onClick = onReset,
+                destructive = true,
+                enabled = draft != initial
+            )
         }
     }
 }
 
-@Composable
-private fun KeyControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.sectionRows(
+    sections: List<EditorSection>,
+    onOpen: (EditorSection) -> Unit
+) {
+    sections.forEach { section ->
+        row { UkNavRow(stringResource(section.title), onClick = { onOpen(section) }) }
+    }
+}
+
+private fun LazyListScope.sectionContent(
+    section: EditorSection,
+    style: Style,
+    onChange: (Style) -> Unit
+) {
+    when (section) {
+        EditorSection.Overview -> Unit
+
+        EditorSection.Appearance -> group { appearanceRows(style, onChange) }
+
+        EditorSection.Keys -> group { keyRows(style, onChange) }
+
+        EditorSection.Labels -> group { labelRows(style, onChange) }
+
+        EditorSection.Background -> group { backgroundRows(style, onChange) }
+
+        EditorSection.Feedback -> group { feedbackRows(style, onChange) }
+
+        EditorSection.SuggestionBar -> group { barRows(style, onChange) }
+
+        EditorSection.BottomRow -> group { bottomRowRows(style, onChange) }
+
+        EditorSection.Panels -> group { panelRows(style, onChange) }
+
+        EditorSection.Motion -> group { motionRows(style, onChange) }
+
+        EditorSection.ColorsLight -> group {
+            paletteRows(style.light) { onChange(style.copy(light = it)) }
+        }
+
+        EditorSection.ColorsDark -> group {
+            paletteRows(style.dark) { onChange(style.copy(dark = it)) }
+        }
+    }
+}
+
+private fun UkGroupScope.appearanceRows(style: Style, onChange: (Style) -> Unit) {
+    choiceOf(R.string.style_appearance, style.appearance, {
+        onChange(style.copy(appearance = it))
+    }) {
+        listOf(
+            opt(Appearance.FOLLOW_SYSTEM, R.string.appearance_system),
+            opt(Appearance.LIGHT, R.string.appearance_light),
+            opt(Appearance.DARK, R.string.appearance_dark)
+        )
+    }
+    toggle(R.string.style_dynamic_colors, style.dynamicColors) {
+        onChange(style.copy(dynamicColors = it))
+    }
+}
+
+@Suppress("LongMethod")
+private fun UkGroupScope.keyRows(style: Style, onChange: (Style) -> Unit) {
     val k = style.keys
     fun set(keys: KeyShape) = onChange(style.copy(keys = keys))
-    StyleSection(R.string.group_keys) {
-        FloatSliderRow(R.string.ctl_corner, k.cornerRadiusDp, KeyShape.CORNER_RANGE) {
-            set(k.copy(cornerRadiusDp = it))
-        }
-        FloatSliderRow(R.string.ctl_gap_x, k.gapXDp, KeyShape.GAP_RANGE) {
-            set(k.copy(gapXDp = it))
-        }
-        FloatSliderRow(R.string.ctl_gap_y, k.gapYDp, KeyShape.GAP_RANGE) {
-            set(k.copy(gapYDp = it))
-        }
-        IntSliderRow(
-            R.string.ctl_row_letter,
-            k.letterRowHeightPercent,
-            KeyShape.ROW_PERCENT_RANGE
+    floatSlider(R.string.ctl_corner, k.cornerRadiusDp, KeyShape.CORNER_RANGE, ValueFormat::dp) {
+        set(k.copy(cornerRadiusDp = it))
+    }
+    floatSlider(R.string.ctl_gap_x, k.gapXDp, KeyShape.GAP_RANGE, ValueFormat::dp) {
+        set(k.copy(gapXDp = it))
+    }
+    floatSlider(R.string.ctl_gap_y, k.gapYDp, KeyShape.GAP_RANGE, ValueFormat::dp) {
+        set(k.copy(gapYDp = it))
+    }
+    intSlider(
+        R.string.ctl_row_letter,
+        k.letterRowHeightPercent,
+        KeyShape.ROW_PERCENT_RANGE,
+        ValueFormat::percent
+    ) {
+        set(k.copy(letterRowHeightPercent = it))
+    }
+    intSlider(
+        R.string.ctl_row_number,
+        k.numberRowHeightPercent,
+        KeyShape.ROW_PERCENT_RANGE,
+        ValueFormat::percent
+    ) {
+        set(k.copy(numberRowHeightPercent = it))
+    }
+    intSlider(
+        R.string.ctl_row_bottom,
+        k.bottomRowHeightPercent,
+        KeyShape.ROW_PERCENT_RANGE,
+        ValueFormat::percent
+    ) {
+        set(k.copy(bottomRowHeightPercent = it))
+    }
+    toggle(R.string.ctl_border, k.border) { set(k.copy(border = it)) }
+    if (k.border) {
+        floatSlider(
+            R.string.ctl_border_width,
+            k.borderWidthDp,
+            KeyShape.BORDER_RANGE,
+            ValueFormat::dp
         ) {
-            set(k.copy(letterRowHeightPercent = it))
+            set(k.copy(borderWidthDp = it))
         }
-        IntSliderRow(
-            R.string.ctl_row_number,
-            k.numberRowHeightPercent,
-            KeyShape.ROW_PERCENT_RANGE
+    }
+    choiceOf(R.string.ctl_shadow, k.shadow, { set(k.copy(shadow = it)) }) {
+        listOf(
+            opt(ShadowKind.NONE, R.string.opt_shadow_none),
+            opt(ShadowKind.BOTTOM_EDGE, R.string.opt_shadow_bottom),
+            opt(ShadowKind.ELEVATION, R.string.opt_shadow_elevation)
+        )
+    }
+    if (k.shadow != ShadowKind.NONE) {
+        floatSlider(
+            R.string.ctl_elevation,
+            k.elevationDp,
+            KeyShape.ELEVATION_RANGE,
+            ValueFormat::dp
         ) {
-            set(k.copy(numberRowHeightPercent = it))
-        }
-        IntSliderRow(
-            R.string.ctl_row_bottom,
-            k.bottomRowHeightPercent,
-            KeyShape.ROW_PERCENT_RANGE
-        ) {
-            set(k.copy(bottomRowHeightPercent = it))
-        }
-        SwitchRow(R.string.ctl_border, k.border) { set(k.copy(border = it)) }
-        if (k.border) {
-            FloatSliderRow(R.string.ctl_border_width, k.borderWidthDp, KeyShape.BORDER_RANGE) {
-                set(k.copy(borderWidthDp = it))
-            }
-        }
-        ChoiceRow(
-            R.string.ctl_shadow,
-            listOf(
-                Choice(ShadowKind.NONE, stringResource(R.string.opt_shadow_none)),
-                Choice(ShadowKind.BOTTOM_EDGE, stringResource(R.string.opt_shadow_bottom)),
-                Choice(ShadowKind.ELEVATION, stringResource(R.string.opt_shadow_elevation))
-            ),
-            k.shadow
-        ) { set(k.copy(shadow = it)) }
-        if (k.shadow != ShadowKind.NONE) {
-            FloatSliderRow(R.string.ctl_elevation, k.elevationDp, KeyShape.ELEVATION_RANGE) {
-                set(k.copy(elevationDp = it))
-            }
+            set(k.copy(elevationDp = it))
         }
     }
 }
 
-@Composable
-private fun LabelControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.labelRows(style: Style, onChange: (Style) -> Unit) {
     val l = style.labels
     fun set(labels: LabelStyle) = onChange(style.copy(labels = labels))
-    StyleSection(R.string.group_labels) {
-        ChoiceRow(
-            R.string.ctl_font,
-            listOf(
-                Choice(FontChoice.SYSTEM, stringResource(R.string.opt_font_system)),
-                Choice(FontChoice.INTER, "Inter"),
-                Choice(FontChoice.ROBOTO_FLEX, "Roboto Flex"),
-                Choice(FontChoice.ATKINSON_HYPERLEGIBLE, "Atkinson Hyperlegible"),
-                Choice(FontChoice.NUNITO, "Nunito")
-            ),
-            l.font
-        ) { set(l.copy(font = it)) }
-        IntSliderRow(R.string.ctl_weight, l.weight, LabelStyle.WEIGHT_RANGE) {
-            set(l.copy(weight = it))
-        }
-        IntSliderRow(R.string.ctl_label_size, l.sizePercent, LabelStyle.SIZE_RANGE) {
-            set(l.copy(sizePercent = it))
-        }
-        ChoiceRow(
-            R.string.ctl_letter_case,
-            listOf(
-                Choice(LetterCase.FOLLOW_SHIFT, stringResource(R.string.opt_case_shift)),
-                Choice(LetterCase.ALWAYS_UPPER, stringResource(R.string.opt_case_upper))
-            ),
-            l.letterCase
-        ) { set(l.copy(letterCase = it)) }
-        SwitchRow(R.string.ctl_hints, l.showHints) { set(l.copy(showHints = it)) }
+    choiceOf(R.string.ctl_font, l.font, { set(l.copy(font = it)) }) {
+        listOf(
+            opt(FontChoice.SYSTEM, R.string.opt_font_system),
+            UkOption(FontChoice.INTER, "Inter"),
+            UkOption(FontChoice.ROBOTO_FLEX, "Roboto Flex"),
+            UkOption(FontChoice.ATKINSON_HYPERLEGIBLE, "Atkinson Hyperlegible"),
+            UkOption(FontChoice.NUNITO, "Nunito")
+        )
     }
+    intSlider(R.string.ctl_weight, l.weight, LabelStyle.WEIGHT_RANGE, Int::toString) {
+        set(l.copy(weight = it))
+    }
+    intSlider(R.string.ctl_label_size, l.sizePercent, LabelStyle.SIZE_RANGE, ValueFormat::percent) {
+        set(l.copy(sizePercent = it))
+    }
+    choiceOf(R.string.ctl_letter_case, l.letterCase, { set(l.copy(letterCase = it)) }) {
+        listOf(
+            opt(LetterCase.FOLLOW_SHIFT, R.string.opt_case_shift),
+            opt(LetterCase.ALWAYS_UPPER, R.string.opt_case_upper)
+        )
+    }
+    toggle(R.string.ctl_hints, l.showHints) { set(l.copy(showHints = it)) }
 }
 
-@Composable
-private fun BackgroundControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.backgroundRows(style: Style, onChange: (Style) -> Unit) {
     val b = style.background
     fun set(background: BackgroundStyle) = onChange(style.copy(background = background.sanitized()))
-    StyleSection(R.string.group_background) {
-        ChoiceRow(
-            R.string.ctl_bg_kind,
-            listOf(
-                Choice(BackgroundKind.SOLID, stringResource(R.string.opt_bg_solid)),
-                Choice(BackgroundKind.GRADIENT, stringResource(R.string.opt_bg_gradient))
-            ),
-            b.kind
-        ) { set(b.copy(kind = it)) }
-        ColorRow(R.string.ctl_bg_light, b.lightColors.first()) {
-            set(b.copy(lightColors = listOf(it) + b.lightColors.drop(1)))
+    choiceOf(R.string.ctl_bg_kind, b.kind, { set(b.copy(kind = it)) }) {
+        listOf(
+            opt(BackgroundKind.SOLID, R.string.opt_bg_solid),
+            opt(BackgroundKind.GRADIENT, R.string.opt_bg_gradient)
+        )
+    }
+    colorField(R.string.ctl_bg_light, b.lightColors.first()) {
+        set(b.copy(lightColors = listOf(it) + b.lightColors.drop(1)))
+    }
+    colorField(R.string.ctl_bg_dark, b.darkColors.first()) {
+        set(b.copy(darkColors = listOf(it) + b.darkColors.drop(1)))
+    }
+    if (b.kind == BackgroundKind.GRADIENT) {
+        colorField(R.string.ctl_bg_light_2, b.lightColors.getOrElse(1) { b.lightColors.last() }) {
+            set(b.copy(lightColors = listOf(b.lightColors.first(), it)))
         }
-        ColorRow(R.string.ctl_bg_dark, b.darkColors.first()) {
-            set(b.copy(darkColors = listOf(it) + b.darkColors.drop(1)))
+        colorField(R.string.ctl_bg_dark_2, b.darkColors.getOrElse(1) { b.darkColors.last() }) {
+            set(b.copy(darkColors = listOf(b.darkColors.first(), it)))
         }
-        if (b.kind == BackgroundKind.GRADIENT) {
-            ColorRow(R.string.ctl_bg_light_2, b.lightColors.getOrElse(1) { b.lightColors.last() }) {
-                set(b.copy(lightColors = listOf(b.lightColors.first(), it)))
-            }
-            ColorRow(R.string.ctl_bg_dark_2, b.darkColors.getOrElse(1) { b.darkColors.last() }) {
-                set(b.copy(darkColors = listOf(b.darkColors.first(), it)))
-            }
-            IntSliderRow(R.string.ctl_bg_angle, b.gradientAngleDegrees, 0..GRADIENT_MAX_ANGLE) {
-                set(b.copy(gradientAngleDegrees = it))
-            }
+        intSlider(
+            R.string.ctl_bg_angle,
+            b.gradientAngleDegrees,
+            0..GRADIENT_MAX_ANGLE,
+            ValueFormat::degrees
+        ) {
+            set(b.copy(gradientAngleDegrees = it))
         }
     }
 }
 
-@Composable
-private fun FeedbackControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.feedbackRows(style: Style, onChange: (Style) -> Unit) {
     val f = style.feedback
-    StyleSection(R.string.group_feedback) {
-        ChoiceRow(
-            R.string.ctl_popup,
-            listOf(
-                Choice(PopupKind.BUBBLE, stringResource(R.string.opt_popup_bubble)),
-                Choice(PopupKind.ENLARGED_KEY, stringResource(R.string.opt_popup_enlarged)),
-                Choice(PopupKind.NONE, stringResource(R.string.opt_popup_none))
-            ),
-            f.popup
-        ) { onChange(style.copy(feedback = f.copy(popup = it))) }
-        ChoiceRow(
-            R.string.ctl_press,
-            listOf(
-                Choice(PressAnimation.NONE, stringResource(R.string.opt_press_none)),
-                Choice(PressAnimation.SCALE, stringResource(R.string.opt_press_scale)),
-                Choice(PressAnimation.FADE, stringResource(R.string.opt_press_fade))
-            ),
-            f.pressAnimation
-        ) { onChange(style.copy(feedback = f.copy(pressAnimation = it))) }
+    choiceOf(R.string.ctl_popup, f.popup, { onChange(style.copy(feedback = f.copy(popup = it))) }) {
+        listOf(
+            opt(PopupKind.BUBBLE, R.string.opt_popup_bubble),
+            opt(PopupKind.ENLARGED_KEY, R.string.opt_popup_enlarged),
+            opt(PopupKind.NONE, R.string.opt_popup_none)
+        )
+    }
+    choiceOf(
+        R.string.ctl_press,
+        f.pressAnimation,
+        { onChange(style.copy(feedback = f.copy(pressAnimation = it))) }
+    ) {
+        listOf(
+            opt(PressAnimation.NONE, R.string.opt_press_none),
+            opt(PressAnimation.SCALE, R.string.opt_press_scale),
+            opt(PressAnimation.FADE, R.string.opt_press_fade)
+        )
     }
 }
 
-@Composable
-private fun BarControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.barRows(style: Style, onChange: (Style) -> Unit) {
     val s = style.suggestionBar
     fun set(bar: SuggestionBarStyle) = onChange(style.copy(suggestionBar = bar))
-    StyleSection(R.string.group_suggestions) {
-        ChoiceRow(
-            R.string.ctl_bar_layout,
-            listOf(
-                Choice(BarLayout.THREE_WITH_DIVIDERS, stringResource(R.string.opt_bar_three)),
-                Choice(BarLayout.SCROLLING_LIST, stringResource(R.string.opt_bar_list))
-            ),
-            s.layout
-        ) { set(s.copy(layout = it)) }
-        ChoiceRow(
-            R.string.ctl_tool_icons,
-            listOf(
-                Choice(ToolIcons.SHOWN, stringResource(R.string.opt_tools_shown)),
-                Choice(ToolIcons.COLLAPSED, stringResource(R.string.opt_tools_collapsed)),
-                Choice(ToolIcons.HIDDEN, stringResource(R.string.opt_tools_hidden))
-            ),
-            s.toolIcons
-        ) { set(s.copy(toolIcons = it)) }
-        IntSliderRow(R.string.ctl_bar_height, s.heightDp, SuggestionBarStyle.HEIGHT_RANGE) {
-            set(s.copy(heightDp = it))
-        }
-        IntSliderRow(R.string.ctl_bar_text_size, s.textSizePercent, LabelStyle.SIZE_RANGE) {
-            set(s.copy(textSizePercent = it))
-        }
-        IntSliderRow(R.string.ctl_bar_text_weight, s.textWeight, LabelStyle.WEIGHT_RANGE) {
-            set(s.copy(textWeight = it))
-        }
+    choiceOf(R.string.ctl_bar_layout, s.layout, { set(s.copy(layout = it)) }) {
+        listOf(
+            opt(BarLayout.THREE_WITH_DIVIDERS, R.string.opt_bar_three),
+            opt(BarLayout.SCROLLING_LIST, R.string.opt_bar_list)
+        )
+    }
+    choiceOf(R.string.ctl_tool_icons, s.toolIcons, { set(s.copy(toolIcons = it)) }) {
+        listOf(
+            opt(ToolIcons.SHOWN, R.string.opt_tools_shown),
+            opt(ToolIcons.COLLAPSED, R.string.opt_tools_collapsed),
+            opt(ToolIcons.HIDDEN, R.string.opt_tools_hidden)
+        )
+    }
+    intSlider(
+        R.string.ctl_bar_height,
+        s.heightDp,
+        SuggestionBarStyle.HEIGHT_RANGE,
+        ValueFormat::dp
+    ) {
+        set(s.copy(heightDp = it))
+    }
+    intSlider(
+        R.string.ctl_bar_text_size,
+        s.textSizePercent,
+        LabelStyle.SIZE_RANGE,
+        ValueFormat::percent
+    ) {
+        set(s.copy(textSizePercent = it))
+    }
+    intSlider(R.string.ctl_bar_text_weight, s.textWeight, LabelStyle.WEIGHT_RANGE, Int::toString) {
+        set(s.copy(textWeight = it))
     }
 }
 
-@Composable
-private fun BottomRowControls(style: Style, onChange: (Style) -> Unit) {
+private fun UkGroupScope.bottomRowRows(style: Style, onChange: (Style) -> Unit) {
     val r = style.bottomRow
-    StyleSection(R.string.group_bottom_row) {
-        ChoiceRow(
-            R.string.ctl_arrangement,
-            listOf(
-                Choice(
-                    BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
-                    stringResource(R.string.opt_row_classic)
-                ),
-                Choice(
-                    BottomRowArrangement.SYMBOLS_EMOJI_SPACE_PERIOD_ENTER,
-                    stringResource(R.string.opt_row_emoji)
-                ),
-                Choice(
-                    BottomRowArrangement.SYMBOLS_COMMA_SPACE_MIC_ENTER,
-                    stringResource(R.string.opt_row_mic)
-                ),
-                Choice(
-                    BottomRowArrangement.SYMBOLS_GLOBE_SPACE_ENTER,
-                    stringResource(R.string.opt_row_globe)
-                )
+    choiceOf(R.string.ctl_arrangement, r.arrangement, {
+        onChange(style.copy(bottomRow = r.copy(arrangement = it)))
+    }) {
+        listOf(
+            opt(
+                BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
+                R.string.opt_row_classic
             ),
-            r.arrangement
-        ) { onChange(style.copy(bottomRow = r.copy(arrangement = it))) }
-        ChoiceRow(
-            R.string.ctl_mic,
-            listOf(
-                Choice(MicPlacement.BOTTOM_MARGIN, stringResource(R.string.opt_mic_margin)),
-                Choice(MicPlacement.BOTTOM_ROW, stringResource(R.string.opt_mic_row)),
-                Choice(MicPlacement.SUGGESTION_BAR, stringResource(R.string.opt_mic_bar))
-            ),
-            r.micPlacement
-        ) { onChange(style.copy(bottomRow = r.copy(micPlacement = it))) }
+            opt(BottomRowArrangement.SYMBOLS_EMOJI_SPACE_PERIOD_ENTER, R.string.opt_row_emoji),
+            opt(BottomRowArrangement.SYMBOLS_COMMA_SPACE_MIC_ENTER, R.string.opt_row_mic),
+            opt(BottomRowArrangement.SYMBOLS_GLOBE_SPACE_ENTER, R.string.opt_row_globe)
+        )
+    }
+    choiceOf(R.string.ctl_mic, r.micPlacement, {
+        onChange(style.copy(bottomRow = r.copy(micPlacement = it)))
+    }) {
+        listOf(
+            opt(MicPlacement.BOTTOM_MARGIN, R.string.opt_mic_margin),
+            opt(MicPlacement.BOTTOM_ROW, R.string.opt_mic_row),
+            opt(MicPlacement.SUGGESTION_BAR, R.string.opt_mic_bar)
+        )
     }
 }
 
-@Composable
-private fun PanelAndMotionControls(style: Style, onChange: (Style) -> Unit) {
-    StyleSection(R.string.group_panels) {
-        FloatSliderRow(
-            R.string.ctl_panel_corner,
-            style.panels.cornerRadiusDp,
-            com.qtekfun.ultimatekeys.style.PanelStyle.CORNER_RANGE
-        ) { onChange(style.copy(panels = style.panels.copy(cornerRadiusDp = it))) }
-    }
-    StyleSection(R.string.group_motion) {
-        ChoiceRow(
-            R.string.ctl_transition,
-            listOf(
-                Choice(PanelTransition.NONE, stringResource(R.string.opt_motion_none)),
-                Choice(PanelTransition.FADE, stringResource(R.string.opt_motion_fade)),
-                Choice(PanelTransition.SLIDE, stringResource(R.string.opt_motion_slide))
-            ),
-            style.motion.transition
-        ) { onChange(style.copy(motion = style.motion.copy(transition = it))) }
-        IntSliderRow(
-            R.string.ctl_duration,
-            style.motion.durationMs,
-            com.qtekfun.ultimatekeys.style.MotionStyle.DURATION_RANGE
-        ) { onChange(style.copy(motion = style.motion.copy(durationMs = it))) }
+private fun UkGroupScope.panelRows(style: Style, onChange: (Style) -> Unit) {
+    floatSlider(
+        R.string.ctl_panel_corner,
+        style.panels.cornerRadiusDp,
+        PanelStyle.CORNER_RANGE,
+        ValueFormat::dp
+    ) {
+        onChange(style.copy(panels = style.panels.copy(cornerRadiusDp = it)))
     }
 }
+
+private fun UkGroupScope.motionRows(style: Style, onChange: (Style) -> Unit) {
+    choiceOf(
+        R.string.ctl_transition,
+        style.motion.transition,
+        { onChange(style.copy(motion = style.motion.copy(transition = it))) }
+    ) {
+        listOf(
+            opt(PanelTransition.NONE, R.string.opt_motion_none),
+            opt(PanelTransition.FADE, R.string.opt_motion_fade),
+            opt(PanelTransition.SLIDE, R.string.opt_motion_slide)
+        )
+    }
+    intSlider(
+        R.string.ctl_duration,
+        style.motion.durationMs,
+        MotionStyle.DURATION_RANGE,
+        ValueFormat::millis
+    ) {
+        onChange(style.copy(motion = style.motion.copy(durationMs = it)))
+    }
+}
+
+private fun UkGroupScope.colorField(
+    @StringRes label: Int,
+    color: ArgbColor,
+    onChange: (ArgbColor) -> Unit
+) = row { ColorRow(stringResource(label), color, onChange) }
 
 private class PaletteField(
     val label: Int,
@@ -449,12 +570,9 @@ private val paletteFields = listOf(
     }, { p, c -> p.copy(gestureTrail = c) })
 )
 
-@Composable
-private fun PaletteControls(title: Int, palette: Palette, onChange: (Palette) -> Unit) {
-    StyleSection(title) {
-        paletteFields.forEach { field ->
-            ColorRow(field.label, field.get(palette)) { onChange(field.set(palette, it)) }
-        }
+private fun UkGroupScope.paletteRows(palette: Palette, onChange: (Palette) -> Unit) {
+    paletteFields.forEach { field ->
+        colorField(field.label, field.get(palette)) { onChange(field.set(palette, it)) }
     }
 }
 
