@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Dictation models: the `full` build ships the Base model (works offline from the first start, and the app still has no network permission at all); the `lite` build downloads Base or Small from a fixed, checksum-verified address (resumes after interruptions, Wi-Fi only by default, can be cancelled). Both builds can import a model file; files the app does not recognise are installed only after a warning.
+- Model manager and dictation settings screens: install, delete and choose the model, dictation language (automatic, Spanish or English) and how long a pause ends the dictation. The voice panel's "Choose a model" button opens the manager. Spanish translation included.
+
 ## [0.7.0] - 2026-10-08
 
 ### Added

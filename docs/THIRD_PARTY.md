@@ -111,7 +111,9 @@ Material Symbols (outlined, 24 px Android vectors, Apache License 2.0) from `goo
 | `samples/jfk.wav` (352 KB) | Audio the smoke test transcribes | Inside the submodule at the pinned tag | n/a | Speech excerpt shipped by whisper.cpp for its own tests |
 
 `.github/workflows/ci.yml` downloads the model, verifies the checksum and caches it under the key
-`whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins arrive with Phase 7.
+`whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins are in `docs/MODELS.md` and
+`voice-models/src/main/assets/models.json` (same repository and commit; MIT). The `full` flavor bundles `base`; the `lite`
+flavor downloads either. Neither file is ever committed.
 ## Papers behind gesture typing
 
 The `:gesture` module (Phase 10) is original code. These papers were read for their ideas and are cited in `docs/gesture/DESIGN.md`; none of their code or data is used.

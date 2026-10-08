@@ -12,12 +12,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Decision: the `full` flavor and F-Droid
 
-The `full` flavor bundles a ~60 MB Whisper model that the build downloads from a pinned URL and verifies by SHA-256. F-Droid builds from source and discourages downloading binary blobs at build time, and a large model makes the APK heavy. Assessment: the model is MIT-licensed data, but fetching it during the build is likely to be rejected. Therefore:
+The `full` flavor bundles the `base` Whisper model (59 707 625 bytes, SHA-256 pinned in `voice-models/src/main/assets/models.json`,
+see `docs/MODELS.md`). The build downloads it once from a Hugging Face URL pinned to a commit, verifies the checksum and
+stores it uncompressed in the APK. The release APK sizes are in `docs/PERFORMANCE.md`; in short, `full` is the `lite` APK plus
+about 57 MiB, because the model is incompressible.
 
-- F-Droid receives `lite` only (the model is downloaded by the user at runtime, or imported from a file).
-- `full` is published on GitHub Releases only.
+Assessment for F-Droid, honestly:
 
-The owner can revisit this when submitting to fdroiddata.
+- The model is MIT-licensed data (OpenAI's Whisper weights converted by the whisper.cpp project), so the licence is not the
+  problem. Whether a binary model file is acceptable as an asset is a judgment for the F-Droid reviewers, and nobody has
+  asked them yet; this assessment is a prediction, not a ruling.
+- F-Droid builds from source on its own servers. Fetching a binary of this size from a third-party host during the build is
+  what its reviewers tend to refuse (unreproducible inputs, an external dependency that can disappear, load on their build
+  farm). Pinning the commit and the checksum makes our build deterministic, but it does not change that the build depends on a
+  download outside the source tree. Committing the model to the repository is not an option (project rule, and it would make
+  every clone 60 MB heavier).
+- A 60 MB-larger APK also takes space in every F-Droid mirror and update for every user, including those who never dictate.
+- `lite` has none of these issues: the model is downloaded by the user at run time (or imported from a file), the app
+  declares INTERNET only for that, and the build needs no model.
+
+Decision:
+
+- F-Droid receives `lite` only. The metadata draft in `fdroid/com.qtekfun.ultimatekeys.yml` already builds the `lite` flavor.
+- `full` is published on GitHub Releases only, as the fully air-gapped option (no INTERNET permission, dictation works at
+  first start). Both flavors share the application id and the signing key, so a user can move from one to the other as an
+  update.
+- The owner can revisit this when submitting to fdroiddata: if the reviewers accept a pinned, checksummed model as a build
+  input, nothing in the code changes; only the F-Droid metadata (a second build entry for `full`) does.
 
 ## Reproducible builds
 

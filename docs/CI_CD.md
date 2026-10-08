@@ -32,7 +32,7 @@ Job `check` (ubuntu-latest, timeout ~45 min):
 2. `actions/setup-java` Temurin 21; `gradle/actions/setup-gradle` (also validates the wrapper checksum).
 3. Pinned NDK and CMake for `:engine` and `:voice`; `ccache` for native builds.
 4. Cache downloaded dictionaries and Whisper models (keys = their pinned SHA-256).
-5. `./gradlew check assembleDebug` — `check` must include: unit tests of all modules and both flavors, lint, detekt/ktlint, `verifyFullHasNoInternet`, `originalityCheck`, coverage verification, screenshot tests.
+5. `./gradlew check assembleDebug` — `check` must include: unit tests of all modules and both flavors, lint, detekt/ktlint, `verifyFullHasNoInternet`, `verifyLiteHasInternet`, `originalityCheck`, coverage verification, screenshot tests.
 6. On failure, upload reports (retention 14 days).
 
 Job `emulator-tests` (from Phase 1; KVM): `reactivecircus/android-emulator-runner`, API 34 x86_64, `connectedFullDebugAndroidTest` (IME smoke flows, engine JNI, and from Phase 6 whisper JNI with the cached `tiny` model).
