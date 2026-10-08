@@ -50,4 +50,27 @@ class SettingsTest {
         repo.update { it.copy(soundVolume = 300) }
         assertEquals(100, repo.settings.first().soundVolume)
     }
+
+    @Test
+    fun `clipboard and emoji settings round trip and clamp`() = runTest {
+        val file = Files.createTempFile("settings", ".preferences_pb").toFile().apply { delete() }
+        val repo = DataStoreSettingsRepository(
+            PreferenceDataStoreFactory.create(scope = backgroundScope) { file }
+        )
+        repo.update {
+            it.copy(
+                clipboardEnabled = false,
+                clipboardRetention = "week",
+                clipboardMaxItems = 1,
+                emojiSkinTone = 9,
+                emojiRecents = "a b"
+            )
+        }
+        val s = repo.settings.first()
+        assertEquals(false, s.clipboardEnabled)
+        assertEquals("week", s.clipboardRetention)
+        assertEquals(5, s.clipboardMaxItems)
+        assertEquals(5, s.emojiSkinTone)
+        assertEquals("a b", s.emojiRecents)
+    }
 }

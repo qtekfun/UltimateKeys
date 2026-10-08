@@ -3,13 +3,23 @@
 
 package com.qtekfun.ultimatekeys.ime
 
+import com.qtekfun.ultimatekeys.clipboard.ClipStore
+import com.qtekfun.ultimatekeys.clipboard.ClipboardHistory
+import com.qtekfun.ultimatekeys.clipboard.ClipboardPolicy
+import com.qtekfun.ultimatekeys.clipboard.MemoryClipStore
+import com.qtekfun.ultimatekeys.clipboard.Retention
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.core.SettingsRepository
+import com.qtekfun.ultimatekeys.emoji.EmojiCatalog
+import com.qtekfun.ultimatekeys.emoji.EmojiData
+import com.qtekfun.ultimatekeys.emoji.EmojiSearch
 import com.qtekfun.ultimatekeys.engine.NoopSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.SuggestionEngine
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.logic.InputOptions
 import com.qtekfun.ultimatekeys.ime.logic.Page
+import com.qtekfun.ultimatekeys.ime.panels.PanelKind
+import com.qtekfun.ultimatekeys.ime.panels.PanelsController
 import com.qtekfun.ultimatekeys.ime.suggest.PrivacyGuardedEngine
 import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
@@ -48,6 +58,10 @@ class KeyboardController(
     styles: StyleRepository = InMemoryStyleRepository(),
     /** Dictation; null hides the microphone key (no speech engine in this build). */
     val dictation: DictationHost? = null,
+    clipStore: ClipStore = MemoryClipStore(),
+    emojiLoader: suspend () -> EmojiData = {
+        EmojiData(EmojiCatalog(emptyList()), EmojiSearch(emptyList()))
+    },
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
@@ -61,7 +75,32 @@ class KeyboardController(
         styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
 
     /** Optional keys that exist yet; the microphone appears once dictation is wired in. */
-    val features = BottomRowFeatures(voice = dictation != null)
+    val features = BottomRowFeatures(emoji = true, voice = dictation != null)
+
+    /** The clipboard history; nothing reaches it while typing is private. */
+    val clipboard = ClipboardHistory(
+        store = clipStore,
+        policy = {
+            val s = settings.value
+            ClipboardPolicy(
+                enabled = s.clipboardEnabled,
+                retention = Retention.fromId(s.clipboardRetention),
+                maxItems = s.clipboardMaxItems
+            )
+        },
+        isPrivate = { privacy.isPrivate }
+    )
+
+    /** The emoji and clipboard panels. */
+    val panels = PanelsController(
+        scope = scope,
+        settings = repository,
+        currentSettings = { settings.value },
+        history = clipboard,
+        loadEmoji = emojiLoader,
+        isPrivate = { privacy.isPrivate },
+        insert = { logic.insertVerbatim(it) }
+    )
     val latency = LatencyTracker()
     val suggestions = SuggestionController(
         engine = PrivacyGuardedEngine(engine) { privacy.isPrivate },
@@ -152,10 +191,12 @@ class KeyboardController(
 
             KeyAction.SWITCH_SYMBOLS_2 -> logic.showPage(Page.SYMBOLS_2)
 
-            KeyAction.MIC -> dictation?.open()
+            KeyAction.MIC -> {
+                panels.close()
+                dictation?.open()
+            }
 
-            // Its key only appears once the emoji panel exists (BottomRowFeatures).
-            KeyAction.EMOJI -> Unit
+            KeyAction.EMOJI -> openPanel(PanelKind.EMOJI)
         }
     }
 
@@ -171,6 +212,15 @@ class KeyboardController(
     fun onSuggestionTapped(index: Int) {
         val word = suggestions.state.value.slots.getOrNull(index).orEmpty()
         if (word.isNotEmpty()) logic.commitWithAutoSpace(word)
+    }
+
+    /** The clipboard button in the suggestion bar. */
+    fun openClipboard() = openPanel(PanelKind.CLIPBOARD)
+
+    /** Panels are exclusive: opening one ends a running dictation. */
+    private fun openPanel(kind: PanelKind) {
+        dictation?.cancel()
+        panels.open(kind)
     }
 
     /** The private-mode button in the suggestion bar. */

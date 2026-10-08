@@ -23,11 +23,14 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.qtekfun.ultimatekeys.clipboard.SystemClipboardWatcher
+import com.qtekfun.ultimatekeys.clipboard.clipStore
 import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
 import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
+import com.qtekfun.ultimatekeys.emoji.loadEmojiData
 import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
 import com.qtekfun.ultimatekeys.engine.SharedEngine
@@ -65,6 +68,7 @@ class UltimateKeysService :
     private val engine = SharedEngine.instance
     private lateinit var controller: KeyboardController
     private lateinit var transcriber: WhisperTranscriber
+    private var clipboardWatcher: SystemClipboardWatcher? = null
 
     override val lifecycle: Lifecycle get() = lifecycleRegistry
     override val savedStateRegistry: SavedStateRegistry
@@ -102,11 +106,15 @@ class UltimateKeysService :
             engine = engine,
             styles = styleRepository(),
             dictation = dictation,
+            clipStore = clipStore(this),
+            emojiLoader = { loadEmojiData(this@UltimateKeysService, listOf("en", "es")) },
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
             },
             logLatency = if (debuggable) { msg -> Log.d("UKLatency", msg) } else null
         )
+        clipboardWatcher =
+            SystemClipboardWatcher(this, controller.clipboard, scope).also { it.start() }
     }
 
     /** Builds the dictionaries on first run (seconds) and then switches typing to the real engine. */
@@ -177,6 +185,7 @@ class UltimateKeysService :
 
     override fun onFinishInputView(finishingInput: Boolean) {
         controller.onKeyboardHidden()
+        controller.panels.close()
         controller.logic.onFinishInput()
         controller.privacy.onKeyboardClosed()
         moveTo(Lifecycle.State.STARTED)
@@ -205,6 +214,7 @@ class UltimateKeysService :
     override fun onDestroy() {
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         controller.onKeyboardHidden()
+        clipboardWatcher?.stop()
         scope.cancel()
         transcriber.close()
         engine.close()

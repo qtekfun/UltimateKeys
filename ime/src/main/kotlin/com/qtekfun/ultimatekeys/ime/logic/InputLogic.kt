@@ -117,6 +117,25 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         afterTyping()
     }
 
+    /**
+     * Inserts [text] exactly as given (an emoji or a clipboard entry): no shift, no smart
+     * punctuation, and the word being typed is finished first without being autocorrected.
+     */
+    fun insertVerbatim(text: String) {
+        val ed = editor ?: return
+        ed.beginBatchEdit()
+        try {
+            undo = null
+            finishWord(ed, null)
+            ed.commitText(text)
+            autoSpace = false
+            lastSpaceAt = NEVER
+        } finally {
+            ed.endBatchEdit()
+        }
+        afterTyping()
+    }
+
     /** Commits [word] followed by a space that punctuation may swallow (used by suggestions). */
     fun commitWithAutoSpace(word: String) {
         val ed = editor ?: return

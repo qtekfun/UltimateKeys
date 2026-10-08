@@ -40,6 +40,18 @@ class InputLogicTest {
     }
 
     @Test
+    fun `insert verbatim ignores shift and finishes the composing word`() {
+        val (l, e) = logic(options = InputOptions(composeWords = true))
+        l.type("hi")
+        l.onShiftTap()
+        l.insertVerbatim("a, b")
+        assertEquals("hia, b", e.text.toString())
+        assertEquals("", e.composingText)
+        assertEquals(ShiftState.OFF, l.state.value.shift)
+        assertEquals(0, e.batchDepth)
+    }
+
+    @Test
     fun `shift once capitalizes one letter then turns off`() {
         val (l, e) = logic()
         l.onShiftTap()
