@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-08
+
 ### Added
 
 - Type in many languages, several at once. Settings > Typing > Languages lists 22 languages (24 with the regional variants English US and UK, Portuguese Brazil and Portugal): Spanish, English, French, German, Italian, Portuguese, Dutch, Polish, Czech, Danish, Norwegian Bokmal, Swedish, Finnish, Turkish, Romanian, Croatian, Slovenian, Serbian (Cyrillic), Lithuanian, Latvian, Russian and Greek, each with its own layout (AZERTY, QWERTZ, Turkish Q, Cyrillic, Greek, and Dvorak and Colemak for English) and a dictionary. Turn on up to six; suggestions, auto-correction, next-word prediction and gesture typing mix all of them with no switching, and the language key cycles through them.
@@ -22,15 +24,15 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [1.0.2] - 2026-10-08
 
+### Changed
+
+- The menu of the language key uses smaller words that always fit their cell.
+
 ## [1.0.1] - 2026-10-08
 
 ### Added
 
 - Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
-
-### Changed
-
-- The menu of the language key uses smaller words that always fit their cell.
 
 
 ## [1.0.0] - 2026-10-08
@@ -167,7 +169,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...v1.0.0
