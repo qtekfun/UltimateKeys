@@ -91,6 +91,11 @@ private fun HomeScreen(repository: SettingsRepository) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
+        val version = remember(context) { AppVersion.read(context) }
+        Text(
+            stringResource(R.string.app_version, version.name, version.code),
+            style = MaterialTheme.typography.bodyMedium
+        )
         SetupSteps(status)
         var sample by rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
