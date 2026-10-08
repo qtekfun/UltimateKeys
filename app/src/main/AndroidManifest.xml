@@ -30,6 +30,9 @@
             android:name=".models.ModelsActivity"
             android:exported="false" />
         <activity
+            android:name=".LicensesActivity"
+            android:exported="false" />
+        <activity
             android:name=".UserDictionaryActivity"
             android:exported="false" />
         <activity

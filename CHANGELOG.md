@@ -11,8 +11,17 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- Gesture typing: glide over the letters to type a word. A trail in the style's color follows the finger, the best word is typed with an automatic space, the other candidates sit in the suggestion bar (tap one to swap), and backspace removes the whole word. Works for Spanish and English together with no switching, offers your own dictionary words, and learns nothing in private mode. Settings: turn it on or off, show the trail, sensitivity. Styles gain a gesture trail color (style files move to schema version 2 and older files are upgraded automatically).
+- The home screen shows the app version and build number.
+- TalkBack and other screen readers can use the keyboard: every key, suggestion and bar button is announced and activated (explore by touch, double tap), shift says its state, enter says the editor action, long-press alternatives are in the actions menu, and the emoji, clipboard and dictation panels are fully labelled. Typing without a screen reader is unaffected.
+- Open-source licenses screen on the home screen: every component, font, icon set, data set and library with its license, link and full license text (GPL-3.0, Apache-2.0, MIT, SIL OFL 1.1, Unicode).
 - Dictation models: the `full` build ships the Base model (works offline from the first start, and the app still has no network permission at all); the `lite` build downloads Base or Small from a fixed, checksum-verified address (resumes after interruptions, Wi-Fi only by default, can be cancelled). Both builds can import a model file; files the app does not recognise are installed only after a warning.
 - Model manager and dictation settings screens: install, delete and choose the model, dictation language (automatic, Spanish or English) and how long a pause ends the dictation. The voice panel's "Choose a model" button opens the manager. Spanish translation included.
+
+### Changed
+
+- App screens for accessibility: 48 dp touch targets, labelled sliders and switches that read their value, section headers that say whether they are open, buttons that name the style they act on, and an error message (not only a red outline) for invalid colors.
+- Spanish translation audited; the build now fails when a string has no Spanish translation, or the placeholders differ.
 
 ## [0.7.0] - 2026-10-08
 
@@ -20,7 +29,6 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - Clipboard history: copied text is kept for 1 hour, 1 day, 7 days or forever (setting), up to a maximum number of clips, with pin, delete and clear all. The clipboard panel opens from the button in the suggestion bar. Nothing is saved in private mode, and clips that apps mark as sensitive are never saved.
 - Emoji panel: categories, recent emoji, a preferred skin tone and offline search by name in English and Spanish (accents optional). It opens from the emoji key or the suggestion-bar button, and both panels follow the style's colors, corners and motion.
-- Gesture typing: glide over the letters to type a word. A trail in the style's color follows the finger, the best word is typed with an automatic space, the other candidates sit in the suggestion bar (tap one to swap), and backspace removes the whole word. Works for Spanish and English together with no switching, offers your own dictionary words, and learns nothing in private mode. Settings: turn it on or off, show the trail, sensitivity. Styles gain a gesture trail color (style files move to schema version 2 and older files are upgraded automatically).
 
 ## [0.6.0] - 2026-10-08
 

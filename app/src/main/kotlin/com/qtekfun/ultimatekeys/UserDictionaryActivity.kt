@@ -12,6 +12,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.core.UserWord
 import com.qtekfun.ultimatekeys.core.UserWordsRepository
@@ -74,6 +78,14 @@ class UserDictionaryActivity : ComponentActivity() {
 
 private val languages = listOf("es", "en")
 
+/** The language's own name in the language of the screen ("Spanish" or "español"). */
+private fun languageName(code: String): String {
+    val shown = Locale.getDefault()
+    return Locale.forLanguageTag(code).getDisplayLanguage(shown)
+        .replaceFirstChar { it.titlecase(shown) }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Screen(
     repository: UserWordsRepository,
@@ -96,15 +108,15 @@ private fun Screen(
         }
 
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
+        Heading(
             stringResource(R.string.user_dictionary_title),
-            style = MaterialTheme.typography.headlineSmall
+            MaterialTheme.typography.headlineSmall
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             languages.forEach { code ->
                 FilterChip(selected = language == code, onClick = {
                     language = code
-                }, label = { Text(code) })
+                }, label = { Text(languageName(code)) })
             }
         }
         Row(
@@ -123,7 +135,7 @@ private fun Screen(
                 Text(stringResource(R.string.user_dictionary_add_button))
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = {
                 importer.launch(arrayOf("text/*"))
             }) { Text(stringResource(R.string.user_dictionary_import)) }
@@ -142,10 +154,13 @@ private fun Screen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("${entry.word}  (${entry.language})")
-                    TextButton(onClick = {
-                        removeWord(repository, entry)
-                    }) { Text(stringResource(R.string.user_dictionary_remove)) }
+                    Text("${entry.word}  (${languageName(entry.language)})", Modifier.weight(1f))
+                    val removeLabel =
+                        stringResource(R.string.user_dictionary_remove_word, entry.word)
+                    TextButton(
+                        onClick = { removeWord(repository, entry) },
+                        modifier = Modifier.semantics { contentDescription = removeLabel }
+                    ) { Text(stringResource(R.string.user_dictionary_remove)) }
                 }
             }
         }

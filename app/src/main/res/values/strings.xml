@@ -5,6 +5,7 @@
 -->
 <resources>
     <string name="app_name">UltimateKeys</string>
+    <string name="app_version">Version %1$s (build %2$d)</string>
     <string name="setup_title">Set up the keyboard</string>
     <string name="step_enable">1. Enable UltimateKeys</string>
     <string name="step_enabled">1. Enabled</string>
@@ -213,6 +214,7 @@
     <string name="dictation_language_es">Spanish</string>
     <string name="dictation_language_en">English</string>
     <string name="dictation_language_note">Switching language in the middle of a sentence is unreliable with small models; the Small model copes better.</string>
-    <string name="dictation_silence">Stop after silence: %1$s s</string>
+    <string name="dictation_silence_label">Stop after silence</string>
+    <string name="dictation_silence_value">%1$s s</string>
     <string name="dictation_silence_note">How long a pause ends the dictation by itself.</string>
 </resources>

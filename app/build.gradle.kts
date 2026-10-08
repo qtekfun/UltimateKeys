@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     // The model downloader exists only in the `lite` flavor; `full` has no network code at all.
     "liteImplementation"(libs.androidx.work.runtime)
+    // Reads assets/licenses/components.json (already used by :layouts, no new artifact).
+    implementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(projects.dictionaries)
     androidTestImplementation(projects.engine)

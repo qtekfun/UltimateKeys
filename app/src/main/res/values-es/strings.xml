@@ -5,6 +5,7 @@
 -->
 <resources>
     <string name="app_name">UltimateKeys</string>
+    <string name="app_version">Versión %1$s (compilación %2$d)</string>
     <string name="setup_title">Configura el teclado</string>
     <string name="step_enable">1. Activar UltimateKeys</string>
     <string name="step_enabled">1. Activado</string>
@@ -213,6 +214,7 @@
     <string name="dictation_language_es">Español</string>
     <string name="dictation_language_en">Inglés</string>
     <string name="dictation_language_note">Cambiar de idioma a mitad de frase no es fiable con los modelos pequeños; el modelo Small lo hace mejor.</string>
-    <string name="dictation_silence">Parar tras silencio: %1$s s</string>
+    <string name="dictation_silence_label">Parar tras silencio</string>
+    <string name="dictation_silence_value">%1$s s</string>
     <string name="dictation_silence_note">Cuánto dura una pausa para que el dictado termine solo.</string>
 </resources>

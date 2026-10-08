@@ -12,7 +12,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,9 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -38,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -91,7 +89,12 @@ private fun HomeScreen(repository: SettingsRepository) {
         Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
+        Heading(stringResource(R.string.app_name), MaterialTheme.typography.headlineMedium)
+        val version = remember(context) { AppVersion.read(context) }
+        Text(
+            stringResource(R.string.app_version, version.name, version.code),
+            style = MaterialTheme.typography.bodyMedium
+        )
         SetupSteps(status)
         var sample by rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
@@ -126,6 +129,11 @@ private fun HomeScreen(repository: SettingsRepository) {
         }) {
             Text(stringResource(R.string.dictation_settings_open))
         }
+        Button(onClick = {
+            context.startActivity(Intent(context, LicensesActivity::class.java))
+        }) {
+            Text(stringResource(R.string.licenses_open))
+        }
         SettingsSection(settings, ::update)
     }
 }
@@ -134,7 +142,7 @@ private fun HomeScreen(repository: SettingsRepository) {
 private fun SetupSteps(status: ImeStatus) {
     val context = LocalContext.current
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.setup_title), style = MaterialTheme.typography.titleMedium)
+        Heading(stringResource(R.string.setup_title))
         Button(
             onClick = { context.startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) },
             enabled = !status.enabled
@@ -164,7 +172,7 @@ private fun SettingsSection(
     update: ((KeyboardSettings) -> KeyboardSettings) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.titleMedium)
+        Heading(stringResource(R.string.settings_title))
         SliderSetting(
             R.string.setting_height,
             settings.heightPercent,
@@ -232,21 +240,18 @@ private fun SettingsSection(
 }
 
 /** The clipboard history options (SPEC section 10). Pinned clips never expire. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ClipboardSection(
     settings: KeyboardSettings,
     update: ((KeyboardSettings) -> KeyboardSettings) -> Unit
 ) {
-    Text(
-        stringResource(R.string.clipboard_title),
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 8.dp)
-    )
+    Heading(stringResource(R.string.clipboard_title), Modifier.padding(top = 8.dp))
     SwitchSetting(R.string.setting_clipboard_history, settings.clipboardEnabled) { v ->
         update { it.copy(clipboardEnabled = v) }
     }
     Text(stringResource(R.string.setting_clipboard_retention))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         RETENTION_CHOICES.forEach { (id, label) ->
             FilterChip(
                 selected = settings.clipboardRetention == id,
@@ -275,25 +280,16 @@ private val RETENTION_CHOICES = listOf(
 
 @Composable
 private fun SliderSetting(label: Int, value: Int, range: IntRange, onChange: (Int) -> Unit) {
-    Column {
-        Text("${stringResource(label)}: $value")
-        Slider(
-            value = value.toFloat(),
-            onValueChange = { onChange(it.toInt()) },
-            valueRange = range.first.toFloat()..range.last.toFloat(),
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    LabeledSlider(
+        label = stringResource(label),
+        valueText = value.toString(),
+        value = value.toFloat(),
+        range = range.first.toFloat()..range.last.toFloat(),
+        onChange = { onChange(it.toInt()) }
+    )
 }
 
 @Composable
 private fun SwitchSetting(label: Int, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(stringResource(label), Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = onChange)
-    }
+    LabeledSwitch(stringResource(label), checked, onChange)
 }

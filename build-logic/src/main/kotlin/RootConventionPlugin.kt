@@ -12,5 +12,10 @@ class RootConventionPlugin : Plugin<Project> {
             description = "Fails when our files name other keyboard products."
             projectRoot.set(target.layout.projectDirectory)
         }
+        target.tasks.register("translationCheck", TranslationCheckTask::class.java) {
+            group = "verification"
+            description = "Fails when a default string has no Spanish translation, or the reverse."
+            projectRoot.set(target.layout.projectDirectory)
+        }
     }
 }

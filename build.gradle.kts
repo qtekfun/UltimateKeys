@@ -24,6 +24,10 @@ kover {
                 classes(
                     "com.qtekfun.ultimatekeys.MainActivity*",
                     "com.qtekfun.ultimatekeys.ImeStatus*",
+                    // Compose screens of the app; the data they show is tested (LicenseCatalog).
+                    "com.qtekfun.ultimatekeys.LicensesActivity*",
+                    "com.qtekfun.ultimatekeys.AccessibleControlsKt*",
+                    "com.qtekfun.ultimatekeys.ime.surface.KeyboardAccessibilityLayerKt*",
                     "com.qtekfun.ultimatekeys.ime.UltimateKeysService*",
                     "com.qtekfun.ultimatekeys.ime.AndroidEditorConnection",
                     "com.qtekfun.ultimatekeys.ime.Feedback",
@@ -80,5 +84,7 @@ kover {
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn("koverVerify")
+    dependsOn(":privacy:koverVerify")
     dependsOn("originalityCheck")
+    dependsOn("translationCheck")
 }

@@ -9,11 +9,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 |---|---|---|---|
 | AOSP LatinIME native engine | Suggestions and autocorrect | Apache-2.0 | Planned (Phase 2), vendored in `third_party/aosp-latinime/` |
 | whisper.cpp (with its bundled ggml) | Offline speech-to-text | MIT | Phase 6, git submodule `third_party/whisper.cpp`, unmodified (see below) |
+| Whisper models `base`, `small` | Dictation models (data, never committed) | MIT | Phase 7, bundled (`base`, `full`) or downloaded (`lite`) with SHA-256, see `docs/MODELS.md` |
 | AOSP LatinIME word lists `es`, `en` | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
 | Unicode CLDR annotations and emoji list | Emoji search keywords, categories and skin-tone forms | Unicode License v3 | Phase 5, processed at build time (see below) |
 | Open fonts and Material Symbols | Style engine | OFL / Apache-2.0 | Planned (Phase 3) |
 
-Libraries from Gradle (AndroidX, Kotlin, kotlinx, JUnit) are listed by their licenses in the in-app licenses screen (Phase 8).
+Libraries from Gradle (AndroidX, Kotlin, kotlinx, Room) are listed by their licenses in the in-app licenses screen. That screen reads `app/src/main/assets/licenses/components.json`; when you add a row to the component or font tables (or a library to `gradle/libs.versions.toml`), add the matching entry there, with the row's text in `thirdPartyRows`: `LicenseCatalogTest` fails until you do (ADR 0018).
 
 ## Dictionaries (`:dictionaries`)
 

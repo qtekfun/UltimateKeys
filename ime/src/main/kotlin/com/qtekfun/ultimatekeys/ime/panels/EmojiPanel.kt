@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -91,7 +92,7 @@ internal fun EmojiPanel(
         PanelBottomBar(
             theme = theme,
             current = PanelKind.EMOJI,
-            tone = SkinToneButton(toneColor(ui.tone), actions.onCycleTone),
+            tone = SkinToneButton(toneColor(ui.tone), toneName(ui.tone), actions.onCycleTone),
             onKeys = actions.onKeys,
             onSwitch = actions.onSwitch,
             onDelete = actions.onDelete
@@ -123,7 +124,8 @@ private fun ColumnScope.BrowseContent(theme: PanelTheme, ui: EmojiUi, actions: E
                     stringResource(R.string.panel_recents),
                     { actions.onSelectCategory(null) },
                     Modifier.size(40.dp),
-                    selected = ui.category == null
+                    selected = ui.category == null,
+                    toggled = ui.category == null
                 ) { ClockIcon(theme.text) }
             }
             items(EmojiCategory.entries) { category ->
@@ -132,7 +134,8 @@ private fun ColumnScope.BrowseContent(theme: PanelTheme, ui: EmojiUi, actions: E
                     categoryName(category),
                     { actions.onSelectCategory(category) },
                     Modifier.size(40.dp),
-                    selected = ui.category == category
+                    selected = ui.category == category,
+                    toggled = ui.category == category
                 ) { EmojiText(category.icon, 22.sp) }
             }
         }
@@ -149,6 +152,7 @@ private fun ColumnScope.BrowseContent(theme: PanelTheme, ui: EmojiUi, actions: E
 
 @Composable
 private fun EmojiGrid(cells: List<String>, actions: EmojiActions, ui: EmojiUi) {
+    val insert = stringResource(R.string.panel_insert)
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 44.dp),
         modifier = Modifier.fillMaxSize().padding(horizontal = 6.dp)
@@ -157,7 +161,9 @@ private fun EmojiGrid(cells: List<String>, actions: EmojiActions, ui: EmojiUi) {
             Box(
                 Modifier
                     .height(44.dp)
-                    .clickable { pick(emoji, ui, actions) },
+                    .clickable(onClickLabel = insert, role = Role.Button) {
+                        pick(emoji, ui, actions)
+                    },
                 contentAlignment = Alignment.Center
             ) { EmojiText(emoji, 26.sp) }
         }
@@ -204,6 +210,7 @@ private fun ColumnScope.SearchContent(theme: PanelTheme, ui: EmojiUi, actions: E
             Modifier.size(40.dp)
         ) { VectorIcon(R.drawable.ms_close, theme.text) }
     }
+    val insert = stringResource(R.string.panel_insert)
     Box(Modifier.fillMaxWidth().height(SEARCH_RESULT_DP.dp)) {
         when {
             ui.query.isBlank() ->
@@ -224,7 +231,9 @@ private fun ColumnScope.SearchContent(theme: PanelTheme, ui: EmojiUi, actions: E
                         Modifier
                             .size(SEARCH_RESULT_DP.dp)
                             .semantics { contentDescription = hit.name }
-                            .clickable { actions.onPickText(hit.emoji) },
+                            .clickable(onClickLabel = insert, role = Role.Button) {
+                                actions.onPickText(hit.emoji)
+                            },
                         contentAlignment = Alignment.Center
                     ) { EmojiText(hit.emoji, 28.sp) }
                 }
@@ -255,7 +264,7 @@ private fun SearchKeys(
                             .padding(2.dp)
                             .clip(theme.shape())
                             .background(theme.surface)
-                            .clickable { actions.onType(key.output) },
+                            .clickable(role = Role.Button) { actions.onType(key.output) },
                         contentAlignment = Alignment.Center
                     ) { PanelText(key.label, theme, size = 17.sp, center = true) }
                 }
@@ -267,7 +276,7 @@ private fun SearchKeys(
                             .padding(2.dp)
                             .clip(theme.shape())
                             .background(theme.surface)
-                            .clickable(onClick = actions.onDeleteQuery)
+                            .clickable(role = Role.Button, onClick = actions.onDeleteQuery)
                             .semantics { contentDescription = deleteLabel },
                         contentAlignment = Alignment.Center
                     ) { VectorIcon(R.drawable.ms_backspace, theme.text) }
@@ -301,6 +310,18 @@ private fun categoryName(category: EmojiCategory): String = stringResource(
         EmojiCategory.OBJECTS -> R.string.panel_cat_objects
         EmojiCategory.SYMBOLS -> R.string.panel_cat_symbols
         EmojiCategory.FLAGS -> R.string.panel_cat_flags
+    }
+)
+
+@Composable
+internal fun toneName(tone: SkinTone): String = stringResource(
+    when (tone) {
+        SkinTone.NONE -> R.string.panel_tone_default
+        SkinTone.LIGHT -> R.string.panel_tone_light
+        SkinTone.MEDIUM_LIGHT -> R.string.panel_tone_medium_light
+        SkinTone.MEDIUM -> R.string.panel_tone_medium
+        SkinTone.MEDIUM_DARK -> R.string.panel_tone_medium_dark
+        SkinTone.DARK -> R.string.panel_tone_dark
     }
 )
 

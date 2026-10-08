@@ -139,10 +139,10 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 - [ ] 8.1 Meet the latency targets in `SPEC.md` §12; optimize and document in `docs/PERFORMANCE.md` (including APK sizes per flavor).
 - [ ] 8.2 Model warm-up on voice panel open, unload after idle; memory caps.
-- [ ] 8.3 Accessibility: TalkBack for keys (explore-by-touch) and all panels/settings; 48 dp targets in settings.
-- [ ] 8.4 Complete Spanish translation.
-- [ ] 8.5 In-app "Open-source licenses" screen generated from `docs/THIRD_PARTY.md` data.
-- [ ] 8.6 Zero lint warnings in our modules; coverage targets met.
+- [x] 8.3 Accessibility: TalkBack for keys (explore-by-touch) and all panels/settings; 48 dp targets in settings.
+- [x] 8.4 Complete Spanish translation.
+- [x] 8.5 In-app "Open-source licenses" screen generated from `docs/THIRD_PARTY.md` data.
+- [x] 8.6 Zero lint warnings in our modules; coverage targets met.
 - [ ] 8.7 **[HUMAN]** Real-device benchmarks, battery, 30-minute stability session (Find X8 Pro and a Pixel).
 
 **DoD:** release `v0.9.0`.
@@ -152,12 +152,13 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 ## Phase 9 — Release material and 1.0
 
 - [x] 9.1 Original app icon (adaptive + monochrome), Ultimate family style.
-- [ ] 9.2 Screenshots generated from screenshot tests into `fastlane/metadata/android/*/images/phoneScreenshots/` (show several presets).
-- [ ] 9.3 Store texts EN + ES and 1.0.0 changelog; no references to other products.
-- [ ] 9.4 Final README: features, style engine, flavors, privacy statement, install (GitHub, Obtainium, F-Droid status), build, credits.
-- [ ] 9.5 Check every acceptance criterion in `SPEC.md` §14 that can be automated; list the rest in `docs/HUMAN_VERIFICATION.md`.
+- [x] 9.2 Screenshots generated from screenshot tests into `fastlane/metadata/android/*/images/phoneScreenshots/` (show several presets).
+- [x] 9.3 Store texts EN + ES and 1.0.0 changelog; no references to other products.
+- [x] 9.4 Final README: features, style engine, flavors, privacy statement, install (GitHub, Obtainium, F-Droid status), build, credits.
+- [x] 9.5 Check every acceptance criterion in `SPEC.md` §14 that can be automated; list the rest in `docs/HUMAN_VERIFICATION.md`.
 - [ ] 9.6 Release `1.0.0-rc.1` (pre-release); fix anything found, more `rc.N` if needed; then release `1.0.0` with both APKs and checksums.
 - [ ] 9.7 Finalize `fdroid/com.qtekfun.ultimatekeys.yml` (`Binaries`, `AllowedAPKSigningKeys` placeholder, `UpdateCheckMode: Tags`) and verify reproducibility of the tagged build; **[HUMAN]** submit to fdroiddata.
+<!-- 9.7 prepared (recipe, reproducibility notes in docs/DISTRIBUTION.md); open: verify the tagged 1.0.0 build and submit to fdroiddata -->
 
 **DoD:** `v1.0.0` published.
 

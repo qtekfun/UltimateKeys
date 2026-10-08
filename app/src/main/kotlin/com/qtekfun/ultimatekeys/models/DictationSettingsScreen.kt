@@ -7,18 +7,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.qtekfun.ultimatekeys.Heading
+import com.qtekfun.ultimatekeys.LabeledSlider
+import com.qtekfun.ultimatekeys.MinTouchTarget
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import kotlin.math.roundToInt
@@ -41,22 +44,19 @@ internal fun DictationSettingsScreen(
         Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TextButton(onClick = onBack) { Text(stringResource(R.string.models_back)) }
+        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) { Text(stringResource(R.string.models_back)) }
         Text(
             stringResource(R.string.dictation_title),
             style = MaterialTheme.typography.headlineSmall
         )
-        Text(
-            stringResource(R.string.dictation_language),
-            style = MaterialTheme.typography.titleMedium
-        )
+        Heading(stringResource(R.string.dictation_language))
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             LANGUAGES.forEach { (code, label) ->
                 FilterChip(
                     selected = settings.dictationLanguage == code,
                     onClick = { update { it.copy(dictationLanguage = code) } },
                     label = { Text(stringResource(label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().heightIn(min = MinTouchTarget)
                 )
             }
         }
@@ -66,24 +66,16 @@ internal fun DictationSettingsScreen(
         )
         val ms = settings.dictationSilenceMs
         val seconds = "${ms / MS_PER_SECOND}.${ms % MS_PER_SECOND / TENTH_MS}"
-        Row {
-            Text(
-                stringResource(
-                    R.string.dictation_silence,
-                    seconds
-                ),
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-        val range = KeyboardSettings.DICTATION_SILENCE_RANGE
-        Slider(
-            value = settings.dictationSilenceMs.toFloat(),
-            onValueChange = { v ->
+        LabeledSlider(
+            label = stringResource(R.string.dictation_silence_label),
+            valueText = stringResource(R.string.dictation_silence_value, seconds),
+            value = ms.toFloat(),
+            range = KeyboardSettings.DICTATION_SILENCE_RANGE.first.toFloat()..
+                KeyboardSettings.DICTATION_SILENCE_RANGE.last.toFloat(),
+            onChange = { v ->
                 val stepped = (v / SILENCE_STEP_MS).roundToInt() * SILENCE_STEP_MS
                 update { it.copy(dictationSilenceMs = stepped) }
-            },
-            valueRange = range.first.toFloat()..range.last.toFloat(),
-            modifier = Modifier.fillMaxWidth()
+            }
         )
         Text(
             stringResource(R.string.dictation_silence_note),

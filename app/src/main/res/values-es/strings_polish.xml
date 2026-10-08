@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<resources>
+    <string name="a11y_expanded">Desplegado</string>
+    <string name="a11y_collapsed">Plegado</string>
+    <string name="a11y_action_on_style">%1$s, %2$s</string>
+    <string name="color_invalid">No es un color válido. Usa #RRGGBB o #AARRGGBB.</string>
+    <string name="style_preview">Vista previa del estilo %1$s</string>
+    <string name="user_dictionary_remove_word">Quitar %1$s</string>
+    <string name="licenses_open">Licencias de código abierto</string>
+    <string name="licenses_title">Licencias de código abierto</string>
+    <string name="licenses_intro">UltimateKeys es software libre, publicado bajo la Licencia Pública General de GNU versión 3 o posterior. Contiene los componentes de código abierto que se listan abajo. Toca uno para leer el texto completo de su licencia.</string>
+    <string name="licenses_view_text">Ver el texto de la licencia</string>
+    <string name="licenses_open_website">Abrir el sitio web</string>
+    <string name="licenses_loading">Cargando…</string>
+    <string name="licenses_no_browser">Ninguna app puede abrir este enlace.</string>
+    <string name="licenses_cat_app">Esta app</string>
+    <string name="licenses_cat_code">Código de terceros</string>
+    <string name="licenses_cat_data">Datos</string>
+    <string name="licenses_cat_fonts">Fuentes</string>
+    <string name="licenses_cat_icons">Iconos</string>
+    <string name="licenses_cat_libraries">Bibliotecas</string>
+    <string name="licenses_cat_build">Herramientas de compilación</string>
+</resources>

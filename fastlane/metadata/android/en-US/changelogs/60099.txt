@@ -1,0 +1,1 @@
+Offline dictation: tap the microphone, speak, and the text is written at the cursor. Speech is recognized on your phone and audio is never saved.

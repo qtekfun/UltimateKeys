@@ -42,4 +42,44 @@ Decision:
 
 ## Reproducible builds
 
-Goal: F-Droid's build of a tag matches the APK published on GitHub (`Binaries`, `AllowedAPKSigningKeys`). Measures: pinned JDK/AGP/NDK/CMake, `vcsInfo.include = false`, no dependency-info blob, deterministic native flags (Phase 2). A CI job comparing two clean builds is added in Phase 2.
+Goal: F-Droid's build of a tag matches the APK published on GitHub (`Binaries`, `AllowedAPKSigningKeys`).
+
+Measures in place:
+
+- Pinned JDK 21, AGP, Gradle (wrapper), NDK `28.2.13676358` (F-Droid name `r28c`) and CMake `3.31.6` (`build-logic`).
+- `vcsInfo.include = false` and no dependency-info blob in the APK.
+- Native code: `-ffile-prefix-map` for the repository, the build directory and the NDK, `-Wl,--build-id=none`, no timestamps (`engine/src/main/cpp/CMakeLists.txt`, `voice/src/main/cpp/CMakeLists.txt`).
+- The version code is derived from `appVersion`, never from a date.
+- The `reproducible-build` job of `ci.yml` builds `assembleFullRelease assembleLiteRelease` in two clean checkouts in different directories and fails if the unsigned APKs differ (`cmp`). It runs on every PR.
+
+What the CI job does not prove, and what to check before the first F-Droid submission (human, once `1.0.0` is tagged):
+
+1. Build the tag on a machine that is not the CI runner (or in F-Droid's own build server image) and compare it with the published `lite` APK: `apksigcopier compare UltimateKeys-1.0.0-lite.apk --unsigned app-lite-release-unsigned.apk` (or `diffoscope`).
+2. If the native libraries differ only because of the toolchain image, document it here and keep the fallback below.
+
+Fallback if the build cannot be made reproducible: drop `Binaries` and `AllowedAPKSigningKeys` from the metadata, so F-Droid signs with its own key. Users would then not be able to switch between GitHub and F-Droid builds without uninstalling.
+
+## F-Droid recipe (`fdroid/com.qtekfun.ultimatekeys.yml`)
+
+The file has no comments because fdroiddata's tools remove them, so the choices are listed here.
+
+| Field | Why |
+|---|---|
+| `Binaries` | Our signed `lite` APK of the same tag; F-Droid compares its build with it and ships ours. |
+| `AllowedAPKSigningKeys` | SHA-256 of the release certificate (64 hex digits, no colons). |
+| `UpdateCheckMode: Tags ^v[0-9]+\.[0-9]+\.[0-9]+$` | Only final tags: release candidates (`-rc.N`) are not offered to F-Droid users. |
+| `AutoUpdateMode: Version` | A new final tag adds a build entry by itself; its `versionCode` is computed as in `Versions.kt`. |
+| `submodules: true` | `third_party/whisper.cpp` is a git submodule (pinned to a release tag). |
+| `sudo` | Installs JDK 21, which the build needs. |
+| `prebuild` | Runs `:dictionaries:fetchDictionaries` and `:emoji:generateEmojiData`, which download pinned files over the network and verify their SHA-256 into the Gradle cache. F-Droid builds without network after `prebuild`, so the later Gradle step finds them cached. |
+| `gradle: lite` | Only the `lite` flavor (see the decision above). |
+| `ndk: r28c` | `28.2.13676358`, the version pinned in `build-logic`. |
+
+The build entry names `1.0.0` because that is the first release meant for F-Droid; the tag `v1.0.0` does not exist until Phase 9 task 9.6. The owner opens the fdroiddata merge request after the tag exists (`docs/HUMAN_TASKS.md`) and runs `fdroid lint`, `fdroid rewritemeta` and `fdroid build -l com.qtekfun.ultimatekeys` first.
+
+Open points for the owner or for Phase 7:
+
+- TODO (Phase 7): `lite` will add a WorkManager model downloader. If it adds Gradle tasks that fetch anything at build time, add them to `prebuild`; the `lite` APK itself must not contain a model.
+- TODO (Phase 7): confirm that F-Droid's scanner has no complaint about the `INTERNET` permission or the model URL (an anti-feature such as `NonFreeNet` is not expected, since the download only fetches Whisper weights under the MIT license and only when the user asks).
+- Check that the `prebuild` Gradle invocation finds the Android SDK and NDK in the build server image; if it does not, move the fetch into the `gradle` step by relying on the normal build (the same tasks run as part of it).
+- Per-version texts come from `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` (at most 500 bytes each), title, short and full description from the same tree, screenshots from `images/phoneScreenshots/`.
