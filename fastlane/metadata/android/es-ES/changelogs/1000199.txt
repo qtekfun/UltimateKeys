@@ -1,0 +1,1 @@
+Escribir en los bordes es más fácil: margen lateral configurable, letras de los extremos más anchas (opcional) y el gesto de atrás del sistema ya no se lleva los toques de las teclas del borde.

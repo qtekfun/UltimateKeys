@@ -13,13 +13,23 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - Type in many languages, several at once. Settings > Typing > Languages lists 22 languages (24 with the regional variants English US and UK, Portuguese Brazil and Portugal): Spanish, English, French, German, Italian, Portuguese, Dutch, Polish, Czech, Danish, Norwegian Bokmal, Swedish, Finnish, Turkish, Romanian, Croatian, Slovenian, Serbian (Cyrillic), Lithuanian, Latvian, Russian and Greek, each with its own layout (AZERTY, QWERTZ, Turkish Q, Cyrillic, Greek, and Dvorak and Colemak for English) and a dictionary. Turn on up to six; suggestions, auto-correction, next-word prediction and gesture typing mix all of them with no switching, and the language key cycles through them.
 - The space bar shows the language you are typing in (it can be turned off), and the menu of the language key has a Languages entry that opens the screen.
-- Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
 
 ### Changed
 
 - The letter layout setting moved into Settings > Typing > Languages, where each language with several layouts has its own choice. Spanish and English stay the default.
 - Dictionaries are copied and built only for the languages that are turned on, in the background; each one takes a few seconds the first time it is enabled.
 - Dictation and emoji search still understand Spanish and English only.
+
+## [1.0.2] - 2026-10-08
+
+## [1.0.1] - 2026-10-08
+
+### Added
+
+- Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
+
+### Changed
+
 - The menu of the language key uses smaller words that always fit their cell.
 
 
@@ -157,7 +167,9 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...v1.0.0
 [1.0.0-rc.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.2...v1.0.0-rc.1
 [0.9.2]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.1...v0.9.2
