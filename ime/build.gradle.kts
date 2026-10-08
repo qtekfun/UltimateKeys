@@ -15,6 +15,7 @@ dependencies {
     api(projects.layouts)
     api(projects.engine)
     api(projects.privacy)
+    api(projects.voice)
     implementation(projects.dictionaries)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.foundation)

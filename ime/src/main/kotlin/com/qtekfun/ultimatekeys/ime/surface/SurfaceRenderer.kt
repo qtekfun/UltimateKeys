@@ -97,7 +97,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         dimens: SurfaceDimens
     ) {
         if (geometry.top <= 0f) return
-        val layout = StripLayout(geometry.width, geometry.top, strip.showToggle)
+        val layout = StripLayout(geometry.width, geometry.top, strip.showToggle, strip.showMic)
         if (strip.isPrivate) {
             scope.drawRect(
                 style.privateTint.copy(alpha = PRIVATE_WASH),
@@ -105,17 +105,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 Size(geometry.width, geometry.top)
             )
         }
-        if (strip.showToggle) {
-            val ink = if (strip.isPrivate) style.privateTint else style.hint
-            KeyIcons.incognito(
-                scope,
-                layout.toggleWidth / 2f,
-                geometry.top / 2f,
-                geometry.top * TOGGLE_ICON,
-                ink,
-                strip.isPrivate
-            )
-        }
+        drawStripButtons(scope, geometry, strip, layout, style)
         val words = strip.words
         if (words.isEmpty()) return
         val cell = layout.cellWidth
@@ -150,6 +140,36 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 style.barText
             )
             text.isFakeBoldText = false
+        }
+    }
+
+    /** The private-mode button on the left and the dictation button on the right of the bar. */
+    private fun drawStripButtons(
+        scope: DrawScope,
+        geometry: KeyGeometry,
+        strip: StripState,
+        layout: StripLayout,
+        style: SurfaceStyle
+    ) {
+        if (strip.showToggle) {
+            val ink = if (strip.isPrivate) style.privateTint else style.hint
+            KeyIcons.incognito(
+                scope,
+                layout.toggleWidth / 2f,
+                geometry.top / 2f,
+                geometry.top * TOGGLE_ICON,
+                ink,
+                strip.isPrivate
+            )
+        }
+        if (strip.showMic) {
+            KeyIcons.mic(
+                scope,
+                geometry.width - layout.micWidth / 2f,
+                geometry.top / 2f,
+                geometry.top * TOGGLE_ICON,
+                style.hint
+            )
         }
     }
 

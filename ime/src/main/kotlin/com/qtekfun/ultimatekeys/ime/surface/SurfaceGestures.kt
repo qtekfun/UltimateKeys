@@ -37,6 +37,7 @@ class SurfaceGestures(
 
     /** Whether the private-mode button sits at the left of the suggestion bar. */
     var stripToggleVisible = false
+    var stripMicVisible = false
     var metrics = GestureMetrics(slop = 1f, dragStep = 1f, chooserMinCell = 1f, chooserHeight = 1f)
 
     private class Press(var key: PlacedKey, val downX: Float) {
@@ -61,8 +62,7 @@ class SurfaceGestures(
     fun down(id: Long, x: Float, y: Float) {
         val geo = geometry ?: return
         if (y < geo.top) {
-            val strip = StripLayout(geo.width, geo.top, stripToggleVisible)
-            stripPresses[id] = if (strip.isToggle(x)) TOGGLE_SLOT else strip.slotAt(x)
+            stripPresses[id] = slotAt(x)
             return
         }
         val placed = geo.keyAt(x, y) ?: return
@@ -208,20 +208,22 @@ class SurfaceGestures(
 
     private fun slotAt(x: Float): Int {
         val geo = geometry ?: return 0
-        val strip = StripLayout(geo.width, geo.top, stripToggleVisible)
-        return if (strip.isToggle(x)) TOGGLE_SLOT else strip.slotAt(x)
+        val strip = StripLayout(geo.width, geo.top, stripToggleVisible, stripMicVisible)
+        return when {
+            strip.isToggle(x) -> TOGGLE_SLOT
+            strip.isMic(x) -> MIC_SLOT
+            else -> strip.slotAt(x)
+        }
     }
 
     fun up(id: Long, x: Float = -1f) {
         val slot = stripPresses.remove(id)
         if (slot != null) {
             if (x < 0f || slotAt(x) == slot) {
-                if (slot ==
-                    TOGGLE_SLOT
-                ) {
-                    controller.togglePrivate()
-                } else {
-                    controller.onSuggestionTapped(slot)
+                when (slot) {
+                    TOGGLE_SLOT -> controller.togglePrivate()
+                    MIC_SLOT -> controller.onAction(KeyAction.MIC)
+                    else -> controller.onSuggestionTapped(slot)
                 }
             }
             return
@@ -288,5 +290,6 @@ class SurfaceGestures(
     private companion object {
         const val CHAR_STEPS = 5
         const val TOGGLE_SLOT = -1
+        const val MIC_SLOT = -2
     }
 }
