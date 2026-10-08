@@ -1,0 +1,1 @@
+El menú de la tecla de idiomas usa palabras más pequeñas que siempre caben.
