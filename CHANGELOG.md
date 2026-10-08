@@ -9,13 +9,17 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Gesture typing: glide over the letters to type a word. A trail in the style's color follows the finger, the best word is typed with an automatic space, the other candidates sit in the suggestion bar (tap one to swap), and backspace removes the whole word. Works for Spanish and English together with no switching, offers your own dictionary words, and learns nothing in private mode. Settings: turn it on or off, show the trail, sensitivity. Styles gain a gesture trail color (style files move to schema version 2 and older files are upgraded automatically).
+- The home screen shows the app version and build number.
+
 ## [0.7.0] - 2026-10-08
 
 ### Added
 
 - Clipboard history: copied text is kept for 1 hour, 1 day, 7 days or forever (setting), up to a maximum number of clips, with pin, delete and clear all. The clipboard panel opens from the button in the suggestion bar. Nothing is saved in private mode, and clips that apps mark as sensitive are never saved.
 - Emoji panel: categories, recent emoji, a preferred skin tone and offline search by name in English and Spanish (accents optional). It opens from the emoji key or the suggestion-bar button, and both panels follow the style's colors, corners and motion.
-- Gesture typing: glide over the letters to type a word. A trail in the style's color follows the finger, the best word is typed with an automatic space, the other candidates sit in the suggestion bar (tap one to swap), and backspace removes the whole word. Works for Spanish and English together with no switching, offers your own dictionary words, and learns nothing in private mode. Settings: turn it on or off, show the trail, sensitivity. Styles gain a gesture trail color (style files move to schema version 2 and older files are upgraded automatically).
 
 ## [0.6.0] - 2026-10-08
 
