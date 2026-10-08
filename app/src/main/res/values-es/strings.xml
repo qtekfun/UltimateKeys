@@ -211,6 +211,7 @@
     <string name="dictation_language_en">Inglés</string>
     <string name="dictation_mic_side">Posición del micrófono</string>
     <string name="dictation_mic_left">Izquierda</string>
+    <string name="dictation_mic_center">Centro</string>
     <string name="dictation_mic_right">Derecha</string>
     <string name="dictation_mic_side_note">Dónde está el micrófono bajo las teclas. Muévelo si se solapa con el botón que Android muestra para cambiar de teclado.</string>
     <string name="dictation_language_note">Cambiar de idioma a mitad de frase no es fiable con los modelos pequeños; el modelo Small lo hace mejor.</string>

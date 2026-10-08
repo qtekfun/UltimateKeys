@@ -27,6 +27,10 @@ class SettingsTest {
             KeyboardSettings(dictationMicSide = "middle").sanitized().dictationMicSide
         )
         assertEquals(
+            KeyboardSettings.MIC_CENTER,
+            KeyboardSettings(dictationMicSide = "center").sanitized().dictationMicSide
+        )
+        assertEquals(
             KeyboardSettings.MIC_RIGHT,
             KeyboardSettings(dictationMicSide = "right").sanitized().dictationMicSide
         )

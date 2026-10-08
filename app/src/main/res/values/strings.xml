@@ -211,6 +211,7 @@
     <string name="dictation_language_en">English</string>
     <string name="dictation_mic_side">Microphone position</string>
     <string name="dictation_mic_left">Left</string>
+    <string name="dictation_mic_center">Center</string>
     <string name="dictation_mic_right">Right</string>
     <string name="dictation_mic_side_note">Where the microphone sits under the keys. Move it if it overlaps the button Android shows to switch keyboards.</string>
     <string name="dictation_language_note">Switching language in the middle of a sentence is unreliable with small models; the Small model copes better.</string>
