@@ -24,3 +24,14 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Bottom margin (settings, 0-48 dp) looks right with gesture navigation and with the three-button bar.
 - [ ] First launch after install: dictionaries build in the background without freezing typing (`UltimateKeys` log tag, no native crash).
 - [ ] Suggestion latency on a real device (`docs/PERFORMANCE.md`; the emulator test asserts p95 < 30 ms for engine calls only).
+
+## Phase 6 — Voice core
+
+- [ ] Dictation quality in Spanish, English and mixed sentences on the Find X8 Pro with a real `base` model (plan 6.9); note which language the auto-detection picks for short phrases and whether forcing a language helps.
+- [ ] First use: the microphone key shows the explanation, the permission dialog appears from the transparent activity, and after granting it dictation starts by itself. After refusing once, the panel offers "Open settings" and that screen opens.
+- [ ] Auto-stop after a pause feels right (1.5 s default) in a quiet room, in a street and in a car; the level meter follows the voice.
+- [ ] The microphone is released when the keyboard hides or the app changes (the system's microphone indicator goes away), and during a phone call the panel shows the "microphone busy" message.
+- [ ] Inserted text spacing and capitalization read naturally after a full stop, after a comma and in the middle of a sentence; one undo in the app removes a whole dictated phrase.
+- [ ] In a password field and with private mode on, dictated words do not appear in the suggestion bar afterwards.
+- [ ] Real-time factor and latency of `tiny` and `base` on the device (`UKVoice` log tag in a debug build); check that the threads run on the fast cores.
+- [ ] Voice panel look in every built-in style, light and dark, with the microphone in the bottom row and in the suggestion bar.

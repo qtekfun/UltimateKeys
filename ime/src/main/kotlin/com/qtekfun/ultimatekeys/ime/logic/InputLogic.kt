@@ -141,6 +141,49 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         afterTyping()
     }
 
+    /**
+     * Inserts dictated [text] at the cursor as one edit, so a single undo removes all of it. Spacing
+     * and capitalization follow what is around the cursor (see [DictationFormatter]). The words feed
+     * learning only when [learn] is true (never while private mode is on).
+     */
+    fun insertDictation(text: String, language: String, learn: Boolean) {
+        val ed = editor ?: return
+        ed.beginBatchEdit()
+        try {
+            undo = null
+            finishComposing(ed)
+            val before = ed.textBeforeCursor(CONTEXT_CHARS)
+            val formatted = DictationFormatter.format(
+                text,
+                before,
+                ed.textAfterCursor(AFTER_CHARS),
+                language,
+                prose = context.isTextual
+            )
+            if (formatted.isEmpty()) return
+            ed.commitText(formatted)
+            autoSpace = false
+            lastSpaceAt = NEVER
+            if (learn) learnWords(formatted, before.toString())
+            suggestionHook?.onComposingChanged("", contextBefore(ed))
+        } finally {
+            ed.endBatchEdit()
+        }
+        afterTyping()
+    }
+
+    private fun learnWords(inserted: String, before: String) {
+        val hook = suggestionHook ?: return
+        var history = before
+        inserted.split(' ', '\n').forEach { token ->
+            val word = token.trim { !it.isLetter() }
+            if (word.length >= MIN_LEARNED_WORD && word.all { it.isLetter() || it == '\'' }) {
+                hook.onWordFinished(word, history, false)
+            }
+            history = "$history$token "
+        }
+    }
+
     fun onSpace() {
         val ed = editor ?: return
         val now = clock()
@@ -463,6 +506,8 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         const val DOUBLE_SPACE_MS = 600L
         const val WORD_LOOKBEHIND = 64
         const val CONTEXT_CHARS = 120
+        const val AFTER_CHARS = 8
+        const val MIN_LEARNED_WORD = 2
         const val SPACE_SWALLOWING = ".,;:!?)"
         const val CLOSERS = ")]\"'"
     }

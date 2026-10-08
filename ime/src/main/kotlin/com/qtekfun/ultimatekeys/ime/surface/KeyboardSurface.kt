@@ -3,6 +3,8 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -37,7 +40,12 @@ import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.voice.VoicePanel
+import com.qtekfun.ultimatekeys.style.MicPlacement
+import com.qtekfun.ultimatekeys.style.PanelTransition
 import com.qtekfun.ultimatekeys.style.ToolIcons
+import com.qtekfun.ultimatekeys.voice.DictationState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /** The keyboard: a strip reserved for suggestions (Phase 2) above a single-canvas key grid. */
 @Composable
@@ -99,10 +107,16 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         }
 
     val showToggle = privacy.isPrivate || activeStyle.suggestionBar.toolIcons != ToolIcons.HIDDEN
+    val showMic = controller.features.voice &&
+        activeStyle.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR
+    val dictation = controller.dictation
+    val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
+    val dictating = dictation != null && dictationState != DictationState.Idle
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
     gestures.stripToggleVisible = showToggle
+    gestures.stripMicVisible = showMic
     gestures.metrics = with(density) {
         GestureMetrics(
             slop = 12.dp.toPx(),
@@ -112,6 +126,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         )
     }
     DisposableEffect(layout) { onDispose { gestures.cancelAll() } }
+    // Fingers still down on the keys must not type into the panel that replaces them.
+    LaunchedEffect(dictating) { gestures.cancelAll() }
 
     val renderer = remember(context) { SurfaceRenderer(FontCatalog(context.assets)) }
     // The system bar area below the keys carries the keyboard's own background, like a margin.
@@ -121,43 +137,62 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             .background(style.background)
             .navigationBarsPadding()
     ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(
-                    SurfaceSpec.totalHeightDp(
-                        layout.rows.size,
-                        settings.heightPercent,
-                        settings.bottomMarginDp,
-                        activeStyle,
-                        settings.numberRow
-                    ).dp
+        val totalHeight = SurfaceSpec.totalHeightDp(
+            layout.rows.size,
+            settings.heightPercent,
+            settings.bottomMarginDp,
+            activeStyle,
+            settings.numberRow
+        ).dp
+        val fadeMs = if (activeStyle.motion.transition == PanelTransition.NONE) {
+            0
+        } else {
+            activeStyle.motion.durationMs
+        }
+        Crossfade(
+            targetState = dictating,
+            animationSpec = tween(fadeMs),
+            label = "panel"
+        ) { panel ->
+            if (panel && dictation != null) {
+                VoicePanel(
+                    host = dictation,
+                    style = activeStyle,
+                    isPrivate = privacy.isPrivate,
+                    modifier = Modifier.height(totalHeight)
                 )
-                .onSizeChanged { widthPx = it.width.toFloat() }
-                .semantics {
-                    contentDescription = description
-                    if (privacy.isPrivate) stateDescription = privateOn
-                    if (controller.privacy.canToggle) {
-                        customActions = listOf(
-                            CustomAccessibilityAction(privateAction) {
-                                controller.togglePrivate()
-                                true
+            } else {
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(totalHeight)
+                        .onSizeChanged { widthPx = it.width.toFloat() }
+                        .semantics {
+                            contentDescription = description
+                            if (privacy.isPrivate) stateDescription = privateOn
+                            if (controller.privacy.canToggle) {
+                                customActions = listOf(
+                                    CustomAccessibilityAction(privateAction) {
+                                        controller.togglePrivate()
+                                        true
+                                    }
+                                )
                             }
-                        )
-                    }
+                        }
+                        .pointerInput(gestures) { trackPointers(gestures) }
+                ) {
+                    renderer.draw(
+                        this,
+                        geometry,
+                        state,
+                        presses,
+                        style,
+                        labels,
+                        dimens,
+                        StripState(strip.slots, privacy.isPrivate, showToggle, showMic)
+                    )
                 }
-                .pointerInput(gestures) { trackPointers(gestures) }
-        ) {
-            renderer.draw(
-                this,
-                geometry,
-                state,
-                presses,
-                style,
-                labels,
-                dimens,
-                StripState(strip.slots, privacy.isPrivate, showToggle)
-            )
+            }
         }
     }
 }
@@ -206,6 +241,8 @@ private fun rememberLabels(): SurfaceLabels {
         moreSymbols = "=\\<"
     )
 }
+
+private val IdleDictation = MutableStateFlow<DictationState>(DictationState.Idle)
 
 private const val LABEL_RATIO = 0.4f
 private const val PERCENT = 100f

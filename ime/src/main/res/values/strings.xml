@@ -24,4 +24,23 @@
     <string name="keyboard_description">Keyboard</string>
     <string name="private_mode_on">Private mode is on</string>
     <string name="private_mode_toggle">Turn private mode on or off</string>
+    <string name="voice_panel_description">Dictation</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_listening_hint">Pause when you finish, or tap the microphone</string>
+    <string name="voice_speaking_hint">Go on, I am listening</string>
+    <string name="voice_transcribing">Writing it down…</string>
+    <string name="voice_stop">Stop and write the text</string>
+    <string name="voice_cancel">Cancel</string>
+    <string name="voice_close">Close</string>
+    <string name="voice_private_hint">Private mode: nothing is learned</string>
+    <string name="voice_error_no_permission">Dictation needs the microphone. Sound is never saved and never leaves this device.</string>
+    <string name="voice_error_no_model">No dictation model is installed yet.</string>
+    <string name="voice_error_model_load">The dictation model could not be loaded.</string>
+    <string name="voice_error_mic">The microphone is busy or not available.</string>
+    <string name="voice_error_no_speech">Nothing was heard.</string>
+    <string name="voice_error_failed">Dictation did not work this time.</string>
+    <string name="voice_action_allow">Allow microphone</string>
+    <string name="voice_action_settings">Open settings</string>
+    <string name="voice_action_models">Choose a model</string>
+    <string name="voice_action_retry">Try again</string>
 </resources>

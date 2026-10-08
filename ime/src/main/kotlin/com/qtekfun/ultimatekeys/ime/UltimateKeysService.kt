@@ -35,6 +35,15 @@ import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
+import com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions
+import com.qtekfun.ultimatekeys.ime.voice.DictationHost
+import com.qtekfun.ultimatekeys.voice.DictationConfig
+import com.qtekfun.ultimatekeys.voice.DictationController
+import com.qtekfun.ultimatekeys.voice.DirectoryModelSource
+import com.qtekfun.ultimatekeys.voice.MicrophonePermission
+import com.qtekfun.ultimatekeys.voice.MicrophonePermissionFlow
+import com.qtekfun.ultimatekeys.voice.MicrophoneSource
+import com.qtekfun.ultimatekeys.voice.WhisperTranscriber
 import java.io.File
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
@@ -55,6 +64,7 @@ class UltimateKeysService :
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val engine = SharedEngine.instance
     private lateinit var controller: KeyboardController
+    private lateinit var transcriber: WhisperTranscriber
 
     override val lifecycle: Lifecycle get() = lifecycleRegistry
     override val savedStateRegistry: SavedStateRegistry
@@ -67,6 +77,23 @@ class UltimateKeysService :
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
         loadEngineInBackground()
         val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+        transcriber = WhisperTranscriber(
+            log = if (debuggable) { msg -> Log.d("UKVoice", msg) } else null
+        )
+        val dictation = DictationHost(
+            controller = DictationController(
+                scope = scope,
+                transcriber = transcriber,
+                microphone = { MicrophoneSource() },
+                models = DirectoryModelSource(File(filesDir, "models")),
+                permission = MicrophonePermission.of(this),
+                config = { DictationConfig() },
+                onResult = { controller.onDictationResult(it) }
+            ),
+            actions = AndroidDictationActions(this),
+            permissionResults = MicrophonePermissionFlow.results,
+            scope = scope
+        )
         controller = KeyboardController(
             logic = InputLogic(),
             repository = settingsRepository(),
@@ -74,6 +101,7 @@ class UltimateKeysService :
             feedback = Feedback(this),
             engine = engine,
             styles = styleRepository(),
+            dictation = dictation,
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
             },
@@ -148,6 +176,7 @@ class UltimateKeysService :
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
+        controller.onKeyboardHidden()
         controller.logic.onFinishInput()
         controller.privacy.onKeyboardClosed()
         moveTo(Lifecycle.State.STARTED)
@@ -175,7 +204,9 @@ class UltimateKeysService :
 
     override fun onDestroy() {
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+        controller.onKeyboardHidden()
         scope.cancel()
+        transcriber.close()
         engine.close()
         store.clear()
         super.onDestroy()

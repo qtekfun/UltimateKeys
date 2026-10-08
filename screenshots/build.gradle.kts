@@ -28,6 +28,7 @@ tasks.withType<Test>().configureEach {
 dependencies {
     testImplementation(projects.ime)
     testImplementation(projects.style)
+    testImplementation(libs.androidx.compose.foundation)
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
     testImplementation(libs.roborazzi)

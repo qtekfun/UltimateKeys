@@ -23,6 +23,7 @@ import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 import com.qtekfun.ultimatekeys.ime.logic.KeyboardState
 import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
+import com.qtekfun.ultimatekeys.style.MicPlacement
 import com.qtekfun.ultimatekeys.style.Style
 
 /**
@@ -90,7 +91,13 @@ fun KeyboardPreview(
                 surface,
                 labels,
                 dimens,
-                StripState(content.suggestions, content.private, content.showToggle)
+                StripState(
+                    content.suggestions,
+                    content.private,
+                    content.showToggle,
+                    showMic = content.features.voice &&
+                        style.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR
+                )
             )
         }
     }

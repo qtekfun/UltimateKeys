@@ -24,4 +24,23 @@
     <string name="keyboard_description">Teclado</string>
     <string name="private_mode_on">Modo privado activado</string>
     <string name="private_mode_toggle">Activar o desactivar el modo privado</string>
+    <string name="voice_panel_description">Dictado</string>
+    <string name="voice_listening">Escuchando…</string>
+    <string name="voice_listening_hint">Haz una pausa al terminar o toca el micrófono</string>
+    <string name="voice_speaking_hint">Sigue, te escucho</string>
+    <string name="voice_transcribing">Escribiendo…</string>
+    <string name="voice_stop">Detener y escribir el texto</string>
+    <string name="voice_cancel">Cancelar</string>
+    <string name="voice_close">Cerrar</string>
+    <string name="voice_private_hint">Modo privado: no se aprende nada</string>
+    <string name="voice_error_no_permission">El dictado necesita el micrófono. El sonido nunca se guarda ni sale de este dispositivo.</string>
+    <string name="voice_error_no_model">Todavía no hay ningún modelo de dictado instalado.</string>
+    <string name="voice_error_model_load">No se pudo cargar el modelo de dictado.</string>
+    <string name="voice_error_mic">El micrófono está ocupado o no está disponible.</string>
+    <string name="voice_error_no_speech">No se oyó nada.</string>
+    <string name="voice_error_failed">El dictado no ha funcionado esta vez.</string>
+    <string name="voice_action_allow">Permitir micrófono</string>
+    <string name="voice_action_settings">Abrir ajustes</string>
+    <string name="voice_action_models">Elegir un modelo</string>
+    <string name="voice_action_retry">Reintentar</string>
 </resources>

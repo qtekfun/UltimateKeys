@@ -35,6 +35,16 @@ kover {
                     "com.qtekfun.ultimatekeys.ime.surface.ToneSource\$Companion",
                     "com.qtekfun.ultimatekeys.styles.*",
                     "com.qtekfun.ultimatekeys.core.SettingsStoreKt*",
+                    // Dictation: JNI glue, Android audio and permission plumbing and the panel's
+                    // drawing. Their logic lives in tested classes; the emulator test covers JNI.
+                    "com.qtekfun.ultimatekeys.voice.NativeWhisper",
+                    "com.qtekfun.ultimatekeys.voice.JniWhisperBackend",
+                    "com.qtekfun.ultimatekeys.voice.MicrophoneSource",
+                    "com.qtekfun.ultimatekeys.voice.MicrophonePermission\$Companion*",
+                    "com.qtekfun.ultimatekeys.voice.MicrophonePermissionFlow",
+                    "com.qtekfun.ultimatekeys.voice.RecordAudioPermissionActivity*",
+                    "com.qtekfun.ultimatekeys.ime.voice.VoicePanelKt*",
+                    "com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions",
                 )
                 
             }

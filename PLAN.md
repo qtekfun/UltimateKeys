@@ -108,14 +108,14 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 6 — Voice core (whisper.cpp)
 
-- [ ] 6.1 whisper.cpp git submodule at a release tag; CMake for all ABIs; release flags `-O3`, NEON on ARM.
-- [ ] 6.2 JNI + `SpeechTranscriber` API; model load/unload; threads on big cores.
-- [ ] 6.3 Audio capture 16 kHz mono float in memory; VAD auto-stop with configurable silence timeout.
-- [ ] 6.4 Language auto-detect restricted to `es`/`en`; force options.
-- [ ] 6.5 Voice panel UI (styled): listening animation, level meter, stop, cancel, transcribing, error states.
-- [ ] 6.6 `RECORD_AUDIO` flow via transparent activity.
-- [ ] 6.7 Insertion with spacing/capitalization; single undo step; respects private mode.
-- [ ] 6.8 Tests with fake transcriber; emulator JNI smoke test with `tiny` model (CI cache only).
+- [x] 6.1 whisper.cpp git submodule at a release tag; CMake for all ABIs; release flags `-O3`, NEON on ARM.
+- [x] 6.2 JNI + `SpeechTranscriber` API; model load/unload; threads on big cores.
+- [x] 6.3 Audio capture 16 kHz mono float in memory; VAD auto-stop with configurable silence timeout.
+- [x] 6.4 Language auto-detect restricted to `es`/`en`; force options.
+- [x] 6.5 Voice panel UI (styled): listening animation, level meter, stop, cancel, transcribing, error states.
+- [x] 6.6 `RECORD_AUDIO` flow via transparent activity.
+- [x] 6.7 Insertion with spacing/capitalization; single undo step; respects private mode.
+- [x] 6.8 Tests with fake transcriber; emulator JNI smoke test with `tiny` model (CI cache only).
 - [ ] 6.9 **[HUMAN]** Dictation quality in ES, EN and mixed on the Find X8 Pro.
 
 **DoD:** dictation end to end on emulator with a provided model; release `v0.7.0`.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2026 UltimateKeys contributors
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<resources>
+    <style name="Theme.UltimateKeys.Transparent" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

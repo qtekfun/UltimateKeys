@@ -13,6 +13,7 @@ import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.ime.suggest.PrivacyGuardedEngine
 import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
+import com.qtekfun.ultimatekeys.ime.voice.DictationHost
 import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
@@ -23,6 +24,7 @@ import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
 import com.qtekfun.ultimatekeys.style.StyleRepository
+import com.qtekfun.ultimatekeys.voice.DictationResult
 import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +46,8 @@ class KeyboardController(
     suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val logLatency: ((String) -> Unit)? = null,
     styles: StyleRepository = InMemoryStyleRepository(),
+    /** Dictation; null hides the microphone key (no speech engine in this build). */
+    val dictation: DictationHost? = null,
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
@@ -56,8 +60,8 @@ class KeyboardController(
     val style: StateFlow<Style> =
         styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
 
-    /** Optional keys that exist yet; flipped on by the emoji and voice phases. */
-    val features = BottomRowFeatures()
+    /** Optional keys that exist yet; the microphone appears once dictation is wired in. */
+    val features = BottomRowFeatures(voice = dictation != null)
     val latency = LatencyTracker()
     val suggestions = SuggestionController(
         engine = PrivacyGuardedEngine(engine) { privacy.isPrivate },
@@ -148,10 +152,20 @@ class KeyboardController(
 
             KeyAction.SWITCH_SYMBOLS_2 -> logic.showPage(Page.SYMBOLS_2)
 
-            // Their keys only appear once the emoji panel and dictation exist (BottomRowFeatures).
-            KeyAction.EMOJI, KeyAction.MIC -> Unit
+            KeyAction.MIC -> dictation?.open()
+
+            // Its key only appears once the emoji panel exists (BottomRowFeatures).
+            KeyAction.EMOJI -> Unit
         }
     }
+
+    /** Dictated text arrives: insert it as one edit; nothing is learned while private. */
+    fun onDictationResult(result: DictationResult) {
+        logic.insertDictation(result.text, result.language, learn = !privacy.isPrivate)
+    }
+
+    /** The keyboard is going away: a running dictation must not keep the microphone. */
+    fun onKeyboardHidden() = dictation?.cancel()
 
     /** A tap on slot [index] of the suggestion strip. */
     fun onSuggestionTapped(index: Int) {
