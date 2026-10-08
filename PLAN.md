@@ -66,7 +66,7 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 3 — Style engine
 
-- [ ] 3.1 `:style` schema (versioned, Kotlin serialization) with every parameter in `SPEC.md` §6; validation, clamping and schema migration.
+- [x] 3.1 `:style` schema (versioned, Kotlin serialization) with every parameter in `SPEC.md` §6; validation, clamping and schema migration.
 - [ ] 3.2 Theming runtime: the keyboard surface, suggestion bar and panels read everything from the active Style; live updates without IME restart.
 - [ ] 3.3 Material You dynamic colors and light/dark variants per style.
 - [ ] 3.4 Bundle open fonts (at least 4, e.g. Inter, Roboto Flex, Atkinson Hyperlegible, a rounded one) and Material Symbols; licenses recorded.
