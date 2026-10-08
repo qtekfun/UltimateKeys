@@ -52,6 +52,9 @@ class TypingSmokeTest {
         device.executeShellCommand("settings put secure show_ime_with_hard_keyboard 1")
         device.pressHome()
         device.executeShellCommand("am start -n ${context.packageName}/.MainActivity")
+        // The try-it field lives on the Setup screen, one tap from the home list.
+        device.wait(Until.findObject(By.text(Pattern.compile("Setup|Primeros pasos"))), TIMEOUT)
+            ?.click()
         device.wait(Until.hasObject(By.clazz("android.widget.EditText")), TIMEOUT)
         device.findObject(By.clazz("android.widget.EditText")).click()
         assertNotNull(
