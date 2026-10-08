@@ -131,7 +131,7 @@ class PrivateModeTest {
         val engine = FakeEngine()
         var private = true
         val guarded = PrivacyGuardedEngine(engine) { private }
-        guarded.learn("secret", emptyList(), Locale.ENGLISH)
+        guarded.learn("diary", emptyList(), Locale.ENGLISH)
         assertTrue(engine.learned.isEmpty())
         private = false
         guarded.learn("fine", emptyList(), Locale.ENGLISH)
