@@ -11,6 +11,7 @@ android {
 
 dependencies {
     api(projects.style)
+    api(projects.languages)
     api(libs.kotlinx.coroutines.core)
     api(libs.androidx.datastore.preferences)
 }

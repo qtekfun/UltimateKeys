@@ -15,6 +15,7 @@ enum class SettingsRoute(@StringRes val title: Int) {
     Home(R.string.app_name),
     Setup(R.string.section_setup),
     Typing(R.string.section_typing),
+    Languages(R.string.section_languages),
     Suggestions(R.string.section_suggestions),
     Gestures(R.string.section_gestures),
     Feedback(R.string.section_feedback),
@@ -98,14 +99,4 @@ object HomeModel {
     )
 
     private fun onOff(on: Boolean) = if (on) Summary.On else Summary.Off
-}
-
-/** The names of the letter layouts the keyboard ships. */
-object LayoutNames {
-    @StringRes
-    fun label(id: String): Int? = when (id) {
-        "es_qwerty" -> R.string.layout_es_qwerty
-        "en_qwerty" -> R.string.layout_en_qwerty
-        else -> null
-    }
 }

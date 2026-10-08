@@ -3,6 +3,10 @@
 
 package com.qtekfun.ultimatekeys.dictionaries
 
+import com.qtekfun.ultimatekeys.engine.WordFrequency
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
+import com.qtekfun.ultimatekeys.layouts.CharKey
+import com.qtekfun.ultimatekeys.layouts.LayoutRepository
 import java.io.File
 import java.util.Locale
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -20,9 +24,12 @@ class PinnedDictionariesTest {
     @TempDir
     lateinit var tmp: File
 
+    private fun installed() =
+        DictionaryInstaller(source, File(tmp, "dictionaries")).ensureInstalled()
+
     @Test
     fun `installs the pinned dictionaries and they parse`() {
-        val locator = DictionaryInstaller(source, File(tmp, "dictionaries")).ensureInstalled()
+        val locator = installed()
         assertEquals("aosp-combined-gz", locator.format)
         val spanish = WordListParser.parseGzip(
             locator.fileFor(Locale.forLanguageTag("es"))!!.inputStream()
@@ -35,5 +42,89 @@ class PinnedDictionariesTest {
         assertTrue(spanish.words.any { it.word == "señor" })
         assertTrue(english.words.any { it.word == "the" && it.frequency > 200 })
         assertTrue(spanish.words.all { it.frequency in 0..255 })
+    }
+
+    @Test
+    fun `the catalog and the pins list exactly the same languages`() {
+        val locator = installed()
+        val catalog = LanguageCatalog.all.map { it.dictionaryId }.sorted()
+        assertEquals(catalog, locator.languages.sorted())
+    }
+
+    @Test
+    fun `every list parses, is big enough and is sorted by frequency`() {
+        val locator = installed()
+        LanguageCatalog.all.forEach { language ->
+            val list = WordListParser.parseGzip(locator.fileFor(language.locale)!!.inputStream())
+            assertTrue(list.words.size > 30_000, "${language.tag} has ${list.words.size} words")
+            assertTrue(list.words.all { it.frequency in 0..255 }, language.tag)
+            // The word cap keeps the head of the list, so the head must be the most frequent words.
+            val head = list.words.take(MAX_CHECKED).map { it.frequency }
+            assertEquals(head.sortedDescending(), head, "${language.tag} is not sorted")
+            assertEquals(
+                list.words.maxOf { it.frequency },
+                list.words.first().frequency,
+                language.tag
+            )
+        }
+    }
+
+    @Test
+    fun `the common words of each language can be typed on its default layout`() {
+        val locator = installed()
+        LanguageCatalog.all.forEach { language ->
+            val keys = LayoutRepository.load(language.defaultLayoutId).rows.flatMap { it.keys }
+                .filterIsInstance<CharKey>()
+            val reachable = keys.flatMap { listOf(it.output) + it.alternatives }
+                .flatMap { it.lowercase(Locale.ROOT).toList() }.toSet()
+            val punctuation = "'’-.·"
+            val list = WordListParser.parseGzip(locator.fileFor(language.locale)!!.inputStream())
+            val common = list.words.filter { !it.notAWord }.take(COMMON_WORDS)
+            val untypable = common.filter { w ->
+                w.word.lowercase(language.locale)
+                    .any { it !in reachable && it !in punctuation && !it.isDigit() }
+            }
+            val missing = untypable.flatMap { w ->
+                w.word.lowercase(language.locale).filter { it !in reachable && it !in punctuation }
+                    .toList()
+            }.groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.take(8)
+            assertTrue(
+                untypable.size <= common.size / 100,
+                "${language.tag}: ${untypable.size} of ${common.size} common words need keys " +
+                    "the layout lacks: $missing, e.g. ${untypable.take(5).map { it.word }}"
+            )
+        }
+    }
+
+    @Test
+    fun `the word cap keeps the most frequent words of the real lists`() {
+        val locator = installed()
+        listOf("ru", "ro", "es").forEach { tag ->
+            val language = LanguageCatalog.find(tag)!!
+            val full = WordListParser.parseGzip(locator.fileFor(language.locale)!!.inputStream())
+                .words.filter { !it.notAWord && !it.possiblyOffensive }
+            val built = mutableListOf<WordFrequency>()
+            BinaryDictionaries(locator, File(tmp, "binary-$tag")) { dir, _, words ->
+                dir.mkdirs()
+                built += words
+                true
+            }.prepare(listOf(tag))
+            val cap = BinaryDictionaries.MAX_WORDS
+            assertEquals(minOf(cap, full.size), built.size, tag)
+            // The cap is a prefix of the list, which is sorted by frequency: nothing common is dropped.
+            assertEquals(
+                full.take(COMMON_WORDS).map {
+                    it.word
+                },
+                built.take(COMMON_WORDS).map { it.word },
+                tag
+            )
+            assertTrue(built.last().frequency >= full.getOrNull(cap)?.frequency ?: 0, tag)
+        }
+    }
+
+    private companion object {
+        const val MAX_CHECKED = 5000
+        const val COMMON_WORDS = 20_000
     }
 }

@@ -271,11 +271,75 @@ class AospSuggestionEngineTest {
     }
 
     @Test
+    fun `releasing a language frees its dictionaries and keeps the others`() {
+        val engine = engine()
+        engine.suggest(emptyList(), "hel", english)
+        engine.suggest(emptyList(), "hol", spanish)
+        val liveBefore = bridge.liveSessions
+
+        engine.releaseLanguage(english)
+        engine.releaseLanguage(english) // nothing left to release
+
+        assertTrue(bridge.liveSessions < liveBefore)
+        assertEquals(1, bridge.liveProximityInfos)
+        assertTrue(bridge.dictAt("history-en").closed)
+        assertFalse(bridge.dictAt("history-es").closed)
+        // The language is reopened on demand.
+        engine.suggest(emptyList(), "hel", english)
+        assertEquals(2, bridge.liveProximityInfos)
+    }
+
+    @Test
     fun `languages are independent`() {
         val engine = engine()
         engine.addToUserDictionary("zebra", english)
 
         assertTrue(engine.userDictionaryWords(spanish).isEmpty())
         assertTrue(File(storage, "user-en").isDirectory)
+    }
+
+    @Test
+    fun `non-ascii words and case rules go through intact`() {
+        val russian = Locale.forLanguageTag("ru")
+        val turkish = Locale.forLanguageTag("tr")
+        bridge.mainScripts[mainPath] = { dict ->
+            dict.probabilities["привет"] = 200
+            dict.probabilities["işte"] = 180
+            dict.typingResults = { composing, _ ->
+                when (composing.lowercase(turkish)) {
+                    "iş" -> listOf(RawSuggestion("işte", 100, 1))
+                    else -> listOf(RawSuggestion("привет", 100, 1))
+                }
+            }
+        }
+        val engine = engine()
+
+        assertEquals("Привет", engine.suggest(emptyList(), "Прив", russian).single().word)
+        assertEquals("ПРИВЕТ", engine.suggest(emptyList(), "ПРИВ", russian).single().word)
+        assertTrue(engine.isValidWord("привет", russian))
+        assertFalse(engine.isValidWord("hello", russian))
+        // Turkish: the dotted capital I of "İş" must give "İşte", not "Işte".
+        assertEquals("İşte", engine.suggest(emptyList(), "İş", turkish).single().word)
+        assertEquals("İŞTE", engine.suggest(emptyList(), "İŞ", turkish).single().word)
+    }
+
+    @Test
+    fun `the proximity grid comes from the geometry given for the locale`() {
+        val russian = Locale.forLanguageTag("ru")
+        val cyrillic = KeyboardGeometry.fromRows(listOf("йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю"))
+        val engine = AospSuggestionEngine(
+            storageDir = storage,
+            dictionaries = { DictionaryFile(mainPath, 0L, 1000L) },
+            geometryFor = { if (it.language == "ru") cyrillic else KeyboardGeometry.qwertyFor(it) },
+            learningEnabled = { learning },
+            autoCorrectThreshold = 0.185f,
+            clockMillis = { nowMillis },
+            bridge = bridge
+        )
+
+        engine.suggest(emptyList(), "при", russian)
+        engine.suggest(emptyList(), "hel", english)
+
+        assertEquals(listOf(cyrillic, KeyboardGeometry.qwertyFor(english)), bridge.geometries)
     }
 }

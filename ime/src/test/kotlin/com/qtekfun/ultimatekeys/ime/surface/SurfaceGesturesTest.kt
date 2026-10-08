@@ -28,16 +28,26 @@ import org.junit.jupiter.api.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SurfaceGesturesTest {
-    private class Rig(scope: TestScope, text: String = "") {
+    private class Rig(
+        scope: TestScope,
+        text: String = "",
+        settings: KeyboardSettings =
+            KeyboardSettings(longPressDelayMs = 300, letterLayoutId = "es_qwerty")
+    ) {
         val editor = FakeEditorConnection(text)
         val logic = InputLogic()
-        val repo =
-            FakeSettingsRepository(
-                KeyboardSettings(longPressDelayMs = 300, letterLayoutId = "es_qwerty")
-            )
+        val repo = FakeSettingsRepository(settings)
         var pickerShown = 0
-        val controller =
-            KeyboardController(logic, repo, scope.backgroundScope, null) { pickerShown++ }
+        var languagesShown = 0
+        var settingsShown = 0
+        val controller = KeyboardController(
+            logic,
+            repo,
+            scope.backgroundScope,
+            null,
+            openSettings = { settingsShown++ },
+            openLanguages = { languagesShown++ }
+        ) { pickerShown++ }
         var last: List<PressView> = emptyList()
         val gestures = SurfaceGestures(controller, scope.backgroundScope) { last = it }
         val geometry: KeyGeometry
@@ -250,6 +260,61 @@ class SurfaceGesturesTest {
         r.gestures.up(1)
         assertEquals(1, r.pickerShown)
         assertEquals("", r.editor.text.toString())
+    }
+
+    @Test
+    fun `the language key cycles through three languages and wraps`() = runTest {
+        val r = Rig(
+            this,
+            settings = KeyboardSettings(
+                longPressDelayMs = 300,
+                enabledLanguages = listOf("es", "fr", "ru"),
+                letterLayoutId = "es_qwerty"
+            )
+        )
+        val seen = mutableListOf(r.repo.settings.value.letterLayoutId)
+        repeat(3) {
+            r.tap(1, r.key(KeyAction.GLOBE))
+            runCurrent()
+            seen += r.repo.settings.value.letterLayoutId
+        }
+        assertEquals(listOf("es_qwerty", "fr_azerty", "ru_jcuken", "es_qwerty"), seen)
+    }
+
+    @Test
+    fun `the language key uses the layout chosen for the language`() = runTest {
+        val r = Rig(
+            this,
+            settings = KeyboardSettings(
+                longPressDelayMs = 300,
+                enabledLanguages = listOf("es", "fr"),
+                languageLayouts = mapOf("fr" to "fr_qwerty"),
+                letterLayoutId = "es_qwerty"
+            )
+        )
+        r.tap(1, r.key(KeyAction.GLOBE))
+        runCurrent()
+        assertEquals("fr_qwerty", r.repo.settings.value.letterLayoutId)
+    }
+
+    @Test
+    fun `the menu entries open the settings, the picker and the languages screen`() = runTest {
+        val r = Rig(this)
+        r.gestures.globeMenu = listOf("Settings", "Keyboards", "Languages")
+        val globe = r.key(KeyAction.GLOBE)
+        for (entry in 0..2) {
+            r.gestures.down(1, globe.centerX, globe.top + 10)
+            advanceTimeBy(350)
+            runCurrent()
+            val menu = r.last.single().chooser!!
+            assertEquals(3, menu.items.size)
+            val cell = menu.cellWidth
+            r.gestures.move(1, menu.left + cell * entry + cell / 2, globe.top - 5)
+            r.gestures.up(1)
+        }
+        assertEquals(1, r.settingsShown)
+        assertEquals(1, r.pickerShown)
+        assertEquals(1, r.languagesShown)
     }
 
     @Test

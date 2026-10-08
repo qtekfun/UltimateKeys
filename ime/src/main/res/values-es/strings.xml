@@ -90,5 +90,6 @@
     <string name="panel_tone_medium_dark">Medio oscuro</string>
     <string name="panel_tone_dark">Oscuro</string>
     <string name="globe_menu_settings">Ajustes</string>
+    <string name="globe_menu_languages">Idiomas</string>
     <string name="globe_menu_keyboards">Teclados</string>
 </resources>

@@ -60,8 +60,12 @@ internal class FakeNativeBridge : NativeBridge {
         liveSessions--
     }
 
-    override fun newProximityInfo(geometry: KeyboardGeometry): Long =
-        (++liveProximityInfos).toLong()
+    val geometries = mutableListOf<KeyboardGeometry>()
+
+    override fun newProximityInfo(geometry: KeyboardGeometry): Long {
+        geometries += geometry
+        return (++liveProximityInfos).toLong()
+    }
 
     override fun releaseProximityInfo(proximityInfo: Long) {
         liveProximityInfos--

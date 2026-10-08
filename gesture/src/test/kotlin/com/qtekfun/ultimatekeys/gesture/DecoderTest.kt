@@ -222,8 +222,18 @@ class GestureDecoderTest {
     }
 
     @Test
-    fun `words that need a missing key are never candidates`() {
+    fun `words with a letter that has no key are traced by the base letter`() {
         val v = TestKeyboard.vocabulary(Triple(0, "año", 200), Triple(0, "ano", 100))
+        val d = GestureDecoder(v)
+        assertEquals(
+            listOf("año", "ano"),
+            d.decode(TestKeyboard.pathOf("ano"), keyboard).map { it.word }
+        )
+    }
+
+    @Test
+    fun `words that need a key without any stand-in are never candidates`() {
+        val v = TestKeyboard.vocabulary(Triple(0, "дом", 200), Triple(0, "ano", 100))
         val d = GestureDecoder(v)
         assertEquals(listOf("ano"), d.decode(TestKeyboard.pathOf("ano"), keyboard).map { it.word })
     }

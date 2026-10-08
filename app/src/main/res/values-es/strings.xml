@@ -218,7 +218,7 @@
     <string name="dictation_mic_center">Centro</string>
     <string name="dictation_mic_right">Derecha</string>
     <string name="dictation_mic_side_note">Dónde está el micrófono bajo las teclas. Muévelo si se solapa con el botón que Android muestra para cambiar de teclado.</string>
-    <string name="dictation_language_note">Cambiar de idioma a mitad de frase no es fiable con los modelos pequeños; el modelo Small lo hace mejor.</string>
+    <string name="dictation_language_note">El dictado solo entiende español e inglés por ahora, aunque el teclado escriba en más idiomas. Cambiar de idioma a mitad de frase no es fiable con los modelos pequeños; el modelo Small lo hace mejor.</string>
     <string name="dictation_silence_label">Parar tras silencio</string>
     <string name="dictation_silence_note">Cuánto dura una pausa para que el dictado termine solo.</string>
     <string name="nav_back">Atrás</string>
@@ -241,9 +241,13 @@
     <string name="group_layout">Distribución</string>
     <string name="group_typing_help">Al escribir</string>
     <string name="group_keys_press">Teclas</string>
-    <string name="setting_layout">Distribución de letras</string>
-    <string name="layout_es_qwerty">Español (QWERTY)</string>
-    <string name="layout_en_qwerty">Inglés (QWERTY)</string>
+    <string name="section_languages">Idiomas</string>
+    <string name="languages_footer">Las sugerencias mezclan todos los idiomas activados, así que puedes escribir en varios sin cambiar. La tecla de idioma pasa de uno a otro en este orden. Cada idioma usa memoria; puedes activar hasta %1$d.</string>
+    <string name="languages_status_preparing">Preparando el diccionario…</string>
+    <string name="languages_status_failed">Diccionario no disponible</string>
+    <string name="languages_replaces">Sustituye a %1$s</string>
+    <string name="languages_space_note">La barra espaciadora muestra el idioma en que escribes; toca la tecla de idioma para pasar al siguiente y mantenla pulsada para más opciones.</string>
+    <string name="setting_language_on_space">Mostrar el idioma en la barra espaciadora</string>
     <string name="suggestions_learned_note">Las palabras que añades y las que aprende el teclado se quedan en este dispositivo.</string>
     <string name="gestures_note">Desliza el dedo sobre las letras para escribir una palabra.</string>
     <string name="feedback_note">Baja el sonido de las teclas al mínimo para que no suenen.</string>

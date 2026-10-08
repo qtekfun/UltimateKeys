@@ -21,8 +21,8 @@ A modern Android keyboard that is private, fully offline and looks the way you w
 
 Available today (see the changelog for the version that introduced each one):
 
-- **Typing**: Spanish and English QWERTY (with `ñ`), two symbol pages, numeric and phone layouts, an optional number row, long-press accents and alternatives, shift and caps lock, auto-capitalization, double space for a period, an accelerating delete key, cursor control on the space bar and drag-to-select on delete.
-- **Suggestions in two languages**: up to three suggestions, auto-correction (backspace right after undoes it) and next-word prediction, mixing Spanish and English with no switching. Your own dictionary can be imported and exported.
+- **Typing**: 22 languages (24 with the regional variants), each with its own layout: Spanish and English QWERTY (with `ñ`), French AZERTY, German QWERTZ, Turkish Q, Cyrillic and Greek layouts and more, two symbol pages, numeric and phone layouts, an optional number row, long-press accents and alternatives, shift and caps lock, auto-capitalization, double space for a period, an accelerating delete key, cursor control on the space bar and drag-to-select on delete.
+- **Suggestions in several languages at once**: up to three suggestions, auto-correction (backspace right after undoes it) and next-word prediction, mixing up to six languages you turn on in Settings > Typing > Languages with no switching (Spanish and English by default). Your own dictionary can be imported and exported.
 - **Gesture typing**: glide over the letters; the best word is typed, the alternatives wait in the suggestion bar.
 - **Style engine**: see below.
 - **Private mode**: starts by itself in incognito tabs and password fields, or by hand. While it is on nothing is learned and nothing is stored in the clipboard history.
@@ -106,7 +106,7 @@ Issues and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Co
 
 UltimateKeys is original Kotlin code that builds on these projects, each under its own license:
 
-- The suggestion engine of the **Android Open Source Project** (LatinIME native code and the Spanish and English word lists), Apache-2.0, vendored under `third_party/aosp-latinime/` with its notice and a list of modifications.
+- The suggestion engine of the **Android Open Source Project** (LatinIME native code and the word lists of 24 languages), Apache-2.0, vendored under `third_party/aosp-latinime/` with its notice and a list of modifications.
 - **whisper.cpp** and ggml by Georgi Gerganov and contributors, MIT, as a git submodule in `third_party/whisper.cpp`; the speech models are OpenAI Whisper weights.
 - **Unicode CLDR** annotations and the Unicode emoji data, Unicode License v3, for emoji search.
 - Open fonts (Inter, Roboto Flex, Atkinson Hyperlegible, Nunito; SIL OFL 1.1) and Material Symbols (Apache-2.0).

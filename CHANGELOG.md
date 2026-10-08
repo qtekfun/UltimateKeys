@@ -9,6 +9,17 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Type in many languages, several at once. Settings > Typing > Languages lists 22 languages (24 with the regional variants English US and UK, Portuguese Brazil and Portugal): Spanish, English, French, German, Italian, Portuguese, Dutch, Polish, Czech, Danish, Norwegian Bokmal, Swedish, Finnish, Turkish, Romanian, Croatian, Slovenian, Serbian (Cyrillic), Lithuanian, Latvian, Russian and Greek, each with its own layout (AZERTY, QWERTZ, Turkish Q, Cyrillic, Greek, and Dvorak and Colemak for English) and a dictionary. Turn on up to six; suggestions, auto-correction, next-word prediction and gesture typing mix all of them with no switching, and the language key cycles through them.
+- The space bar shows the language you are typing in (it can be turned off), and the menu of the language key has a Languages entry that opens the screen.
+
+### Changed
+
+- The letter layout setting moved into Settings > Typing > Languages, where each language with several layouts has its own choice. Spanish and English stay the default.
+- Dictionaries are copied and built only for the languages that are turned on, in the background; each one takes a few seconds the first time it is enabled.
+- Dictation and emoji search still understand Spanish and English only.
+
 ## [1.0.2] - 2026-10-08
 
 ## [1.0.1] - 2026-10-08

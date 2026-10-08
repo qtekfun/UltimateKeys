@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.core.SettingsRepository
 import com.qtekfun.ultimatekeys.core.settingsRepository
+import com.qtekfun.ultimatekeys.ime.MainRoutes
 import com.qtekfun.ultimatekeys.models.ModelsActivity
 import com.qtekfun.ultimatekeys.settings.AboutScreen
 import com.qtekfun.ultimatekeys.settings.ClipboardScreen
@@ -32,6 +33,7 @@ import com.qtekfun.ultimatekeys.settings.FeedbackScreen
 import com.qtekfun.ultimatekeys.settings.GesturesScreen
 import com.qtekfun.ultimatekeys.settings.HomeScreen
 import com.qtekfun.ultimatekeys.settings.HomeTarget
+import com.qtekfun.ultimatekeys.settings.LanguagesScreen
 import com.qtekfun.ultimatekeys.settings.PrivacyScreen
 import com.qtekfun.ultimatekeys.settings.SettingsRoute
 import com.qtekfun.ultimatekeys.settings.SetupScreen
@@ -51,12 +53,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val repository = settingsRepository()
-        setUkContent { SettingsHost(repository) }
+        val start = if (intent.getStringExtra(MainRoutes.EXTRA_ROUTE) == MainRoutes.LANGUAGES) {
+            listOf(SettingsRoute.Home, SettingsRoute.Typing, SettingsRoute.Languages)
+        } else {
+            listOf(SettingsRoute.Home)
+        }
+        setUkContent { SettingsHost(repository, start) }
     }
 }
 
 @Composable
-private fun SettingsHost(repository: SettingsRepository) {
+private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRoute>) {
     val context = LocalContext.current
     var status by remember { mutableStateOf(ImeStatus.read(context)) }
     val owner = LocalLifecycleOwner.current
@@ -72,7 +79,7 @@ private fun SettingsHost(repository: SettingsRepository) {
     val update: ((KeyboardSettings) -> KeyboardSettings) -> Unit = { transform ->
         scope.launch { repository.update(transform) }
     }
-    var stack by rememberRouteStack(SettingsRoute.Home, SettingsRoute.entries)
+    var stack by rememberRouteStack(SettingsRoute.Home, SettingsRoute.entries, start)
     BackHandler(enabled = stack.canGoBack) { stack = stack.back() }
     val back = { stack = stack.back() }
 
@@ -97,7 +104,14 @@ private fun SettingsHost(repository: SettingsRepository) {
             onBack = back
         )
 
-        SettingsRoute.Typing -> TypingScreen(settings, update, back)
+        SettingsRoute.Typing -> TypingScreen(
+            settings,
+            update,
+            onOpenLanguages = { stack = stack.open(SettingsRoute.Languages) },
+            onBack = back
+        )
+
+        SettingsRoute.Languages -> LanguagesScreen(settings, update, back)
 
         SettingsRoute.Suggestions -> SuggestionsScreen(
             settings,

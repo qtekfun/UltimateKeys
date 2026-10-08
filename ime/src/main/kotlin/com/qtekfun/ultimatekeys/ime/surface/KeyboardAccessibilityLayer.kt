@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -107,8 +108,10 @@ internal fun KeyboardAccessibilityOverlay(
     modifier: Modifier = Modifier
 ) {
     val labels = rememberA11yLabels()
-    val nodes = remember(geometry, state, strip, labels) {
-        KeyAccessibility.nodes(geometry, state, strip, labels)
+    val settings by controller.settings.collectAsState()
+    val language = settings.activeLanguage.nativeName
+    val nodes = remember(geometry, state, strip, labels, language) {
+        KeyAccessibility.nodes(geometry, state, strip, labels, language)
     }
     val privateState = stringResource(R.string.private_mode_on).takeIf { strip.privateOn }
     val toggle = stringResource(R.string.private_mode_toggle).takeIf { strip.canTogglePrivate }
@@ -176,6 +179,7 @@ internal fun rememberA11yLabels(): A11yLabels {
             globe = text(R.string.key_language),
             keyboardPicker = text(R.string.key_choose_keyboard),
             openSettings = text(R.string.globe_menu_settings),
+            openLanguages = text(R.string.globe_menu_languages),
             symbols = text(R.string.key_symbols),
             letters = text(R.string.key_letters),
             moreSymbols = text(R.string.key_more_symbols),

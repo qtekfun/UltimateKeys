@@ -26,12 +26,23 @@ import kotlin.math.roundToInt
  *   [MixedConfig.autoCorrectConfidence] confident and its engine asked for it, and the word being typed is not
  *   already valid in any configured language (a valid word from the other language is never "corrected").
  *
- * @param engines one engine per language, keyed by locale; only the language part of the key is used.
+ * With more than two languages the same rules apply: every language gets a weight, the primary one starts ahead
+ * but each other language keeps at least [MixedConfig.minSecondaryPrior], and autocorrect is allowed when the top
+ * suggestion's language clearly leads (at least twice the runner-up) even if its weight is below the gate, since
+ * with six languages a weight of 0.7 is out of reach.
+ *
+ * @param engines one engine per language, keyed by locale; only the language part of the key is used. Regional
+ *   variants of one language (en-US, en-GB) cannot be mixed: the keyboard enables only one of them.
  */
 class MixedSuggestionEngine(
     engines: Map<Locale, SuggestionEngine>,
     private val primary: Locale = Locale.forLanguageTag("es"),
-    private val config: MixedConfig = MixedConfig()
+    private val config: MixedConfig = MixedConfig(),
+    /**
+     * False when the engines are shared with something that outlives this object (the keyboard swaps in a new
+     * mixed engine whenever the enabled languages or the active language change, over the same native engine).
+     */
+    private val closeEngines: Boolean = true
 ) : SuggestionEngine {
     private class Member(val locale: Locale, val engine: SuggestionEngine)
 
@@ -130,6 +141,7 @@ class MixedSuggestionEngine(
     /** Closes every engine even if some fail; the first failure is rethrown with the others suppressed. */
     @Suppress("TooGenericExceptionCaught")
     override fun close() {
+        if (!closeEngines) return
         var failure: Throwable? = null
         for (member in members.values) {
             try {
@@ -199,7 +211,7 @@ class MixedSuggestionEngine(
         val allowed = top.autoCorrect &&
             composing.isNotEmpty() &&
             !top.word.equals(composing, ignoreCase = false) &&
-            (weights[language] ?: 0.0) >= config.autoCorrectConfidence &&
+            confident(language, weights) &&
             !isValidWord(composing, primary)
         return merged.mapIndexed { index, s ->
             if (index == 0 &&
@@ -212,7 +224,17 @@ class MixedSuggestionEngine(
         }
     }
 
+    private fun confident(language: String?, weights: Map<String, Double>): Boolean {
+        val weight = weights[language] ?: return false
+        if (weight >= config.autoCorrectConfidence) return true
+        if (weights.size < MANY_LANGUAGES) return false
+        val runnerUp = weights.filterKeys { it != language }.values.maxOrNull() ?: 0.0
+        return weight >= LEAD_FACTOR * runnerUp
+    }
+
     private companion object {
         const val SCORE_SCALE = 1000
+        const val MANY_LANGUAGES = 3
+        const val LEAD_FACTOR = 2.0
     }
 }

@@ -65,7 +65,9 @@ class SuggestionController(
     override fun autoCorrectFor(composing: String): String? {
         val (word, result) = cache ?: return null
         if (word != composing) return null
-        return result.firstOrNull { it.autoCorrect }?.let { CaseMatcher.match(composing, it.word) }
+        return result.firstOrNull { it.autoCorrect }?.let {
+            CaseMatcher.match(composing, it.word, it.locale ?: locale())
+        }
     }
 
     override fun onWordFinished(word: String, contextBefore: String, corrected: Boolean) {
@@ -94,7 +96,9 @@ class SuggestionController(
     }
 
     private fun arrange(composing: String, result: List<Suggestion>): List<String> {
-        val words = result.map { CaseMatcher.match(composing, it.word) }.distinct()
+        val words = result.map {
+            CaseMatcher.match(composing, it.word, it.locale ?: locale())
+        }.distinct()
         val best = words.firstOrNull() ?: return SuggestionState().slots
         val literalFirst = composing.isNotEmpty() && result.first().autoCorrect && composing != best
         val left = if (literalFirst) composing else words.getOrNull(1).orEmpty()

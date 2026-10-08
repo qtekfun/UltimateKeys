@@ -37,6 +37,11 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
             showSuggestions = this[SHOW_SUGGESTIONS] ?: d.showSuggestions,
             autoCorrect = this[AUTO_CORRECT] ?: d.autoCorrect,
             letterLayoutId = this[LAYOUT] ?: d.letterLayoutId,
+            enabledLanguages = this[LANGUAGES]?.let(LanguageSettingsCodec::decodeList)
+                ?: d.enabledLanguages,
+            languageLayouts = this[LANGUAGE_LAYOUTS]?.let(LanguageSettingsCodec::decodeMap)
+                ?: d.languageLayouts,
+            showLanguageOnSpace = this[SHOW_LANGUAGE_ON_SPACE] ?: d.showLanguageOnSpace,
             privateModeEndsOnClose = this[PRIVATE_ENDS_ON_CLOSE] ?: d.privateModeEndsOnClose,
             clipboardEnabled = this[CLIPBOARD_ENABLED] ?: d.clipboardEnabled,
             clipboardRetention = this[CLIPBOARD_RETENTION] ?: d.clipboardRetention,
@@ -76,6 +81,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[SHOW_SUGGESTIONS] = s.showSuggestions
         this[AUTO_CORRECT] = s.autoCorrect
         this[LAYOUT] = s.letterLayoutId
+        this[LANGUAGES] = LanguageSettingsCodec.encodeList(s.enabledLanguages)
+        this[LANGUAGE_LAYOUTS] = LanguageSettingsCodec.encodeMap(s.languageLayouts)
+        this[SHOW_LANGUAGE_ON_SPACE] = s.showLanguageOnSpace
         this[PRIVATE_ENDS_ON_CLOSE] = s.privateModeEndsOnClose
         this[CLIPBOARD_ENABLED] = s.clipboardEnabled
         this[CLIPBOARD_RETENTION] = s.clipboardRetention
@@ -117,6 +125,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val SHOW_SUGGESTIONS = booleanPreferencesKey("show_suggestions")
         val AUTO_CORRECT = booleanPreferencesKey("auto_correct")
         val LAYOUT = stringPreferencesKey("letter_layout_id")
+        val LANGUAGES = stringPreferencesKey("enabled_languages")
+        val LANGUAGE_LAYOUTS = stringPreferencesKey("language_layouts")
+        val SHOW_LANGUAGE_ON_SPACE = booleanPreferencesKey("show_language_on_space")
         val PRIVATE_ENDS_ON_CLOSE = booleanPreferencesKey("private_mode_ends_on_close")
         val CLIPBOARD_ENABLED = booleanPreferencesKey("clipboard_enabled")
         val CLIPBOARD_RETENTION = stringPreferencesKey("clipboard_retention")

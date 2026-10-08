@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 | AOSP LatinIME native engine | Suggestions and autocorrect | Apache-2.0 | Planned (Phase 2), vendored in `third_party/aosp-latinime/` |
 | whisper.cpp (with its bundled ggml) | Offline speech-to-text | MIT | Phase 6, git submodule `third_party/whisper.cpp`, unmodified (see below) |
 | Whisper models `base`, `small` | Dictation models (data, never committed) | MIT | Phase 7, bundled (`base`, `full`) or downloaded (`lite`) with SHA-256, see `docs/MODELS.md` |
-| AOSP LatinIME word lists `es`, `en` | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
+| AOSP LatinIME word lists (24 languages, see below) | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
 | Unicode CLDR annotations and emoji list | Emoji search keywords, categories and skin-tone forms | Unicode License v3 | Phase 5, processed at build time (see below) |
 | Open fonts and Material Symbols | Style engine | OFL / Apache-2.0 | Planned (Phase 3) |
 
@@ -22,14 +22,42 @@ Pins live in `dictionaries/sources.properties`. The Gradle task `:dictionaries:f
 file from the pinned commit, verifies its SHA-256 and caches it under `$GRADLE_USER_HOME/ultimatekeys-dictionaries/`
 (no network when the verified cache entry exists). Format and rationale: `docs/adr/0008-dictionary-format.md`.
 
-| Language | File | Source (pinned) | SHA-256 | Blob id | License |
-|---|---|---|---|---|---|
-| Spanish (`es`) | `dictionaries/es_wordlist.combined.gz` | `https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/127336e9f29d69607eab55982324b210279ae8c5/dictionaries/es_wordlist.combined.gz` | `889ad52bce2933e2a30a0560b8d5a76f5334500e776a7db7c7cb3e9e79fc2652` | `71e7309fc39fce01f26080afea2fa6d689bc20a3` | Apache-2.0 |
-| English (`en`, US spelling) | `dictionaries/en_US_wordlist.combined.gz` | same repository and commit | `0f78dd455b532be169a23f233227b811fabced4b5bd7fc9c40cc05839793bcbd` | `8aed9c5e0b94d0f3e9654f66104d7af1e84c454f` | Apache-2.0 |
+| Language (id) | File in `dictionaries/` upstream | SHA-256 | Size (bytes) |
+|---|---|---|---|
+| Spanish (`es`) | `es_wordlist.combined.gz` | `889ad52bce2933e2a30a0560b8d5a76f5334500e776a7db7c7cb3e9e79fc2652` | 1,165,885 |
+| English (US) (`en-US`) | `en_US_wordlist.combined.gz` | `0f78dd455b532be169a23f233227b811fabced4b5bd7fc9c40cc05839793bcbd` | 883,015 |
+| English (UK) (`en-GB`) | `en_GB_wordlist.combined.gz` | `2d8555b0f1e256be9953a4575595f2fc76d559bffdf3fa4c9bd7f263185d9b58` | 865,437 |
+| French (`fr`) | `fr_wordlist.combined.gz` | `cc917a0a81acab0ea12089c2fb06b5c6be98c75f23a7605bfdbbeb698abfd65e` | 1,108,423 |
+| German (`de`) | `de_wordlist.combined.gz` | `07ae553cd55f9901412065bad7617379908ed5f2a701d226ffde85a9b8ffd5c0` | 1,293,447 |
+| Italian (`it`) | `it_wordlist.combined.gz` | `4ac1fa3b112130416843f5abc2a61fdbd2395a41fb6a719790cd7c45934218ec` | 935,024 |
+| Portuguese (Brazil) (`pt-BR`) | `pt_BR_wordlist.combined.gz` | `f9b7c2f610eacebc782c7d24e64d8ad2620b449defbac326507dfb5702c6c48b` | 879,877 |
+| Portuguese (Portugal) (`pt-PT`) | `pt_PT_wordlist.combined.gz` | `5f95bd4c2b1ada44069e9551e9eff9f1dd572f42a9edac1b23a9d7bf0445971b` | 1,106,730 |
+| Dutch (`nl`) | `nl_wordlist.combined.gz` | `a647ed5fdd846d3240572c9cb10fb8c30880df2ebefea6184a378adb713cd0cd` | 1,054,497 |
+| Polish (`pl`) | `pl_wordlist.combined.gz` | `75a7a488e014ec3b9dbdb2527f09bca6bb28c250232d9ba50cb0ee1f8738ea45` | 1,090,690 |
+| Czech (`cs`) | `cs_wordlist.combined.gz` | `d9974c28a0535f68de55fbc6c914248e82382e52a79184f54883463e67e89c5d` | 948,263 |
+| Danish (`da`) | `da_wordlist.combined.gz` | `a06d6ea0e51b5c5eed5fd16bacc9f392b24be0e59fd5fa43eda417969d7d4332` | 1,017,659 |
+| Norwegian Bokmål (`nb`) | `nb_wordlist.combined.gz` | `2a8076a48c03ab310bfee8df7f05ae9f587201a3de621019ebac8c4e01e10789` | 964,757 |
+| Swedish (`sv`) | `sv_wordlist.combined.gz` | `a8c8aa7d1c8dd65b331fcfb4baf739dddb87b146a5fe737ee0ac218686e379bb` | 1,140,879 |
+| Finnish (`fi`) | `fi_wordlist.combined.gz` | `df70a90f067026cab3cd9eb27482e954f3cd0bb194ffbf6aff342efcd56fa274` | 1,269,544 |
+| Turkish (`tr`) | `tr_wordlist.combined.gz` | `e474cd9e8c0ab3c332db96649d0de6ecd2ca41d3d851c01c562a2c2158b3c00b` | 926,338 |
+| Romanian (`ro`) | `ro_wordlist.combined.gz` | `47139886aea4be76bd5857a6c62cc2b84f2094d58cb2c7b8e7dc05e17452960f` | 3,904,045 |
+| Croatian (`hr`) | `hr_wordlist.combined.gz` | `feeb7f587b07c49bf487320cdf8f3f829425a9e9ead1df4a93e4e2147837b2af` | 1,014,511 |
+| Slovenian (`sl`) | `sl_wordlist.combined.gz` | `f35d91b21722730450216f978f799d3daa9354ad9391130622df75efc59f6ecf` | 315,164 |
+| Serbian (Cyrillic script) (`sr-Cyrl`) | `sr_wordlist.combined.gz` | `a283ef2ae7a36e96baa894a9aebb7749f600cec189693c1cffd76545c6012d1d` | 1,052,031 |
+| Lithuanian (`lt`) | `lt_wordlist.combined.gz` | `63b296c5cf7a1a1da601c92933043caa402ae25c3845ddb705ccba0c902315b7` | 980,893 |
+| Latvian (`lv`) | `lv_wordlist.combined.gz` | `dd5b95e848322ed265d1111864c26734d55e10b53183756e72339dc4ad98f190` | 970,376 |
+| Russian (`ru`) | `ru_wordlist.combined.gz` | `8ef73a234018d23f5ca9ccc6cb65adecfd5667e87a8b6c6f1ed13ab86abad16e` | 1,397,626 |
+| Greek (`el`) | `el_wordlist.combined.gz` | `45ca1e21ff24322762f34b1feac4cb2427645a396621a1ea8aaebcf9217653e6` | 1,134,961 |
+
+Every file is fetched from
+`https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/127336e9f29d69607eab55982324b210279ae8c5/dictionaries/<file>`.
+The blob ids of the first two (Spanish `71e7309fc39fce01f26080afea2fa6d689bc20a3`, English US `8aed9c5e0b94d0f3e9654f66104d7af1e84c454f`) were recorded when they were added.
+The upstream Hebrew list (`iw`) is not used: Hebrew is written right to left, which the keyboard does not support (ADR 0022).
 
 Pinned commit: `127336e9f29d69607eab55982324b210279ae8c5` (tip of `main` checked on 2026-10-07, dated 2025-02-26).
-Both files are unigram lists with frequencies 0..255 (about 236k Spanish and 156k English headwords) whose header
-reads `dictionary=main:es,locale=es,...,version=54`.
+All files are unigram lists with frequencies 0..255 (from about 60k Slovenian to 1.1M Romanian headwords; the engine keeps
+the 250,000 most frequent, see ADR 0008) whose header reads `dictionary=main:es,locale=es,...,version=54`. The Serbian list is
+written in Cyrillic.
 
 Attribution: Copyright (c) 2008, The Android Open Source Project, licensed under the Apache License, Version 2.0.
 The repository `NOTICE` at the pinned commit states this for the whole project, and the `dictionaries/` directory

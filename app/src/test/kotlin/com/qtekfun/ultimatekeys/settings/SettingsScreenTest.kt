@@ -153,6 +153,7 @@ class SettingsScreenTest {
                 TypingScreen(
                     settings,
                     update = { transform -> settings = transform(settings) },
+                    onOpenLanguages = {},
                     onBack = {},
                     insets = ScreenInsets.of(top = statusBar)
                 )
@@ -172,8 +173,13 @@ class SettingsScreenTest {
     fun `a slider row reads its value in its own unit`() {
         compose.setContent {
             UkTheme(TestSchemes.light) {
-                TypingScreen(KeyboardSettings(heightPercent = 100), {
-                }, {}, ScreenInsets.of(top = statusBar))
+                TypingScreen(
+                    KeyboardSettings(heightPercent = 100),
+                    {},
+                    {},
+                    {},
+                    ScreenInsets.of(top = statusBar)
+                )
             }
         }
         val row = compose.onNode(hasText("Keyboard height"))
@@ -189,7 +195,7 @@ class SettingsScreenTest {
     fun `the back button is a labelled button`() {
         compose.setContent {
             UkTheme(TestSchemes.light) {
-                TypingScreen(KeyboardSettings(), {}, {}, ScreenInsets.of(top = statusBar))
+                TypingScreen(KeyboardSettings(), {}, {}, {}, ScreenInsets.of(top = statusBar))
             }
         }
         compose.onNode(
@@ -205,7 +211,7 @@ class SettingsScreenTest {
     fun `the section titles are headings`() {
         compose.setContent {
             UkTheme(TestSchemes.light) {
-                TypingScreen(KeyboardSettings(), {}, {}, ScreenInsets.of(top = statusBar))
+                TypingScreen(KeyboardSettings(), {}, {}, {}, ScreenInsets.of(top = statusBar))
             }
         }
         compose.onNode(

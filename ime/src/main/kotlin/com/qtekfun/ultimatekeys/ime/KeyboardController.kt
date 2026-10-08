@@ -54,6 +54,7 @@ import kotlinx.coroutines.withContext
 /** Positions in the menu of the language key. */
 const val GLOBE_MENU_SETTINGS = 0
 const val GLOBE_MENU_KEYBOARDS = 1
+const val GLOBE_MENU_LANGUAGES = 2
 
 /** Connects the surface, the typing logic, the settings and the feedback. Main thread only. */
 class KeyboardController(
@@ -74,6 +75,8 @@ class KeyboardController(
         EmojiData(EmojiCatalog(emptyList()), EmojiSearch(emptyList()))
     },
     private val openSettings: () -> Unit = {},
+    /** Opens the Languages screen of the app (a third entry of the language key's menu). */
+    private val openLanguages: () -> Unit = {},
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
@@ -148,6 +151,7 @@ class KeyboardController(
             autoCorrect = s.autoCorrect && s.showSuggestions
         )
         logic.locale = Locale.forLanguageTag(LayoutRepository.load(s.letterLayoutId).locale ?: "en")
+        gesture.setPrimary(s.activeLanguage.tag)
     }
 
     /** The keys of [page]; the letter and symbol pages follow the style's bottom row. */
@@ -287,16 +291,14 @@ class KeyboardController(
         when (index) {
             GLOBE_MENU_SETTINGS -> openSettings()
             GLOBE_MENU_KEYBOARDS -> showImePicker()
+            GLOBE_MENU_LANGUAGES -> openLanguages()
         }
     }
 
+    /** The language key: moves to the next enabled language (and its layout), wrapping around. */
     private fun cycleLayout() {
         scope.launch {
-            repository.update {
-                val ids = LayoutRepository.letterLayoutIds
-                val next = ids[(ids.indexOf(it.letterLayoutId) + 1).mod(ids.size)]
-                it.copy(letterLayoutId = next)
-            }
+            repository.update { it.copy(letterLayoutId = it.layoutOf(it.nextLanguage())) }
         }
     }
 

@@ -24,13 +24,19 @@ data class GestureKey(
  * The letter keys of the layout on screen, which is what word templates are built from. Only keys whose
  * letter is part of [GestureAlphabet] are kept; the first key wins when a letter appears twice.
  *
+ * A letter of the alphabet that has no key here is placed where its base letter's key is (`ö` on a layout
+ * without an `ö` key is where `o` is), so words with such letters can still be traced.
+ *
  * [unit] is the size of one key (the geometric mean of the average width and height). Distances in the
  * decoder are measured in units so that tuning does not depend on the screen density.
  */
 class GestureKeyboard(keys: List<GestureKey>) {
     private val byIndex = arrayOfNulls<GestureKey>(GestureAlphabet.size)
 
-    /** Centre of each key by alphabet index; NaN for letters this layout lacks. */
+    /** Alphabet indices standing in for a key (letters without a key of their own), by the key's index. */
+    private val aliases = Array(GestureAlphabet.size) { IntArray(0) }
+
+    /** Centre of each key by alphabet index; NaN for letters this layout lacks and cannot stand in for. */
     val centerX = FloatArray(GestureAlphabet.size) { Float.NaN }
     val centerY = FloatArray(GestureAlphabet.size) { Float.NaN }
 
@@ -48,6 +54,7 @@ class GestureKeyboard(keys: List<GestureKey>) {
             centerY[index] = key.centerY
         }
         val present = byIndex.filterNotNull()
+        addAliases()
         unit = if (present.isEmpty()) {
             1f
         } else {
@@ -61,9 +68,28 @@ class GestureKeyboard(keys: List<GestureKey>) {
         }
     }
 
+    /** Gives every letter without a key the position of its base letter's key, when the layout has that. */
+    private fun addAliases() {
+        for (index in 0 until GestureAlphabet.size) {
+            if (byIndex[index] == null) aliasToBase(index)
+        }
+    }
+
+    private fun aliasToBase(index: Int) {
+        var base = GestureAlphabet.fallbackIndex(index)
+        var steps = 0
+        while (base >= 0 && byIndex[base] == null && steps++ < MAX_FALLBACK_STEPS) {
+            base = GestureAlphabet.fallbackIndex(base)
+        }
+        if (base < 0 || byIndex[base] == null) return
+        centerX[index] = centerX[base]
+        centerY[index] = centerY[base]
+        aliases[base] += index
+    }
+
     val isEmpty: Boolean get() = byIndex.all { it == null }
 
-    fun has(index: Int): Boolean = byIndex[index] != null
+    fun has(index: Int): Boolean = !centerX[index].isNaN()
 
     fun distance(a: Int, b: Int): Float = distances[a * GestureAlphabet.size + b]
 
@@ -98,7 +124,10 @@ class GestureKeyboard(keys: List<GestureKey>) {
         for (i in 0 until GestureAlphabet.size) {
             if (byIndex[i] == null) continue
             val d = hypot(centerX[i] - x, centerY[i] - y)
-            if (d <= radius) found += i to d
+            if (d <= radius) {
+                found += i to d
+                aliases[i].forEach { found += it to d }
+            }
         }
         if (found.isEmpty()) nearest(x, y)?.let { found += it to 0f }
         return found.sortedBy { it.second }.map { it.first }.toIntArray()
@@ -107,4 +136,8 @@ class GestureKeyboard(keys: List<GestureKey>) {
     private fun nearest(x: Float, y: Float): Int? =
         (0 until GestureAlphabet.size).filter { byIndex[it] != null }
             .minByOrNull { hypot(centerX[it] - x, centerY[it] - y) }
+
+    private companion object {
+        const val MAX_FALLBACK_STEPS = 3
+    }
 }

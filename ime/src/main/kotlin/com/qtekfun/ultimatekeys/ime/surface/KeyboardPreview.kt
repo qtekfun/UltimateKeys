@@ -43,6 +43,7 @@ fun KeyboardPreview(
     val density = LocalDensity.current
     val surface = remember(style, dark) { SurfaceStyle.resolve(style, dark) }
     val renderer = remember(context) { SurfaceRenderer(FontCatalog(context.assets)) }
+    renderer.locale = content.locale
     val layout = remember(content.layoutId, content.numberRow, style.bottomRow) {
         BottomRow.apply(
             LayoutRepository.pages(content.layoutId, content.numberRow).letters,

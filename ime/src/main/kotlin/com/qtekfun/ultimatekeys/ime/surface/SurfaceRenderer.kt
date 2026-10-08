@@ -35,7 +35,9 @@ data class SurfaceLabels(
     val space: String,
     val symbols: String,
     val letters: String,
-    val moreSymbols: String
+    val moreSymbols: String,
+    /** True when [space] is the name of the active language: it is drawn small, in the hint colour. */
+    val spaceIsLanguage: Boolean = false
 )
 
 /** Sizes in pixels. */
@@ -52,6 +54,9 @@ data class SurfaceDimens(
 
 /** Draws the key surface with plain canvas calls: one pass, no per-key composables. */
 class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
+    /** The case rules of the language being typed: the dotted capital I of Turkish. */
+    var locale: java.util.Locale = java.util.Locale.ROOT
+
     private var loadedFont: FontChoice? = null
     private var loadedWeight = 0
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -251,7 +256,17 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         val ink = if (isEnter) style.actionText else style.text
         when (key) {
             is CharKey -> drawCharKey(scope, placed, key, state, style, dimens)
-            is ActionKey -> drawActionKey(scope, placed, key, state, ink, labels, dimens)
+
+            is ActionKey -> drawActionKey(
+                scope,
+                placed,
+                key,
+                state,
+                ink,
+                labels,
+                dimens,
+                style.hint
+            )
         }
     }
 
@@ -303,7 +318,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
-        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
+        val label = if (upperCase(state, style)) key.label.uppercase(locale) else key.label
         drawText(
             scope,
             label,
@@ -324,6 +339,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun drawActionKey(
         scope: DrawScope,
         placed: PlacedKey,
@@ -331,7 +347,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         state: KeyboardState,
         ink: Color,
         labels: SurfaceLabels,
-        dimens: SurfaceDimens
+        dimens: SurfaceDimens,
+        hintInk: Color
     ) {
         val cx = placed.centerX
         val cy = placed.top + placed.height / 2f
@@ -344,14 +361,19 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
 
             KeyAction.ENTER -> drawEnter(scope, placed, state.enterKind, ink, labels, dimens, unit)
 
-            KeyAction.SPACE -> drawText(
-                scope,
-                labels.space,
-                cx,
-                cy + small / 3f,
-                small,
-                ink.copy(alpha = SPACE_ALPHA)
-            )
+            KeyAction.SPACE -> if (labels.spaceIsLanguage) {
+                val size = fitted(labels.space, small, placed.width * SPACE_FIT)
+                drawText(scope, labels.space, cx, cy + size / 3f, size, hintInk)
+            } else {
+                drawText(
+                    scope,
+                    labels.space,
+                    cx,
+                    cy + small / 3f,
+                    small,
+                    ink.copy(alpha = SPACE_ALPHA)
+                )
+            }
 
             KeyAction.GLOBE -> KeyIcons.globe(scope, cx, cy, unit, ink)
 
@@ -424,7 +446,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     ) {
         val key = placed.key as CharKey
         if (style.popupKind == PopupKind.NONE) return
-        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
+        val label = if (upperCase(state, style)) key.label.uppercase(locale) else key.label
         val enlarged = style.popupKind == PopupKind.ENLARGED_KEY
         val h = if (enlarged) placed.height else dimens.previewHeight
         val w = if (enlarged) placed.width * ENLARGED_WIDEN else placed.width * PREVIEW_WIDEN
@@ -517,6 +539,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val ENLARGED_WIDEN = 1.25f
         const val PRESS_SHRINK = 0.04f
         const val MENU_FIT = 0.9f
+        const val SPACE_FIT = 0.85f
         const val ELEVATION_LAYERS = 3
         const val PERCENT = 100f
         const val PRIVATE_WASH = 0.14f

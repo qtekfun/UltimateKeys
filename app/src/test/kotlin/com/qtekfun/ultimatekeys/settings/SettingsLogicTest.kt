@@ -91,8 +91,10 @@ class HomeModelTest {
     fun `targets that live in this activity have a route and the others do not`() {
         val external = HomeTarget.entries.filter { it.route == null }
         assertEquals(setOf(HomeTarget.Appearance, HomeTarget.Dictation), external.toSet())
+        // Languages is opened from Typing, not from the home list.
+        val subScreens = setOf(SettingsRoute.Home, SettingsRoute.Languages)
         assertEquals(
-            SettingsRoute.entries.filter { it != SettingsRoute.Home }.toSet(),
+            SettingsRoute.entries.filter { it !in subScreens }.toSet(),
             HomeTarget.entries.mapNotNull { it.route }.toSet()
         )
     }
@@ -132,10 +134,14 @@ class HomeModelTest {
     }
 
     @Test
-    fun `the shipped layouts have names and an unknown one does not`() {
-        assertTrue(LayoutNames.label("es_qwerty") != null)
-        assertTrue(LayoutNames.label("en_qwerty") != null)
-        assertNull(LayoutNames.label("other"))
+    fun `layouts are named by the arrangement of their keys`() {
+        assertEquals("QWERTY", LanguagesModel.layoutName("en_qwerty"))
+        assertEquals("AZERTY", LanguagesModel.layoutName("fr_azerty"))
+        assertEquals("QWERTZ", LanguagesModel.layoutName("de_qwertz"))
+        assertEquals("Dvorak", LanguagesModel.layoutName("en_dvorak"))
+        assertEquals("Colemak", LanguagesModel.layoutName("en_colemak"))
+        assertEquals("ЙЦУКЕН", LanguagesModel.layoutName("ru_jcuken"))
+        assertEquals("Q", LanguagesModel.layoutName("tr_q"))
     }
 }
 

@@ -103,9 +103,26 @@ class GestureAlphabetTest {
         assertNull(GestureAlphabet.sequenceOf("aaa"))
         assertNull(GestureAlphabet.sequenceOf("e-mail"))
         assertNull(GestureAlphabet.sequenceOf("b2b"))
-        assertNull(GestureAlphabet.sequenceOf("straße"))
+        assertNull(GestureAlphabet.sequenceOf("ça va-t-il"))
         assertNull(GestureAlphabet.sequenceOf("日本"))
         assertNull(GestureAlphabet.sequenceOf(""))
+    }
+
+    @Test
+    fun `letters of other scripts and layouts have keys`() {
+        listOf("привет", "ηλιος", "straße", "çok", "ışık", "łódź", "škola", "smørrebrød").forEach {
+            assertNotNull(GestureAlphabet.sequenceOf(it), it)
+        }
+        // Greek tonos and Cyrillic breve are dropped like Latin accents.
+        assertEquals(
+            GestureAlphabet.sequenceOf("ηλιος")!!.toList(),
+            GestureAlphabet.sequenceOf("ήλιος")!!.toList()
+        )
+        assertTrue(GestureAlphabet.size <= 127)
+        assertEquals(GestureAlphabet.size, GestureAlphabet.LETTERS.toSet().size)
+        val oUmlaut = GestureAlphabet.keyIndex('ö')
+        assertEquals(GestureAlphabet.keyIndex('o'), GestureAlphabet.fallbackIndex(oUmlaut))
+        assertEquals(-1, GestureAlphabet.fallbackIndex(GestureAlphabet.keyIndex('a')))
     }
 
     @Test
@@ -135,9 +152,20 @@ class GestureKeyboardTest {
 
     @Test
     fun `a layout without a letter reports it as missing`() {
-        val n = GestureAlphabet.keyIndex('ñ')
-        assertFalse(keyboard.has(n))
-        assertTrue(keyboard.pathLength(byteArrayOf(0, n.toByte())).isNaN())
+        val ya = GestureAlphabet.keyIndex('я')
+        assertFalse(keyboard.has(ya))
+        assertTrue(keyboard.pathLength(byteArrayOf(0, ya.toByte())).isNaN())
+    }
+
+    @Test
+    fun `a letter without a key stands where its base letter is`() {
+        val enye = GestureAlphabet.keyIndex('ñ')
+        val n = GestureAlphabet.keyIndex('n')
+        assertTrue(keyboard.has(enye))
+        assertEquals(keyboard.centerX[n], keyboard.centerX[enye])
+        assertEquals(keyboard.centerY[n], keyboard.centerY[enye])
+        val near = keyboard.keysNear(keyboard.centerX[n], keyboard.centerY[n], 10f)
+        assertTrue(enye in near && n in near)
     }
 
     @Test

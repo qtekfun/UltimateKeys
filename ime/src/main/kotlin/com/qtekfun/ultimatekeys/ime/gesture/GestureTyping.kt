@@ -22,11 +22,28 @@ class GestureTyping(private val engine: SuggestionEngine) {
     @Volatile
     private var decoder: GestureDecoder? = null
 
+    @Volatile
+    private var vocabulary: GestureVocabulary? = null
+
     val ready: Boolean get() = decoder != null
 
-    /** Starts accepting gestures; the first language of [vocabulary] is the primary one. */
-    fun install(vocabulary: GestureVocabulary) {
-        decoder = GestureDecoder(vocabulary, primaryLanguage = 0)
+    /** The languages of the installed vocabulary (BCP-47 tags), empty before [install]. */
+    val languages: List<String> get() = vocabulary?.languages.orEmpty()
+
+    /**
+     * Starts accepting gestures with [vocabulary], replacing any earlier one (the enabled languages changed).
+     * [primary] is the tag of the language being written, the first of the vocabulary when null or unknown.
+     */
+    fun install(vocabulary: GestureVocabulary, primary: String? = null) {
+        this.vocabulary = vocabulary
+        setPrimary(primary)
+    }
+
+    /** Tells the decoder which language is the active one; cheap, call it when the person switches language. */
+    fun setPrimary(primary: String?) {
+        val installed = vocabulary ?: return
+        val index = installed.languages.indexOf(primary).coerceAtLeast(0)
+        decoder = GestureDecoder(installed, primaryLanguage = index)
     }
 
     /** The words [path] most likely means, best first; empty when there is nothing to say. */

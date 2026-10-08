@@ -19,6 +19,8 @@ android {
 
 dependencies {
     api(projects.engine)
+    testImplementation(projects.languages)
+    testImplementation(projects.layouts)
 }
 
 /**
@@ -28,6 +30,15 @@ dependencies {
  * Offline-friendly: a verified copy in the Gradle user home cache is used without touching the network.
  */
 abstract class FetchDictionariesTask : DefaultTask() {
+    private val httpOk = 200
+    private val httpTooMany = 429
+    private val httpServerError = 500
+    private val maxAttempts = 8
+    private val firstWaitMs = 4_000L
+    private val maxWaitMs = 60_000L
+    private val timeoutMs = 60_000
+    private val msPerSecond = 1_000L
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val sources: RegularFileProperty
@@ -73,7 +84,7 @@ abstract class FetchDictionariesTask : DefaultTask() {
             props.getProperty("$language.source")
         )
         logger.lifecycle("Downloading $language dictionary from $url")
-        val raw = URI(url).toURL().openStream().use { it.readBytes() }
+        val raw = download(url)
         // The source serves the blob base64-encoded.
         val bytes = Base64.getMimeDecoder().decode(raw)
         val actual = sha256(bytes)
@@ -83,6 +94,38 @@ abstract class FetchDictionariesTask : DefaultTask() {
         tmp.writeBytes(bytes)
         Files.move(tmp.toPath(), cached.toPath(), StandardCopyOption.REPLACE_EXISTING)
         return bytes
+    }
+
+    /**
+     * Downloads [url], retrying with a growing pause when the server answers "too many requests"
+     * (429) or fails with a server error: fetching two dozen lists in a row from a cold cache gets rate
+     * limited. Honours `Retry-After` when the server sends it.
+     */
+    private fun download(url: String): ByteArray {
+        var wait = firstWaitMs
+        for (attempt in 1..maxAttempts) {
+            val connection = URI(url).toURL().openConnection() as java.net.HttpURLConnection
+            try {
+                connection.connectTimeout = timeoutMs
+                connection.readTimeout = timeoutMs
+                val code = connection.responseCode
+                if (code == httpOk) return connection.inputStream.use { it.readBytes() }
+                val retryable = code == httpTooMany || code >= httpServerError
+                check(retryable && attempt < maxAttempts) { "HTTP $code for $url" }
+                val hint = connection.getHeaderField(
+                    "Retry-After"
+                )?.toLongOrNull()?.times(msPerSecond)
+                wait = maxOf(wait, hint ?: 0L)
+                logger.lifecycle(
+                    "HTTP $code, retrying in ${wait / msPerSecond} s ($attempt/$maxAttempts)"
+                )
+            } finally {
+                connection.disconnect()
+            }
+            Thread.sleep(wait)
+            wait = minOf(wait * 2, maxWaitMs)
+        }
+        error("Unreachable: $url")
     }
 
     private fun sha256(bytes: ByteArray): String =

@@ -46,6 +46,10 @@ object GestureRig {
         GestureSupport.vocabulary(locator, listOf(spanish, english))
     }
 
+    /** A vocabulary of the given languages (BCP-47 tags), the first being the primary one. */
+    fun vocabularyOf(vararg tags: String): GestureVocabulary =
+        GestureSupport.vocabulary(locator, tags.map { Locale.forLanguageTag(it) })
+
     fun keyboard(layoutId: String): GestureKeyboard {
         val geometry = SurfaceSpec.geometry(
             LayoutRepository.load(layoutId),

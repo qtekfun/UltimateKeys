@@ -21,7 +21,7 @@ import com.qtekfun.ultimatekeys.AppVersion
 import com.qtekfun.ultimatekeys.ImeStatus
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
-import com.qtekfun.ultimatekeys.layouts.LayoutRepository
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.ui.ScreenInsets
 import com.qtekfun.ultimatekeys.ui.UkChevron
 import com.qtekfun.ultimatekeys.ui.UkGlyph
@@ -162,12 +162,12 @@ private fun StepRow(title: String, done: Boolean, enabled: Boolean, onClick: () 
 internal fun TypingScreen(
     settings: KeyboardSettings,
     update: SettingsUpdate,
+    onOpenLanguages: () -> Unit,
     onBack: () -> Unit,
     insets: ScreenInsets = ScreenInsets.current()
 ) {
-    val layouts = LayoutRepository.letterLayoutIds.map { id ->
-        UkOption(id, LayoutNames.label(id)?.let { stringResource(it) } ?: id)
-    }
+    val languages = settings.enabledLanguages.mapNotNull { LanguageCatalog.find(it) }
+        .joinToString(", ") { it.nativeName }
     SubScreen(R.string.section_typing, onBack, insets) {
         section(header = R.string.group_size) {
             intSlider(
@@ -198,8 +198,12 @@ internal fun TypingScreen(
             ) { v -> update { it.copy(edgeKeyBoostPercent = v) } }
         }
         section(header = R.string.group_layout) {
-            choice(R.string.setting_layout, layouts, settings.letterLayoutId) { v ->
-                update { it.copy(letterLayoutId = v) }
+            row {
+                UkNavRow(
+                    stringResource(R.string.section_languages),
+                    onClick = onOpenLanguages,
+                    value = languages
+                )
             }
             toggle(R.string.setting_number_row, settings.numberRow) { v ->
                 update { it.copy(numberRow = v) }

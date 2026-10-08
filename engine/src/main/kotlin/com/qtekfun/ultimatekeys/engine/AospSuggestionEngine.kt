@@ -106,7 +106,7 @@ class AospSuggestionEngine internal constructor(
             }.thenBy { it.word.length }
         )
         ranked.mapIndexed { index, raw ->
-            val word = matchCase(composing, raw.word)
+            val word = matchCase(composing, raw.word, locale)
             val autoCorrect = index == 0 && !typedIsKnown && shouldAutoCorrect(composing, raw)
             Suggestion(word, raw.score, autoCorrect, locale)
         }
@@ -144,6 +144,22 @@ class AospSuggestionEngine internal constructor(
         synchronized(lock) {
             val user = if (closed) null else stateFor(locale).user
             if (user != null && bridge.removeUnigram(user.handle, word.trim())) flush(user)
+        }
+    }
+
+    /**
+     * Frees the native dictionaries of [locale]'s language (what was learned is flushed first). They are opened again
+     * on the next use, so call this when a language is switched off to give its memory back.
+     */
+    fun releaseLanguage(locale: Locale) {
+        synchronized(lock) {
+            val state = states.remove(languageKey(locale)) ?: return
+            state.all.forEach {
+                flush(it)
+                bridge.releaseSession(it.session)
+                bridge.closeDictionary(it.handle)
+            }
+            bridge.releaseProximityInfo(state.proximityInfo)
         }
     }
 
@@ -328,12 +344,12 @@ class AospSuggestionEngine internal constructor(
     private fun userAttributes(language: String) = mapOf("dictionary" to "user.$language")
 
     /** The engine works on lower case; give the candidate the capitalization the user typed. */
-    private fun matchCase(typed: String, candidate: String): String = when {
+    private fun matchCase(typed: String, candidate: String, locale: Locale): String = when {
         typed.length > 1 && typed.all {
             !it.isLetter() || it.isUpperCase()
-        } -> candidate.uppercase()
+        } -> candidate.uppercase(locale)
 
-        typed.first().isUpperCase() -> candidate.replaceFirstChar { it.titlecase() }
+        typed.first().isUpperCase() -> candidate.replaceFirstChar { it.titlecase(locale) }
 
         else -> candidate
     }
