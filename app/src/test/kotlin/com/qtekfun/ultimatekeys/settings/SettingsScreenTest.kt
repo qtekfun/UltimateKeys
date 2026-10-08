@@ -60,7 +60,9 @@ class SettingsScreenTest {
     }
 
     private fun home(insets: ScreenInsets) = compose.setContent {
-        UkTheme(TestSchemes.light) { HomeScreen(KeyboardSettings(), ready, {}, insets = insets) }
+        UkTheme(TestSchemes.light) {
+            HomeScreen(KeyboardSettings(), ready, TEST_VERSION, {}, insets = insets)
+        }
     }
 
     @Test
@@ -119,7 +121,7 @@ class SettingsScreenTest {
     fun `side cutouts push the content in`() {
         compose.setContent {
             UkTheme(TestSchemes.light) {
-                HomeScreen(KeyboardSettings(), ready, {
+                HomeScreen(KeyboardSettings(), ready, TEST_VERSION, {
                 }, insets = ScreenInsets.of(start = 48.dp, end = 48.dp))
             }
         }
@@ -132,7 +134,9 @@ class SettingsScreenTest {
         var opened: HomeTarget? = null
         compose.setContent {
             UkTheme(TestSchemes.light) {
-                HomeScreen(KeyboardSettings(), ready, { opened = it }, insets = ScreenInsets.of())
+                HomeScreen(KeyboardSettings(), ready, TEST_VERSION, {
+                    opened = it
+                }, insets = ScreenInsets.of())
             }
         }
         val row = compose.onNode(hasText("Typing"))

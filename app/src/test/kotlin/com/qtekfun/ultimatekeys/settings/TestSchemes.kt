@@ -57,3 +57,5 @@ internal object TestSchemes {
         outlineVariant = Color(0xFF44474E)
     )
 }
+
+internal val TEST_VERSION = com.qtekfun.ultimatekeys.AppVersion("0.8.1", 80199L)

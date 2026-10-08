@@ -5,7 +5,10 @@
 
 package com.qtekfun.ultimatekeys.settings
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.qtekfun.ultimatekeys.AppVersion
 import com.qtekfun.ultimatekeys.ImeStatus
 import com.qtekfun.ultimatekeys.R
@@ -28,6 +32,7 @@ import com.qtekfun.ultimatekeys.ui.UkRow
 import com.qtekfun.ultimatekeys.ui.UkScreen
 import com.qtekfun.ultimatekeys.ui.UkSeparatorInset
 import com.qtekfun.ultimatekeys.ui.UkSize
+import com.qtekfun.ultimatekeys.ui.UkSpacing
 import com.qtekfun.ultimatekeys.ui.UkTextField
 import com.qtekfun.ultimatekeys.ui.UkTheme
 import com.qtekfun.ultimatekeys.ui.UkValueRow
@@ -41,10 +46,12 @@ internal typealias SettingsUpdate = ((KeyboardSettings) -> KeyboardSettings) -> 
 internal fun HomeScreen(
     settings: KeyboardSettings,
     status: ImeStatus,
+    version: AppVersion,
     onOpen: (HomeTarget) -> Unit,
     modifier: Modifier = Modifier,
     insets: ScreenInsets = ScreenInsets.current()
 ) {
+    val versionText = stringResource(R.string.app_version, version.name, version.code)
     UkScreen(title = stringResource(R.string.app_name), modifier = modifier, insets = insets) {
         HomeModel.groups(settings, status).forEachIndexed { index, entries ->
             group(key = "home-$index", separatorInset = UkSeparatorInset.WithBadge) {
@@ -60,6 +67,15 @@ internal fun HomeScreen(
                     }
                 }
             }
+        }
+        item(key = "version") {
+            Text(
+                versionText,
+                modifier = Modifier.fillMaxWidth().padding(top = UkSpacing.lg),
+                style = UkTheme.typography.footnote,
+                color = UkTheme.colors.secondaryLabel,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

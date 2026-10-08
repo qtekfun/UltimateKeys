@@ -54,7 +54,7 @@ class SettingsScreenshotTest(private val scene: String, private val dark: Boolea
         val ready = ImeStatus(enabled = true, selected = true)
         val update: SettingsUpdate = {}
         when (scene) {
-            "home" -> HomeScreen(settings, ready, none, insets = insets)
+            "home" -> HomeScreen(settings, ready, TEST_VERSION, none, insets = insets)
 
             "typing" -> TypingScreen(settings, update, {}, insets)
 

@@ -77,9 +77,16 @@ private fun SettingsHost(repository: SettingsRepository) {
     val back = { stack = stack.back() }
 
     when (stack.current) {
-        SettingsRoute.Home -> HomeScreen(settings, status, onOpen = { target ->
-            target.route?.let { stack = stack.open(it) } ?: context.openExternal(target)
-        })
+        SettingsRoute.Home -> HomeScreen(
+            settings,
+            status,
+            remember(context) {
+                AppVersion.read(context)
+            },
+            onOpen = { target ->
+                target.route?.let { stack = stack.open(it) } ?: context.openExternal(target)
+            }
+        )
 
         SettingsRoute.Setup -> SetupScreen(
             status = status,
