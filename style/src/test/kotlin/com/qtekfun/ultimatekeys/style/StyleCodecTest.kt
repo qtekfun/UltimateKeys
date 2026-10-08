@@ -52,6 +52,22 @@ class StyleCodecTest {
     }
 
     @Test
+    fun `a version 1 file gains the gesture trail and the private tint`() {
+        val v1 = StyleCodec.encode(Presets.Soft).lines().filterNot {
+            "gestureTrail" in it || "privateTint" in it
+        }.joinToString("\n")
+            .replace("\"schemaVersion\": ${Style.CURRENT_SCHEMA_VERSION}", "\"schemaVersion\": 1")
+            // The last palette entry loses its trailing comma neighbours; the encoder always writes commas.
+            .replace(",\n    }", "\n    }")
+        val migrated = loaded(v1)
+        assertEquals(Style.CURRENT_SCHEMA_VERSION, migrated.schemaVersion)
+        assertEquals(Presets.Soft.light.keyAction, migrated.light.gestureTrail)
+        assertEquals(Presets.Soft.dark.keyAction, migrated.dark.gestureTrail)
+        assertEquals(Palette.DefaultLight.privateTint, migrated.light.privateTint)
+        assertEquals(Palette.DefaultDark.privateTint, migrated.dark.privateTint)
+    }
+
+    @Test
     fun `a missing schema version is read as version 1`() {
         val text = StyleCodec.encode(Style()).lines().filterNot {
             "schemaVersion" in it
@@ -63,7 +79,7 @@ class StyleCodecTest {
     fun `a newer schema is refused`() {
         val text = StyleCodec.encode(
             Style()
-        ).replace("\"schemaVersion\": 1", "\"schemaVersion\": 99")
+        ).replace("\"schemaVersion\": ${Style.CURRENT_SCHEMA_VERSION}", "\"schemaVersion\": 99")
         assertEquals(StyleLoadError.NewerSchema(99), error(text))
     }
 
