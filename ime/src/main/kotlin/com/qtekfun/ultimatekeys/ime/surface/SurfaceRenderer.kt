@@ -22,6 +22,7 @@ import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.LayoutKey
+import com.qtekfun.ultimatekeys.style.BarLayout
 import com.qtekfun.ultimatekeys.style.FontChoice
 import com.qtekfun.ultimatekeys.style.PopupKind
 import com.qtekfun.ultimatekeys.style.PressAnimation
@@ -97,8 +98,18 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     ) {
         if (strip.isEmpty() || geometry.top <= 0f) return
         val cell = geometry.width / strip.size
+        val list = style.barLayout == BarLayout.SCROLLING_LIST
         strip.forEachIndexed { index, word ->
-            if (index > 0) {
+            if (list) {
+                val pad = geometry.top * PILL_PAD
+                val height = geometry.top * PILL_HEIGHT
+                scope.drawRoundRect(
+                    style.barDivider.copy(alpha = PILL_ALPHA),
+                    Offset(cell * index + pad, (geometry.top - height) / 2f),
+                    Size(cell - 2f * pad, height),
+                    CornerRadius(height / 2f)
+                )
+            } else if (index > 0) {
                 scope.drawLine(
                     style.barDivider,
                     Offset(cell * index, geometry.top * DIVIDER_INSET),
@@ -106,7 +117,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                     1f
                 )
             }
-            text.isFakeBoldText = index == 1 || style.barTextBold
+            text.isFakeBoldText = (!list && index == 1) || style.barTextBold
             val baseline = geometry.top / 2f + dimens.labelSize * STRIP_BASELINE
             drawText(
                 scope,
@@ -241,9 +252,9 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         val unit = minOf(placed.height, placed.width) * ICON_SCALE
         val small = dimens.labelSize * SMALL_LABEL
         when (key.action) {
-            KeyAction.SHIFT -> drawShift(scope, cx, cy, unit, ink, state.shift)
+            KeyAction.SHIFT -> KeyIcons.shift(scope, cx, cy, unit, ink, state.shift)
 
-            KeyAction.DELETE -> drawBackspace(scope, cx, cy, unit, ink)
+            KeyAction.DELETE -> KeyIcons.backspace(scope, cx, cy, unit, ink)
 
             KeyAction.ENTER -> drawEnter(scope, placed, state.enterKind, ink, labels, dimens, unit)
 
@@ -256,7 +267,11 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 ink.copy(alpha = SPACE_ALPHA)
             )
 
-            KeyAction.GLOBE -> drawGlobe(scope, cx, cy, unit, ink)
+            KeyAction.GLOBE -> KeyIcons.globe(scope, cx, cy, unit, ink)
+
+            KeyAction.EMOJI -> KeyIcons.smiley(scope, cx, cy, unit, ink)
+
+            KeyAction.MIC -> KeyIcons.mic(scope, cx, cy, unit, ink)
 
             KeyAction.SWITCH_LETTERS -> drawText(
                 scope,
@@ -312,66 +327,6 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             val size = dimens.labelSize * SMALL_LABEL
             drawText(scope, labels.enter.getValue(kind), cx, cy + size / 3f, size, ink)
         }
-    }
-
-    private fun drawShift(
-        scope: DrawScope,
-        cx: Float,
-        cy: Float,
-        unit: Float,
-        ink: Color,
-        shift: ShiftState
-    ) {
-        val p = Path().apply {
-            moveTo(cx, cy - unit * 0.55f)
-            lineTo(cx + unit * 0.5f, cy)
-            lineTo(cx + unit * 0.2f, cy)
-            lineTo(cx + unit * 0.2f, cy + unit * 0.45f)
-            lineTo(cx - unit * 0.2f, cy + unit * 0.45f)
-            lineTo(cx - unit * 0.2f, cy)
-            lineTo(cx - unit * 0.5f, cy)
-            close()
-        }
-        if (shift == ShiftState.OFF) {
-            scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
-        } else {
-            scope.drawPath(p, ink)
-        }
-        if (shift == ShiftState.LOCKED) {
-            scope.drawLine(
-                ink,
-                Offset(cx - unit * 0.3f, cy + unit * 0.65f),
-                Offset(
-                    cx + unit * 0.3f,
-                    cy + unit * 0.65f
-                ),
-                unit * STROKE
-            )
-        }
-    }
-
-    private fun drawBackspace(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
-        val p = Path().apply {
-            moveTo(cx - unit * 0.6f, cy)
-            lineTo(cx - unit * 0.25f, cy - unit * 0.4f)
-            lineTo(cx + unit * 0.6f, cy - unit * 0.4f)
-            lineTo(cx + unit * 0.6f, cy + unit * 0.4f)
-            lineTo(cx - unit * 0.25f, cy + unit * 0.4f)
-            close()
-        }
-        scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
-        val d = unit * 0.18f
-        val x = cx + unit * 0.12f
-        scope.drawLine(ink, Offset(x - d, cy - d), Offset(x + d, cy + d), unit * STROKE)
-        scope.drawLine(ink, Offset(x - d, cy + d), Offset(x + d, cy - d), unit * STROKE)
-    }
-
-    private fun drawGlobe(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
-        val r = unit * 0.5f
-        val stroke = Stroke(width = unit * STROKE)
-        scope.drawCircle(ink, r, Offset(cx, cy), style = stroke)
-        scope.drawOval(ink, Offset(cx - r * 0.45f, cy - r), Size(r * 0.9f, r * 2f), style = stroke)
-        scope.drawLine(ink, Offset(cx - r, cy), Offset(cx + r, cy), unit * STROKE)
     }
 
     private fun drawPreview(
@@ -465,6 +420,9 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val PRESS_SHRINK = 0.04f
         const val ELEVATION_LAYERS = 3
         const val PERCENT = 100f
+        const val PILL_PAD = 0.12f
+        const val PILL_HEIGHT = 0.68f
+        const val PILL_ALPHA = 0.55f
         const val PREVIEW_TEXT = 1.3f
     }
 }

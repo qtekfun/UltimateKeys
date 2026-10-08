@@ -123,6 +123,7 @@
     <string name="opt_tools_shown">Shown</string>
     <string name="opt_tools_collapsed">Behind a button</string>
     <string name="opt_tools_hidden">Hidden</string>
+    <string name="opt_row_classic">[123] [globe] [,] [space] [.] [enter]</string>
     <string name="opt_row_emoji">[123] [emoji] [space] [.] [enter]</string>
     <string name="opt_row_mic">[123] [,] [space] [mic] [enter]</string>
     <string name="opt_row_globe">[123] [globe] [space] [enter]</string>

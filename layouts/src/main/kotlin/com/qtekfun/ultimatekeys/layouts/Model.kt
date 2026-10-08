@@ -10,6 +10,8 @@ enum class KeyAction {
     ENTER,
     SPACE,
     GLOBE,
+    EMOJI,
+    MIC,
     SWITCH_LETTERS,
     SWITCH_SYMBOLS,
     SWITCH_SYMBOLS_2

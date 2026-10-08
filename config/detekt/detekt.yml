@@ -61,7 +61,7 @@ style:
       - '**/*.kts'
       # Icon geometry and color tokens are literal values by nature.
       - '**/surface/SurfaceRenderer.kt'
-      - '**/surface/TempStyle.kt'
+      - '**/surface/KeyIcons.kt'
       - '**/style/Style.kt'
       - '**/style/Presets.kt'
       - '**/surface/KeyboardSurface.kt'

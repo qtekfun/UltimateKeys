@@ -52,9 +52,10 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val labels = rememberLabels()
     val description = stringResource(R.string.keyboard_description)
 
-    val layout = remember(state.page, settings.letterLayoutId, settings.numberRow) {
-        controller.layoutFor(state.page, settings)
-    }
+    val layout =
+        remember(state.page, settings.letterLayoutId, settings.numberRow, activeStyle.bottomRow) {
+            controller.layoutFor(state.page, settings, activeStyle)
+        }
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 

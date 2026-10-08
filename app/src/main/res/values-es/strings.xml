@@ -123,6 +123,7 @@
     <string name="opt_tools_shown">Visibles</string>
     <string name="opt_tools_collapsed">Tras un botón</string>
     <string name="opt_tools_hidden">Ocultos</string>
+    <string name="opt_row_classic">[123] [globo] [,] [espacio] [.] [intro]</string>
     <string name="opt_row_emoji">[123] [emoji] [espacio] [.] [intro]</string>
     <string name="opt_row_mic">[123] [,] [espacio] [mic] [intro]</string>
     <string name="opt_row_globe">[123] [globo] [espacio] [intro]</string>

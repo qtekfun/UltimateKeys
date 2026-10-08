@@ -30,6 +30,8 @@ object LayoutParser {
         "enter" to KeyAction.ENTER,
         "space" to KeyAction.SPACE,
         "globe" to KeyAction.GLOBE,
+        "emoji" to KeyAction.EMOJI,
+        "mic" to KeyAction.MIC,
         "switch_letters" to KeyAction.SWITCH_LETTERS,
         "switch_symbols" to KeyAction.SWITCH_SYMBOLS,
         "switch_symbols_2" to KeyAction.SWITCH_SYMBOLS_2

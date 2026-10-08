@@ -18,8 +18,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.qtekfun.ultimatekeys.ime.BottomRowPlan
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 import com.qtekfun.ultimatekeys.ime.logic.KeyboardState
+import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
 import com.qtekfun.ultimatekeys.style.Style
 
@@ -39,8 +41,11 @@ fun KeyboardPreview(
     val density = LocalDensity.current
     val surface = remember(style, dark) { SurfaceStyle.resolve(style, dark) }
     val renderer = remember(context) { SurfaceRenderer(FontCatalog(context.assets)) }
-    val layout = remember(content.layoutId, content.numberRow) {
-        LayoutRepository.pages(content.layoutId, content.numberRow).letters
+    val layout = remember(content.layoutId, content.numberRow, style.bottomRow) {
+        BottomRow.apply(
+            LayoutRepository.pages(content.layoutId, content.numberRow).letters,
+            BottomRowPlan.slots(style.bottomRow, content.features)
+        )
     }
     var widthPx by remember { mutableFloatStateOf(0f) }
     val rowDp = SurfaceSpec.rowDp(content.heightPercent)

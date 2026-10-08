@@ -334,6 +334,10 @@ private fun BottomRowControls(style: Style, onChange: (Style) -> Unit) {
             R.string.ctl_arrangement,
             listOf(
                 Choice(
+                    BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
+                    stringResource(R.string.opt_row_classic)
+                ),
+                Choice(
                     BottomRowArrangement.SYMBOLS_EMOJI_SPACE_PERIOD_ENTER,
                     stringResource(R.string.opt_row_emoji)
                 ),

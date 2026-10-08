@@ -71,9 +71,9 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 - [x] 3.3 Material You dynamic colors and light/dark variants per style.
 - [x] 3.4 Bundle open fonts (at least 4, e.g. Inter, Roboto Flex, Atkinson Hyperlegible, a rounded one) and Material Symbols; licenses recorded.
 - [x] 3.5 At least 7 original presets with clearly different looks; names and descriptions are ours.
-- [ ] 3.6 Style editor in `:app`: grouped controls, live keyboard preview, reset, duplicate, contrast warning (WCAG AA).
-- [ ] 3.7 Import/export `.ukstyle` via SAF and share sheet; round-trip tests.
-- [ ] 3.8 Bottom-row arrangement and suggestion-bar layout options wired into `:layouts` / `:ime`.
+- [x] 3.6 Style editor in `:app`: grouped controls, live keyboard preview, reset, duplicate, contrast warning (WCAG AA).
+- [x] 3.7 Import/export `.ukstyle` via SAF and share sheet; round-trip tests.
+- [x] 3.8 Bottom-row arrangement and suggestion-bar layout options wired into `:layouts` / `:ime`.
 - [ ] 3.9 Screenshot tests for every preset in light and dark.
 - [ ] 3.10 Originality check script in CI: fails if strings, preset names or identifiers contain other keyboard product names (list in the script). Scans module sources, resources, presets and `fastlane/`; excludes the spec documents (`SPEC.md`, `CLAUDE.md`, `PLAN.md`), which name those products only to forbid them.
 
