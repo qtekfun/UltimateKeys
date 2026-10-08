@@ -28,6 +28,7 @@ include(
     ":ime",
     ":gesture",
     ":layouts",
+    ":languages",
     ":style",
     ":screenshots",
     ":ui",
