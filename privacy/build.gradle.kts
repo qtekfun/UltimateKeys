@@ -12,3 +12,14 @@ android {
 dependencies {
     api(libs.kotlinx.coroutines.core)
 }
+
+// SPEC.md section 12: the private-mode rules are covered completely.
+kover {
+    reports {
+        verify {
+            rule("Private mode rules: full line coverage") {
+                minBound(100)
+            }
+        }
+    }
+}

@@ -1,0 +1,1 @@
+Dictado sin conexión: toca el micrófono, habla y el texto se escribe en el cursor. La voz se reconoce en tu teléfono y el audio nunca se guarda.

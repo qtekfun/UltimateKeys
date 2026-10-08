@@ -1,0 +1,1 @@
+Gesture typing, a clipboard history with retention, pin and delete, and an emoji panel with offline search in English and Spanish. Both panels follow your style.

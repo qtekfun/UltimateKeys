@@ -1,0 +1,1 @@
+Modo privado: se activa solo en pestañas de incógnito y campos de contraseña, o a mano. Mientras está activo no se aprende nada.

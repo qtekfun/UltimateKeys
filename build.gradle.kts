@@ -74,5 +74,6 @@ kover {
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn("koverVerify")
+    dependsOn(":privacy:koverVerify")
     dependsOn("originalityCheck")
 }
