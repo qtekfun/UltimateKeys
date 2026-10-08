@@ -11,6 +11,9 @@ import com.qtekfun.ultimatekeys.style.Style
 object SurfaceSpec {
     const val BASE_ROW_DP = 54f
     const val BOTTOM_PADDING_DP = 6f
+
+    /** The bottom margin is at least this tall when the microphone lives in it. */
+    const val MIC_MARGIN_DP = 40f
     private const val PERCENT = 100f
 
     fun rowDp(heightPercent: Int): Float = BASE_ROW_DP * heightPercent / PERCENT
@@ -25,15 +28,31 @@ object SurfaceSpec {
         percent / PERCENT
     }
 
+    /** True when dictation exists and the style puts its button in the bottom margin. */
+    fun micInMargin(voice: Boolean, style: Style): Boolean = voice &&
+        style.bottomRow.micPlacement ==
+        com.qtekfun.ultimatekeys.style.MicPlacement.BOTTOM_MARGIN
+
+    /** The margin under the keys, made tall enough for the microphone when it sits there. */
+    fun marginDp(bottomMarginDp: Int, micInMargin: Boolean): Float = if (micInMargin) {
+        maxOf(
+            bottomMarginDp.toFloat(),
+            MIC_MARGIN_DP
+        )
+    } else {
+        bottomMarginDp.toFloat()
+    }
+
     fun totalHeightDp(
         rows: Int,
         heightPercent: Int,
         bottomMarginDp: Int = 0,
         style: Style = Presets.default,
-        numberRow: Boolean = false
+        numberRow: Boolean = false,
+        micInMargin: Boolean = false
     ): Float = style.suggestionBar.heightDp +
         rowDp(heightPercent) * rowScales(style, rows, numberRow).sum() +
-        BOTTOM_PADDING_DP + bottomMarginDp
+        BOTTOM_PADDING_DP + marginDp(bottomMarginDp, micInMargin)
 
     fun geometry(
         layout: KeyboardLayout,

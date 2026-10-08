@@ -362,7 +362,7 @@ enum class ToolIcons {
 data class BottomRowStyle(
     val arrangement: BottomRowArrangement =
         BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
-    val micPlacement: MicPlacement = MicPlacement.BOTTOM_ROW
+    val micPlacement: MicPlacement = MicPlacement.BOTTOM_MARGIN
 )
 
 /** Which keys sit in the bottom row, left to right. */
@@ -383,6 +383,10 @@ enum class BottomRowArrangement {
 
 @Serializable
 enum class MicPlacement {
+    /** Under the keys, at the right, in the margin below the last row. */
+    @SerialName("bottom_margin")
+    BOTTOM_MARGIN,
+
     @SerialName("bottom_row")
     BOTTOM_ROW,
 

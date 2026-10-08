@@ -83,7 +83,8 @@ data class A11yStrip(
     val privateOn: Boolean,
     val canTogglePrivate: Boolean,
     val mic: Boolean,
-    val tools: Boolean
+    val tools: Boolean,
+    val marginMic: MarginMic? = null
 )
 
 /**
@@ -99,7 +100,22 @@ object KeyAccessibility {
         state: KeyboardState,
         strip: A11yStrip,
         labels: A11yLabels
-    ): List<A11yNode> = stripNodes(geometry, strip, labels) + keyNodes(geometry, state, labels)
+    ): List<A11yNode> = stripNodes(geometry, strip, labels) +
+        keyNodes(geometry, state, labels) +
+        listOfNotNull(marginMicNode(strip, labels))
+
+    private fun marginMicNode(strip: A11yStrip, labels: A11yLabels): A11yNode? =
+        strip.marginMic?.let {
+            A11yNode(
+                id = "margin-mic",
+                left = it.left,
+                top = it.top,
+                right = it.right,
+                bottom = it.bottom,
+                description = labels.dictate,
+                target = A11yTarget.Action(KeyAction.MIC)
+            )
+        }
 
     fun keyNodes(geometry: KeyGeometry, state: KeyboardState, labels: A11yLabels): List<A11yNode> =
         geometry.keys.mapIndexed { index, placed ->

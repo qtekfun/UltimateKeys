@@ -12,7 +12,9 @@ data class StripState(
     val showToggle: Boolean = false,
     val showMic: Boolean = false,
     /** The clipboard and emoji buttons after the private-mode button. */
-    val showTools: Boolean = false
+    val showTools: Boolean = false,
+    /** The microphone in the bottom margin, when the style puts it there. */
+    val marginMic: MarginMic? = null
 )
 
 /**

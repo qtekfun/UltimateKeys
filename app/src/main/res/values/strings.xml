@@ -132,6 +132,7 @@
     <string name="opt_row_emoji">[123] [emoji] [space] [.] [enter]</string>
     <string name="opt_row_mic">[123] [,] [space] [mic] [enter]</string>
     <string name="opt_row_globe">[123] [globe] [space] [enter]</string>
+    <string name="opt_mic_margin">Bottom margin (under the keys)</string>
     <string name="opt_mic_row">Bottom row</string>
     <string name="opt_mic_bar">Suggestion bar</string>
     <string name="opt_motion_none">None</string>
