@@ -147,6 +147,22 @@ class AospSuggestionEngine internal constructor(
         }
     }
 
+    /**
+     * Frees the native dictionaries of [locale]'s language (what was learned is flushed first). They are opened again
+     * on the next use, so call this when a language is switched off to give its memory back.
+     */
+    fun releaseLanguage(locale: Locale) {
+        synchronized(lock) {
+            val state = states.remove(languageKey(locale)) ?: return
+            state.all.forEach {
+                flush(it)
+                bridge.releaseSession(it.session)
+                bridge.closeDictionary(it.handle)
+            }
+            bridge.releaseProximityInfo(state.proximityInfo)
+        }
+    }
+
     override fun userDictionaryWords(locale: Locale): List<String> = synchronized(lock) {
         val user = if (closed) null else stateFor(locale).user
         user?.let {

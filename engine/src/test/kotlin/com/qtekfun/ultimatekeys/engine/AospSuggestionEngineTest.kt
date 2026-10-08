@@ -271,6 +271,25 @@ class AospSuggestionEngineTest {
     }
 
     @Test
+    fun `releasing a language frees its dictionaries and keeps the others`() {
+        val engine = engine()
+        engine.suggest(emptyList(), "hel", english)
+        engine.suggest(emptyList(), "hol", spanish)
+        val liveBefore = bridge.liveSessions
+
+        engine.releaseLanguage(english)
+        engine.releaseLanguage(english) // nothing left to release
+
+        assertTrue(bridge.liveSessions < liveBefore)
+        assertEquals(1, bridge.liveProximityInfos)
+        assertTrue(bridge.dictAt("history-en").closed)
+        assertFalse(bridge.dictAt("history-es").closed)
+        // The language is reopened on demand.
+        engine.suggest(emptyList(), "hel", english)
+        assertEquals(2, bridge.liveProximityInfos)
+    }
+
+    @Test
     fun `languages are independent`() {
         val engine = engine()
         engine.addToUserDictionary("zebra", english)

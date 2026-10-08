@@ -11,6 +11,12 @@ data class MixedConfig(
     val contextWords: Int = 4,
     /** Prior probability of the primary language; the rest is split evenly among the others. */
     val primaryPrior: Double = 0.75,
+    /**
+     * With many languages an even split would leave each secondary language almost nothing, so none of them could
+     * ever win a suggestion without a long run of context. Each gets at least this much (the primary language
+     * keeps at least half of the prior, so six languages are the limit).
+     */
+    val minSecondaryPrior: Double = 0.1,
     /** Each older context word counts this fraction of the next newer one. */
     val recencyDecay: Double = 0.7,
     /** How much the prior is worth, in units of one fresh, language-specific context word. */
@@ -23,6 +29,7 @@ data class MixedConfig(
     init {
         require(contextWords >= 0) { "contextWords must be >= 0" }
         require(primaryPrior in 0.0..1.0) { "primaryPrior must be in 0..1" }
+        require(minSecondaryPrior in 0.0..1.0) { "minSecondaryPrior must be in 0..1" }
         require(recencyDecay > 0.0 && recencyDecay <= 1.0) { "recencyDecay must be in (0, 1]" }
         require(priorMass > 0.0) { "priorMass must be > 0" }
         require(autoCorrectConfidence in 0.0..1.0) { "autoCorrectConfidence must be in 0..1" }
@@ -43,6 +50,8 @@ data class MixedConfig(
  * never enough to overturn a strong prior.
  */
 internal object LanguageConfidence {
+    private const val HALF = 0.5
+
     /**
      * @param languages all candidate languages (primary included).
      * @param context words typed before the current one, oldest first.
@@ -79,7 +88,11 @@ internal object LanguageConfidence {
 
     fun priors(languages: List<String>, primary: String, config: MixedConfig): Map<String, Double> {
         if (languages.size < 2) return languages.associateWith { 1.0 }
-        val others = (1.0 - config.primaryPrior) / (languages.size - 1)
-        return languages.associateWith { if (it == primary) config.primaryPrior else others }
+        val count = languages.size - 1
+        val others = ((1.0 - config.primaryPrior) / count)
+            .coerceAtLeast(config.minSecondaryPrior)
+            .coerceAtMost(HALF / count)
+            .coerceAtLeast((1.0 - config.primaryPrior) / count)
+        return languages.associateWith { if (it == primary) 1.0 - others * count else others }
     }
 }
