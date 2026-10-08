@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- The microphone under the keys can also sit in the centre (Dictation settings, Microphone position: left, centre or right).
+
+
 ## [0.9.1] - 2026-10-08
 
 ### Changed

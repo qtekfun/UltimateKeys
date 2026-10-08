@@ -99,7 +99,7 @@ class MarginMicTest {
             width = 400f,
             keysBottom = 300f,
             totalHeight = 340f,
-            onLeft = false
+            side = MicSide.RIGHT
         )!!
         assertEquals(400f, zone.right)
         assertEquals(300f, zone.top)
@@ -109,6 +109,30 @@ class MarginMicTest {
         assertTrue(zone.contains(390f, 320f))
         assertFalse(zone.contains(100f, 320f))
         assertFalse(zone.contains(390f, 250f))
+    }
+
+    @Test
+    fun `the zone can sit in the centre`() {
+        val zone = MarginMic.of(
+            width = 400f,
+            keysBottom = 300f,
+            totalHeight = 340f,
+            side = MicSide.CENTER
+        )!!
+        assertEquals(168f, zone.left, 0.01f)
+        assertEquals(232f, zone.right, 0.01f)
+        assertEquals(200f, zone.centerX, 0.01f)
+        assertTrue(zone.contains(200f, 320f))
+        assertFalse(zone.contains(10f, 320f))
+        assertFalse(zone.contains(390f, 320f))
+    }
+
+    @Test
+    fun `stored setting values map to a side and unknown ones to the left`() {
+        assertEquals(MicSide.LEFT, MicSide.of("left"))
+        assertEquals(MicSide.CENTER, MicSide.of("center"))
+        assertEquals(MicSide.RIGHT, MicSide.of("right"))
+        assertEquals(MicSide.LEFT, MicSide.of("bogus"))
     }
 
     @Test

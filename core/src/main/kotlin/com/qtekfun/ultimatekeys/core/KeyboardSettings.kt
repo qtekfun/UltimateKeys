@@ -38,7 +38,7 @@ data class KeyboardSettings(
     val dictationEnabled: Boolean = true,
     /** Dictation language: `auto` (Spanish or English per utterance), `es` or `en`. */
     val dictationLanguage: String = DICTATION_AUTO,
-    /** Side of the margin under the keys where the microphone sits: `left` or `right`. */
+    /** Side of the margin under the keys where the microphone sits: `left`, `center` or `right`. */
     val dictationMicSide: String = MIC_LEFT,
     /** Silence after speech that ends a dictation, in milliseconds. */
     val dictationSilenceMs: Int = DEFAULT_DICTATION_SILENCE_MS,
@@ -78,8 +78,9 @@ data class KeyboardSettings(
         val CLIPBOARD_ITEMS_RANGE = 5..500
         val SKIN_TONE_RANGE = 0..5
         const val MIC_LEFT = "left"
+        const val MIC_CENTER = "center"
         const val MIC_RIGHT = "right"
-        val MIC_SIDES = listOf(MIC_LEFT, MIC_RIGHT)
+        val MIC_SIDES = listOf(MIC_LEFT, MIC_CENTER, MIC_RIGHT)
         const val DICTATION_AUTO = "auto"
         val DICTATION_LANGUAGES = listOf(DICTATION_AUTO, "es", "en")
         const val DEFAULT_DICTATION_SILENCE_MS = 1500

@@ -161,7 +161,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         widthPx,
         geometry.top + geometry.height,
         keysHeightDp * density.density,
-        settings.dictationMicSide == KeyboardSettings.MIC_LEFT
+        MicSide.of(settings.dictationMicSide)
     )
     gestures.marginMic = marginMic
     gestures.globeMenu = globeMenu

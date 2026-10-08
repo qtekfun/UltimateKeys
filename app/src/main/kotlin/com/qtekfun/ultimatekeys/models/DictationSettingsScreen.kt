@@ -36,6 +36,7 @@ internal fun DictationSettingsScreen(
 ) {
     val sides = listOf(
         UkOption(KeyboardSettings.MIC_LEFT, stringResource(R.string.dictation_mic_left)),
+        UkOption(KeyboardSettings.MIC_CENTER, stringResource(R.string.dictation_mic_center)),
         UkOption(KeyboardSettings.MIC_RIGHT, stringResource(R.string.dictation_mic_right))
     )
     val languages = LANGUAGES.map { (code, label) -> UkOption(code, stringResource(label)) }
