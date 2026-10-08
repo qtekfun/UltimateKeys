@@ -3,6 +3,8 @@
 
 package com.qtekfun.ultimatekeys.layouts
 
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
+
 /** The pages a keyboard can show for one language. */
 data class KeyboardPages(
     val letters: KeyboardLayout,
@@ -21,7 +23,8 @@ object LayoutRepository {
         LayoutParser.parse(stream.bufferedReader().use { it.readText() })
     }
 
-    val letterLayoutIds: List<String> = listOf("es_qwerty", "en_qwerty")
+    /** Every letter layout of every catalog language (see `:languages`). */
+    val letterLayoutIds: List<String> = LanguageCatalog.letterLayoutIds
 
     fun pages(letterLayoutId: String, numberRow: Boolean): KeyboardPages = KeyboardPages(
         letters = withNumberRow(load(letterLayoutId), numberRow),

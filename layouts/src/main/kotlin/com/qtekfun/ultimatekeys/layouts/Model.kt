@@ -46,3 +46,15 @@ data class ActionKey(
 data class KeyRow(val keys: List<LayoutKey>)
 
 data class KeyboardLayout(val id: String, val locale: String?, val rows: List<KeyRow>)
+
+/**
+ * The letter keys of each row as lower-case text, in order (rows without letters are dropped). The suggestion
+ * engine builds its typo-proximity grid from this, so any script a layout uses works the same way.
+ */
+fun KeyboardLayout.letterRows(): List<String> = rows.map { row ->
+    row.keys.filterIsInstance<CharKey>().map { it.output }
+        .filter {
+            it.codePointCount(0, it.length) == 1 && it.codePointAt(0).let(Character::isLetter)
+        }
+        .joinToString("") { it.lowercase(java.util.Locale.ROOT) }
+}.filter { it.isNotEmpty() }
