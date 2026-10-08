@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.ime.surface.SurfaceSpec
 import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
@@ -69,7 +70,13 @@ class TypingSmokeTest {
         val layout = LayoutRepository.pages("es_qwerty", numberRow = false).letters
         val bounds = keyboardBounds()
         val density = context.resources.displayMetrics.density
-        val geometry = SurfaceSpec.geometry(layout, bounds.width().toFloat(), density, 100)
+        val geometry = SurfaceSpec.geometry(
+            layout,
+            bounds.width().toFloat(),
+            density,
+            100,
+            sideMarginDp = KeyboardSettings.DEFAULT_SIDE_MARGIN_DP
+        )
         val key = geometry.keys.first { (it.key as? CharKey)?.label == label }
         device.click(
             bounds.left + key.centerX.toInt(),
@@ -84,7 +91,8 @@ class TypingSmokeTest {
             layout,
             bounds.width().toFloat(),
             context.resources.displayMetrics.density,
-            100
+            100,
+            sideMarginDp = KeyboardSettings.DEFAULT_SIDE_MARGIN_DP
         )
         val key = geometry.keys.first { (it.key as? ActionKey)?.action == action }
         device.click(

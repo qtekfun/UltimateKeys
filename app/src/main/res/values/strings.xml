@@ -12,6 +12,10 @@
     <string name="step_selected">2. Selected</string>
     <string name="try_it_here">Try it here</string>
     <string name="setting_height">Keyboard height</string>
+    <string name="group_edges">Edges</string>
+    <string name="setting_side_margin">Side margin</string>
+    <string name="setting_edge_boost">Wider edge keys</string>
+    <string name="edges_note">Keeps the keys away from the screen edge, where the system back gesture can swallow touches. A touch in the margin still types the nearest key. Wider edge keys makes the letters at the ends of each row (such as q, p, a) bigger targets.</string>
     <string name="setting_bottom_margin">Bottom margin</string>
     <string name="setting_private_ends_on_close">Private mode turned on by hand ends when the keyboard closes</string>
     <string name="setting_dictation_enabled">Show the dictation microphone</string>

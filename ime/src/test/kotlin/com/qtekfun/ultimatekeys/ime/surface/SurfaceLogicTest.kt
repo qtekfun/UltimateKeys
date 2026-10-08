@@ -87,4 +87,28 @@ class SurfaceLogicTest {
         t.record(500_000_000L)
         assertEquals(100, t.size())
     }
+
+    @Test
+    fun `a side margin keeps the keys off the edge and touches there still reach the edge keys`() {
+        val g = KeyGeometry(layout, width = 400f, rowHeight = 50f, sideInset = 20f)
+        assertEquals(20f, g.keys.minOf { it.left }, 0.01f)
+        assertEquals(380f, g.keys.maxOf { it.right }, 0.01f)
+        val first = g.keys.first()
+        assertEquals(first, g.keyAt(2f, 25f))
+        val lastOfRow = g.keys.filter { it.top < 50f }.maxBy { it.right }
+        assertEquals(lastOfRow, g.keyAt(398f, 25f))
+    }
+
+    @Test
+    fun `edge boost widens only the letters at the ends of a row`() {
+        val plain = KeyGeometry(layout, width = 400f, rowHeight = 50f)
+        val boosted = KeyGeometry(layout, width = 400f, rowHeight = 50f, edgeBoost = 0.5f)
+        // Row one is a, b, delete: only "a" (a letter at the start) is widened; the rest of the row
+        // gives up that space and the row still fills the whole width.
+        assertTrue(boosted.keys[0].width > plain.keys[0].width)
+        assertTrue(boosted.keys[1].width < plain.keys[1].width)
+        assertTrue(boosted.keys[2].width < plain.keys[2].width)
+        val row = boosted.keys.filter { it.top < 50f }
+        assertEquals(400f, row.sumOf { it.width.toDouble() }.toFloat(), 0.01f)
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -105,7 +106,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             settings.heightPercent,
             settings.numberRow,
             activeStyle,
-            density
+            density,
+            settings.sideMarginDp,
+            settings.edgeKeyBoostPercent
         ) {
             SurfaceSpec.geometry(
                 layout,
@@ -113,7 +116,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                 density.density,
                 settings.heightPercent,
                 activeStyle,
-                settings.numberRow
+                settings.numberRow,
+                settings.sideMarginDp,
+                settings.edgeKeyBoostPercent
             )
         }
 
@@ -204,6 +209,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                             toggle = privateAction.takeIf { controller.privacy.canToggle },
                             onToggle = controller::togglePrivate
                         )
+                        // Keep the system back swipe from taking touches meant for the edge keys.
+                        .systemGestureExclusion()
                         .pointerInput(gestures) { trackPointers(gestures) }
                 ) {
                     renderer.draw(

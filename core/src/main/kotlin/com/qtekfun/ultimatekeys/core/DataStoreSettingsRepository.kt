@@ -25,6 +25,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         return KeyboardSettings(
             heightPercent = this[HEIGHT] ?: d.heightPercent,
             bottomMarginDp = this[BOTTOM_MARGIN] ?: d.bottomMarginDp,
+            sideMarginDp = this[SIDE_MARGIN] ?: d.sideMarginDp,
+            edgeKeyBoostPercent = this[EDGE_BOOST] ?: d.edgeKeyBoostPercent,
             numberRow = this[NUMBER_ROW] ?: d.numberRow,
             longPressDelayMs = this[LONG_PRESS] ?: d.longPressDelayMs,
             hapticIntensity = this[HAPTIC] ?: d.hapticIntensity,
@@ -62,6 +64,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     private fun androidx.datastore.preferences.core.MutablePreferences.write(s: KeyboardSettings) {
         this[HEIGHT] = s.heightPercent
         this[BOTTOM_MARGIN] = s.bottomMarginDp
+        this[SIDE_MARGIN] = s.sideMarginDp
+        this[EDGE_BOOST] = s.edgeKeyBoostPercent
         this[NUMBER_ROW] = s.numberRow
         this[LONG_PRESS] = s.longPressDelayMs
         this[HAPTIC] = s.hapticIntensity
@@ -101,6 +105,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val GESTURE_TRAIL = booleanPreferencesKey("gesture_trail")
         val GESTURE_SENSITIVITY = intPreferencesKey("gesture_sensitivity")
         val BOTTOM_MARGIN = intPreferencesKey("bottom_margin_dp")
+        val SIDE_MARGIN = intPreferencesKey("side_margin_dp")
+        val EDGE_BOOST = intPreferencesKey("edge_key_boost_percent")
         val NUMBER_ROW = booleanPreferencesKey("number_row")
         val LONG_PRESS = intPreferencesKey("long_press_delay_ms")
         val HAPTIC = intPreferencesKey("haptic_intensity")

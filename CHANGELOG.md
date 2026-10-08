@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
+
+
 ## [1.0.0] - 2026-10-08
 
 First stable release. Everything below was introduced step by step in 0.1.0 to 0.9.2 and 1.0.0-rc.1; the full history is in those sections.

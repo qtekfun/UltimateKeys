@@ -3,6 +3,7 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.layouts.LayoutKey
 
@@ -40,7 +41,11 @@ class KeyGeometry(
     gapY: Float = 0f,
     val top: Float = 0f,
     /** Optional height multiplier per row (1 = [rowHeight]); missing entries mean 1. */
-    rowScales: List<Float> = emptyList()
+    rowScales: List<Float> = emptyList(),
+    /** Free space between the screen edge and the keys; touches there still reach the edge keys. */
+    sideInset: Float = 0f,
+    /** Extra width (0.2 = 20%) of a letter at either end of a row, to make it easier to hit. */
+    edgeBoost: Float = 0f
 ) {
     val keys: List<PlacedKey>
     val height: Float = layout.rows.indices.sumOf {
@@ -52,11 +57,15 @@ class KeyGeometry(
         var rowTop = top
         layout.rows.forEachIndexed { rowIndex, row ->
             val thisRowHeight = rowHeight * rowScales.getOrElse(rowIndex) { 1f }
-            val totalWeight = row.keys.sumOf { it.width.toDouble() }.toFloat()
-            val available = width - gapX * row.keys.size
-            var x = gapX / 2f
-            row.keys.forEach { key ->
-                val w = available * key.width / totalWeight
+            val weights = row.keys.mapIndexed { i, key ->
+                val atEnd = i == 0 || i == row.keys.lastIndex
+                key.width * if (atEnd && key is CharKey) 1f + edgeBoost else 1f
+            }
+            val totalWeight = weights.sumOf { it.toDouble() }.toFloat()
+            val available = width - 2f * sideInset - gapX * row.keys.size
+            var x = sideInset + gapX / 2f
+            row.keys.forEachIndexed { i, key ->
+                val w = available * weights[i] / totalWeight
                 placed +=
                     PlacedKey(key, x, rowTop + gapY / 2f, x + w, rowTop + thisRowHeight - gapY / 2f)
                 x += w + gapX

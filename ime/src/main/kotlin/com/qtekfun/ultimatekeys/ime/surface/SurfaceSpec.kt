@@ -60,7 +60,9 @@ object SurfaceSpec {
         density: Float,
         heightPercent: Int,
         style: Style = Presets.default,
-        numberRow: Boolean = false
+        numberRow: Boolean = false,
+        sideMarginDp: Int = 0,
+        edgeBoostPercent: Int = 0
     ) = KeyGeometry(
         layout,
         width = widthPx,
@@ -68,6 +70,8 @@ object SurfaceSpec {
         gapX = style.keys.gapXDp * density,
         gapY = style.keys.gapYDp * density,
         top = style.suggestionBar.heightDp * density,
-        rowScales = rowScales(style, layout.rows.size, numberRow)
+        rowScales = rowScales(style, layout.rows.size, numberRow),
+        sideInset = sideMarginDp * density,
+        edgeBoost = edgeBoostPercent / PERCENT
     )
 }

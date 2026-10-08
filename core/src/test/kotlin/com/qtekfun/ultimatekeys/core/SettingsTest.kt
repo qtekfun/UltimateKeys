@@ -22,6 +22,12 @@ class SettingsTest {
         ).sanitized()
         assertEquals(130, s.heightPercent)
         assertEquals(48, s.bottomMarginDp)
+        assertEquals(32, KeyboardSettings(sideMarginDp = 99).sanitized().sideMarginDp)
+        assertEquals(0, KeyboardSettings(edgeKeyBoostPercent = -5).sanitized().edgeKeyBoostPercent)
+        assertEquals(
+            40,
+            KeyboardSettings(edgeKeyBoostPercent = 500).sanitized().edgeKeyBoostPercent
+        )
         assertEquals(
             KeyboardSettings.MIC_LEFT,
             KeyboardSettings(dictationMicSide = "middle").sanitized().dictationMicSide
