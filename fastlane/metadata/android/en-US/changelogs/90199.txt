@@ -1,0 +1,1 @@
+The microphone under the keys now sits on the left so it no longer overlaps the keyboard switcher button, with a setting to move it. Dictation results are handed over before the state goes idle.
