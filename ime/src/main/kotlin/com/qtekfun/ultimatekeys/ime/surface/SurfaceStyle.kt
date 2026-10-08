@@ -70,12 +70,22 @@ data class SurfaceStyle(
             Appearance.FOLLOW_SYSTEM -> systemDark
         }
 
-        fun resolve(style: Style, systemDark: Boolean): SurfaceStyle {
+        /** [tones] are the system colours; used when the style asks for dynamic colours. */
+        fun resolve(style: Style, systemDark: Boolean, tones: ToneSource? = null): SurfaceStyle {
             val dark = isDark(style, systemDark)
-            val p = style.palette(dark)
+            val dynamic = style.dynamicColors && tones != null
+            val p = if (tones != null && style.dynamicColors) {
+                DynamicPalette.build(tones, dark)
+            } else {
+                style.palette(dark)
+            }
             val labels = style.labels
             return SurfaceStyle(
-                background = backgroundBrush(style, dark),
+                background = if (dynamic && style.background.kind != BackgroundKind.GRADIENT) {
+                    SolidColor(p.barBackground.color())
+                } else {
+                    backgroundBrush(style, dark)
+                },
                 letterKey = p.keyLetter.color(),
                 functionKey = p.keyFunction.color(),
                 spaceKey = p.keySpace.color(),

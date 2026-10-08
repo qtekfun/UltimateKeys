@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -43,7 +44,11 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val density = LocalDensity.current
     val activeStyle by controller.style.collectAsState()
     val systemDark = isSystemInDarkTheme()
-    val style = remember(activeStyle, systemDark) { SurfaceStyle.resolve(activeStyle, systemDark) }
+    val context = LocalContext.current
+    val tones = remember(context) { ToneSource.fromContext(context) }
+    val style = remember(activeStyle, systemDark, tones) {
+        SurfaceStyle.resolve(activeStyle, systemDark, tones)
+    }
     val labels = rememberLabels()
     val description = stringResource(R.string.keyboard_description)
 
