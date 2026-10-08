@@ -183,6 +183,20 @@ internal fun TypingScreen(
                 ValueFormat::dp
             ) { v -> update { it.copy(bottomMarginDp = v) } }
         }
+        section(header = R.string.group_edges, footer = R.string.edges_note) {
+            intSlider(
+                R.string.setting_side_margin,
+                settings.sideMarginDp,
+                KeyboardSettings.SIDE_MARGIN_RANGE,
+                ValueFormat::dp
+            ) { v -> update { it.copy(sideMarginDp = v) } }
+            intSlider(
+                R.string.setting_edge_boost,
+                settings.edgeKeyBoostPercent,
+                KeyboardSettings.EDGE_BOOST_RANGE,
+                ValueFormat::percent
+            ) { v -> update { it.copy(edgeKeyBoostPercent = v) } }
+        }
         section(header = R.string.group_layout) {
             choice(R.string.setting_layout, layouts, settings.letterLayoutId) { v ->
                 update { it.copy(letterLayoutId = v) }

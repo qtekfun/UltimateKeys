@@ -7,6 +7,10 @@ package com.qtekfun.ultimatekeys.core
 data class KeyboardSettings(
     val heightPercent: Int = DEFAULT_HEIGHT_PERCENT,
     val bottomMarginDp: Int = DEFAULT_BOTTOM_MARGIN_DP,
+    /** Space kept free at each side of the keys, away from the screen edge and its gestures. */
+    val sideMarginDp: Int = DEFAULT_SIDE_MARGIN_DP,
+    /** How much wider (in percent) the letters at the end of each row are, to make them easier to hit. */
+    val edgeKeyBoostPercent: Int = 0,
     val numberRow: Boolean = false,
     val longPressDelayMs: Int = DEFAULT_LONG_PRESS_MS,
     val hapticIntensity: Int = DEFAULT_HAPTIC,
@@ -50,6 +54,8 @@ data class KeyboardSettings(
     fun sanitized(): KeyboardSettings = copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
         bottomMarginDp = bottomMarginDp.coerceIn(BOTTOM_MARGIN_RANGE),
+        sideMarginDp = sideMarginDp.coerceIn(SIDE_MARGIN_RANGE),
+        edgeKeyBoostPercent = edgeKeyBoostPercent.coerceIn(EDGE_BOOST_RANGE),
         longPressDelayMs = longPressDelayMs.coerceIn(LONG_PRESS_RANGE),
         hapticIntensity = hapticIntensity.coerceIn(PERCENT_RANGE),
         soundVolume = soundVolume.coerceIn(PERCENT_RANGE),
@@ -66,11 +72,14 @@ data class KeyboardSettings(
     companion object {
         const val DEFAULT_HEIGHT_PERCENT = 100
         const val DEFAULT_BOTTOM_MARGIN_DP = 12
+        const val DEFAULT_SIDE_MARGIN_DP = 4
         const val DEFAULT_LONG_PRESS_MS = 350
         const val DEFAULT_HAPTIC = 50
         const val DEFAULT_GESTURE_SENSITIVITY = 50
         val HEIGHT_RANGE = 70..130
         val BOTTOM_MARGIN_RANGE = 0..48
+        val SIDE_MARGIN_RANGE = 0..32
+        val EDGE_BOOST_RANGE = 0..40
         val LONG_PRESS_RANGE = 150..800
         val PERCENT_RANGE = 0..100
         const val DEFAULT_CLIPBOARD_RETENTION = "day"

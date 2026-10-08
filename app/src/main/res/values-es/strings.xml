@@ -12,6 +12,10 @@
     <string name="step_selected">2. Seleccionado</string>
     <string name="try_it_here">Pruébalo aquí</string>
     <string name="setting_height">Altura del teclado</string>
+    <string name="group_edges">Bordes</string>
+    <string name="setting_side_margin">Margen lateral</string>
+    <string name="setting_edge_boost">Teclas de los bordes más anchas</string>
+    <string name="edges_note">Separa las teclas del borde de la pantalla, donde el gesto de atrás del sistema puede quedarse con los toques. Un toque en el margen sigue escribiendo la tecla más cercana. Con teclas de los bordes más anchas, las letras de los extremos de cada fila (como q, p, a) son más fáciles de acertar.</string>
     <string name="setting_bottom_margin">Margen inferior</string>
     <string name="setting_private_ends_on_close">El modo privado activado a mano termina al cerrar el teclado</string>
     <string name="setting_dictation_enabled">Mostrar el micrófono de dictado</string>
