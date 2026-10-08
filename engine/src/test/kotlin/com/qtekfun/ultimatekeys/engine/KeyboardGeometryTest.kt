@@ -71,4 +71,31 @@ class KeyboardGeometryTest {
         assertTrue(geometry.keys.none { it.codePoint == 'ñ'.code })
         assertEquals(100, spanish.mostCommonKeyWidth)
     }
+
+    @Test
+    fun `any script works because keys are code points`() {
+        val russian = KeyboardGeometry.fromRows(listOf("йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю"))
+        val chars = russian.proximityChars()
+        assertEquals(12 * 100, russian.width)
+        val key = russian.keys.first { it.codePoint == 'к'.code }
+        val cellWidth =
+            (russian.width + KeyboardGeometry.GRID_WIDTH - 1) / KeyboardGeometry.GRID_WIDTH
+        val cellHeight =
+            (russian.height + KeyboardGeometry.GRID_HEIGHT - 1) / KeyboardGeometry.GRID_HEIGHT
+        val x = key.x + key.width / 2
+        val y = key.y + key.height / 2
+        val start = ((y / cellHeight) * KeyboardGeometry.GRID_WIDTH + x / cellWidth) *
+            KeyboardGeometry.MAX_PROXIMITY_CHARS
+        assertEquals('к'.code, chars[start])
+        assertTrue(
+            chars.slice(
+                start until start + KeyboardGeometry.MAX_PROXIMITY_CHARS
+            ).containsAll(listOf('у'.code, 'е'.code))
+        )
+
+        val greek = KeyboardGeometry.fromRows(listOf("ςερτυθιοπ", "ασδφγηξκλ", "ζχψωβνμ"))
+        assertTrue(greek.keys.any { it.codePoint == 'ς'.code })
+        val astral = KeyboardGeometry.fromRows(listOf("a\uD835\uDC1Bc"))
+        assertEquals(listOf('a'.code, 0x1D41B, 'c'.code), astral.keys.map { it.codePoint })
+    }
 }
