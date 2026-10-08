@@ -15,37 +15,59 @@ fun interface AssetSource {
 }
 
 /**
- * Copies the bundled dictionaries to a private directory (the app files dir) so the native engine can open them
- * by path. A `version` marker file makes the copy happen once per [DictionaryIndex.version]; a failed or partial
- * copy never leaves a usable-looking directory behind.
+ * Copies bundled dictionaries to a private directory (the app files dir) so the engine's builder can read them by
+ * path. Only the languages asked for are copied (the keyboard enables a handful out of the many it bundles). Each
+ * file has a marker holding the SHA-256 it was verified against, written last, so a missing, partial or outdated
+ * copy is detected and redone and a failed copy never looks usable. Files of languages that left the index are
+ * removed.
  */
 class DictionaryInstaller(private val assets: AssetSource, private val targetDir: File) {
-    /** Installs if needed and returns the locator for the installed files. Safe to call repeatedly. */
-    fun ensureInstalled(): DictionaryLocator {
+    /**
+     * Installs what is missing or outdated for [languages] (every bundled language when null) and returns the
+     * locator for the installed files. Safe to call repeatedly: an up-to-date language costs no copying.
+     */
+    fun ensureInstalled(languages: Set<String>? = null): DictionaryLocator {
         val index = DictionaryIndex.parse(
             assets.open("${DictionaryIndex.ASSET_DIR}/${DictionaryIndex.INDEX_FILE}")
         )
-        val marker = File(targetDir, MARKER_FILE)
-        val upToDate = marker.isFile && marker.readText() == index.version &&
-            index.assets.all { File(targetDir, it.fileName).isFile }
-        if (!upToDate) install(index)
+        if (!targetDir.isDirectory &&
+            !targetDir.mkdirs()
+        ) {
+            throw IOException("Cannot create $targetDir")
+        }
+        removeStale(index)
+        index.assets.filter { languages == null || it.language in languages }
+            .filterNot { isInstalled(it) }
+            .forEach { install(it) }
         return DictionaryLocator(index, targetDir)
     }
 
-    private fun install(index: DictionaryIndex) {
-        val parent = targetDir.parentFile ?: throw IOException("No parent for $targetDir")
-        parent.mkdirs()
-        val staging = File(parent, targetDir.name + ".staging")
-        staging.deleteRecursively()
-        if (!staging.mkdirs()) throw IOException("Cannot create $staging")
+    private fun isInstalled(asset: DictionaryAsset): Boolean =
+        File(targetDir, asset.fileName).isFile &&
+            DictionaryLocator.markerFor(targetDir, asset).let {
+                it.isFile &&
+                    it.readText() == asset.sha256
+            }
+
+    private fun removeStale(index: DictionaryIndex) {
+        val keep = index.assets.flatMap {
+            listOf(it.fileName, DictionaryLocator.markerFor(targetDir, it).name)
+        }.toSet()
+        targetDir.listFiles()?.filter { it.name !in keep }?.forEach { it.deleteRecursively() }
+    }
+
+    private fun install(asset: DictionaryAsset) {
+        val dest = File(targetDir, asset.fileName)
+        val marker = DictionaryLocator.markerFor(targetDir, asset)
+        val part = File(targetDir, asset.fileName + ".part")
+        marker.delete()
         try {
-            index.assets.forEach { copyVerified(it, File(staging, it.fileName)) }
-            File(staging, MARKER_FILE).writeText(index.version)
-            targetDir.deleteRecursively()
-            val moved = staging.renameTo(targetDir)
-            if (!moved) throw IOException("Cannot move $staging to $targetDir")
+            copyVerified(asset, part)
+            dest.delete()
+            if (!part.renameTo(dest)) throw IOException("Cannot move $part to $dest")
+            marker.writeText(asset.sha256)
         } finally {
-            staging.deleteRecursively()
+            part.delete()
         }
     }
 
@@ -76,8 +98,7 @@ class DictionaryInstaller(private val assets: AssetSource, private val targetDir
         }
     }
 
-    companion object {
-        const val MARKER_FILE = "version"
-        private const val BUFFER_SIZE = 16 * 1024
+    private companion object {
+        const val BUFFER_SIZE = 16 * 1024
     }
 }

@@ -19,6 +19,8 @@ android {
 
 dependencies {
     api(projects.engine)
+    testImplementation(projects.languages)
+    testImplementation(projects.layouts)
 }
 
 /**

@@ -104,6 +104,10 @@ object LanguageCatalog {
 
     fun find(tag: String): Language? = byTag[tag]
 
+    /** The language of [locale]: the exact tag (`en-GB`) first, otherwise the first of its language (`pt`). */
+    fun forLocale(locale: Locale): Language? =
+        byTag[locale.toLanguageTag()] ?: all.firstOrNull { it.code == locale.language }
+
     /** Every letter layout id of every language, without repeats. */
     val letterLayoutIds: List<String> = all.flatMap { it.layoutIds }.distinct()
 

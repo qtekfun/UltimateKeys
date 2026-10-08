@@ -12,6 +12,13 @@ class AndroidAssetSource(private val context: Context) : AssetSource {
     override fun open(path: String): InputStream = context.assets.open(path)
 }
 
-/** Installs the bundled dictionaries under `filesDir/dictionaries` (once per data version) and returns the locator. */
-fun Context.installDictionaries(): DictionaryLocator =
-    DictionaryInstaller(AndroidAssetSource(this), File(filesDir, "dictionaries")).ensureInstalled()
+/**
+ * Installs the bundled word lists of [languages] (every one when null) under `filesDir/dictionaries`, each once per
+ * pinned version, and returns the locator.
+ */
+fun Context.installDictionaries(languages: Set<String>? = null): DictionaryLocator =
+    DictionaryInstaller(AndroidAssetSource(this), File(filesDir, "dictionaries"))
+        .ensureInstalled(languages)
+
+/** Where the binary dictionaries of the engine are built (see [BinaryDictionaries]). */
+fun Context.binaryDictionariesDir(): File = File(filesDir, "engine/dictionaries")

@@ -47,6 +47,15 @@ object WordListParser {
     /** Parses a gzip-compressed word list. */
     fun parseGzip(input: InputStream): WordList = GZIPInputStream(input).use { parse(it) }
 
+    /**
+     * Gives [block] the words of a gzip-compressed list as a lazy sequence, in file order, without holding the whole
+     * list in memory (the biggest list has over a million words). The sequence is only valid inside [block].
+     */
+    fun <R> streamGzip(input: InputStream, block: (Sequence<WordEntry>) -> R): R =
+        GZIPInputStream(input).bufferedReader(Charsets.UTF_8).useLines { lines ->
+            block(lines.filter { it.startsWith(WORD_PREFIX) }.map(::parseWord))
+        }
+
     fun parse(input: InputStream): WordList {
         var header: WordListHeader? = null
         val words = ArrayList<WordEntry>()

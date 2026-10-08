@@ -31,6 +31,7 @@ import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
 import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
+import com.qtekfun.ultimatekeys.dictionaries.binaryDictionariesDir
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
 import com.qtekfun.ultimatekeys.emoji.loadEmojiData
 import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
@@ -40,11 +41,13 @@ import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
 import com.qtekfun.ultimatekeys.ime.gesture.GestureSupport
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
+import com.qtekfun.ultimatekeys.ime.suggest.LayoutGeometries
 import com.qtekfun.ultimatekeys.ime.surface.FirstShowTimer
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
 import com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions
 import com.qtekfun.ultimatekeys.ime.voice.DictationHost
 import com.qtekfun.ultimatekeys.ime.voice.toDictationConfig
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.voice.DictationController
 import com.qtekfun.ultimatekeys.voice.MicrophonePermission
 import com.qtekfun.ultimatekeys.voice.MicrophonePermissionFlow
@@ -137,10 +140,10 @@ class UltimateKeysService :
     private fun loadGesturesInBackground() {
         scope.launch(Dispatchers.Default) {
             try {
-                val locator = installDictionaries()
+                val locator = installDictionaries(DEFAULT_LANGUAGES.toSet())
                 val vocabulary = GestureSupport.vocabulary(
                     locator,
-                    listOf(Locale.forLanguageTag("es"), Locale.forLanguageTag("en"))
+                    DEFAULT_LANGUAGES.map { Locale.forLanguageTag(it) }
                 )
                 controller.gesture.install(vocabulary)
             } catch (
@@ -164,17 +167,21 @@ class UltimateKeysService :
         if (!ENGINE_ENABLED) return
         scope.launch(Dispatchers.IO) {
             try {
-                val source = installDictionaries()
+                val source = installDictionaries(DEFAULT_LANGUAGES.toSet())
                 val builder = DictionaryBuilder { Log.w("UltimateKeys", "dictionary build: $it") }
-                val locator = BinaryDictionaries(
+                val dictionaries = BinaryDictionaries(
                     source,
-                    File(filesDir, "engine/dictionaries"),
-                    builder::build
+                    binaryDictionariesDir(),
+                    build = builder::build
                 )
-                    .prepare()
-                val aosp = AospSuggestionEngine(File(filesDir, "engine/learned"), locator)
+                dictionaries.prepare(DEFAULT_LANGUAGES)
+                val aosp = AospSuggestionEngine(
+                    File(filesDir, "engine/learned"),
+                    dictionaries.locator(),
+                    geometryFor = { LayoutGeometries.forLocale(it) }
+                )
                 val spanish = Locale.forLanguageTag("es")
-                val english = Locale.forLanguageTag("en")
+                val english = Locale.forLanguageTag("en-US")
                 engine.swap(
                     MixedSuggestionEngine(
                         mapOf(spanish to aosp, english to aosp),
@@ -286,5 +293,6 @@ class UltimateKeysService :
          * down, so keep the engine behind this flag (see docs/adr/0008).
          */
         const val ENGINE_ENABLED = true
+        val DEFAULT_LANGUAGES = LanguageCatalog.DEFAULT_ENABLED
     }
 }

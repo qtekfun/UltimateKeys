@@ -12,7 +12,9 @@ object CaseMatcher {
             typed.any { it.isLetter() } ->
             suggestion.uppercase(locale)
 
-        typed.firstOrNull()?.isUpperCase() == true -> suggestion.replaceFirstChar { it.uppercase(locale) }
+        typed.firstOrNull()?.isUpperCase() == true -> suggestion.replaceFirstChar {
+            it.uppercase(locale)
+        }
 
         else -> suggestion
     }

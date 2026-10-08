@@ -9,6 +9,7 @@ import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
 import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
+import com.qtekfun.ultimatekeys.ime.suggest.LayoutGeometries
 import java.io.File
 import java.util.Locale
 import org.junit.After
@@ -26,6 +27,12 @@ class EngineJniTest {
     private val root = File(context.cacheDir, "engine-jni-test")
     private val es = Locale.forLanguageTag("es")
     private val en = Locale.forLanguageTag("en")
+    private val fr = Locale.forLanguageTag("fr")
+    private val ru = Locale.forLanguageTag("ru")
+    private val tr = Locale.forLanguageTag("tr")
+    private val el = Locale.forLanguageTag("el")
+    private val ro = Locale.forLanguageTag("ro")
+    private val languages = listOf("es", "en-US", "fr", "ru", "tr", "el", "ro")
     private lateinit var engine: AospSuggestionEngine
 
     @Before
@@ -33,17 +40,21 @@ class EngineJniTest {
         root.deleteRecursively()
         val messages = mutableListOf<String>()
         val builder = DictionaryBuilder { messages += it }
-        val locator = BinaryDictionaries(
-            context.installDictionaries(),
+        val dictionaries = BinaryDictionaries(
+            context.installDictionaries(languages.toSet()),
             File(root, "dictionaries"),
-            builder::build
-        ).prepare()
-        assertTrue(
-            "dictionary build failed: ${messages.takeLast(5)}",
-            locator.mainDictionary(es) != null
+            build = builder::build
         )
+        val ready = dictionaries.prepare(languages)
+        // Latin with accents, Cyrillic, Greek, Turkish dotted i and a list over the word cap must all build.
+        assertEquals("dictionary build failed: ${messages.takeLast(5)}", languages.toSet(), ready)
+        val locator = dictionaries.locator()
         assertTrue(locator.mainDictionary(en) != null)
-        engine = AospSuggestionEngine(File(root, "learned"), locator)
+        engine = AospSuggestionEngine(
+            File(root, "learned"),
+            locator,
+            geometryFor = { LayoutGeometries.forLocale(it) }
+        )
     }
 
     @After
@@ -57,6 +68,22 @@ class EngineJniTest {
         assertTrue(engine.isValidWord("hola", es))
         assertTrue(engine.isValidWord("house", en))
         assertFalse(engine.isValidWord("qzxwv", en))
+    }
+
+    @Test
+    fun knowsWordsOfOtherScriptsAndAccents() {
+        assertTrue(engine.isValidWord("été", fr))
+        assertTrue(engine.isValidWord("привет", ru))
+        assertTrue(engine.isValidWord("ηλιος", el) || engine.isValidWord("ήλιος", el))
+        assertTrue(engine.isValidWord("çocuk", tr))
+        assertTrue(engine.isValidWord("și", ro))
+        assertFalse(engine.isValidWord("hello", ru))
+    }
+
+    @Test
+    fun suggestsInOtherScriptsAndWithoutAccents() {
+        assertTrue(engine.suggest(emptyList(), "приве", ru).any { it.word == "привет" })
+        assertTrue(engine.suggest(emptyList(), "ecole", fr).any { it.word == "école" })
     }
 
     @Test

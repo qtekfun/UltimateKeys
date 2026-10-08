@@ -96,7 +96,9 @@ class SuggestionController(
     }
 
     private fun arrange(composing: String, result: List<Suggestion>): List<String> {
-        val words = result.map { CaseMatcher.match(composing, it.word, it.locale ?: locale()) }.distinct()
+        val words = result.map {
+            CaseMatcher.match(composing, it.word, it.locale ?: locale())
+        }.distinct()
         val best = words.firstOrNull() ?: return SuggestionState().slots
         val literalFirst = composing.isNotEmpty() && result.first().autoCorrect && composing != best
         val left = if (literalFirst) composing else words.getOrNull(1).orEmpty()
