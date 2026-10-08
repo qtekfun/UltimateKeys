@@ -1,0 +1,1 @@
+Long-press the language key for a menu with Settings and the keyboard picker. New setting to turn the dictation microphone off. The microphone sits in the margin under the keys.
