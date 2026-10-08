@@ -6,6 +6,7 @@ plugins {
     id("uk.root")
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 dependencies {
