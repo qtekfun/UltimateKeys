@@ -175,7 +175,8 @@ fun VoicePanelContent(
                 color = colors.hint,
                 fontSize = HINT_SP.sp,
                 textAlign = TextAlign.Center
-            )
+            ),
+            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
         )
         Row(
             modifier = Modifier.padding(top = 6.dp),
@@ -215,6 +216,7 @@ private fun Orb(
     val speaking = (state as? DictationState.Listening)?.speaking == true
     val busy = state is DictationState.Transcribing
     val stopLabel = stringResource(R.string.voice_stop)
+    val busyLabel = stringResource(R.string.voice_transcribing)
     val core = if (listening || busy) colors.accent else colors.surface
     val ink = if (listening || busy) colors.onAccent else colors.text
     val modifier = Modifier
@@ -224,6 +226,8 @@ private fun Orb(
                 it
                     .clickable(onClickLabel = stopLabel, role = Role.Button, onClick = onStop)
                     .semantics { contentDescription = stopLabel }
+            } else if (busy) {
+                it.semantics { contentDescription = busyLabel }
             } else {
                 it
             }

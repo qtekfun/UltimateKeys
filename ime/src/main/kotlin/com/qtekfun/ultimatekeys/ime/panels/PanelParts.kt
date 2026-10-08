@@ -38,8 +38,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,6 +91,10 @@ internal fun PanelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    /** The current choice of a tab-like button, announced as selected (not by colour alone). */
+    toggled: Boolean? = null,
+    /** The value a button shows without words, such as the skin tone in use. */
+    state: String? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -98,6 +105,8 @@ internal fun PanelButton(
             .semantics {
                 contentDescription = description
                 role = Role.Button
+                if (toggled != null) this.selected = toggled
+                if (state != null) stateDescription = state
             },
         contentAlignment = Alignment.Center
     ) { content() }
@@ -147,14 +156,16 @@ internal fun PanelBottomBar(
             stringResource(R.string.panel_emoji),
             { onSwitch(PanelKind.EMOJI) },
             Modifier.size(44.dp, 40.dp),
-            selected = current == PanelKind.EMOJI
+            selected = current == PanelKind.EMOJI,
+            toggled = current == PanelKind.EMOJI
         ) { VectorIcon(R.drawable.ms_sentiment_satisfied, theme.text) }
         PanelButton(
             theme,
             stringResource(R.string.panel_clipboard),
             { onSwitch(PanelKind.CLIPBOARD) },
             Modifier.size(44.dp, 40.dp),
-            selected = current == PanelKind.CLIPBOARD
+            selected = current == PanelKind.CLIPBOARD,
+            toggled = current == PanelKind.CLIPBOARD
         ) { VectorIcon(R.drawable.ms_content_paste, theme.text) }
         Box(Modifier.weight(1f))
         if (tone != null) {
@@ -162,7 +173,8 @@ internal fun PanelBottomBar(
                 theme,
                 stringResource(R.string.panel_skin_tone),
                 tone.onClick,
-                Modifier.size(44.dp, 40.dp)
+                Modifier.size(44.dp, 40.dp),
+                state = tone.name
             ) { ToneSwatch(theme, tone.color) }
         }
         RepeatingButton(theme, stringResource(R.string.key_delete), onDelete) {
@@ -172,7 +184,7 @@ internal fun PanelBottomBar(
 }
 
 /** The skin-tone button of the emoji panel: shows the tone in use as a swatch. */
-internal data class SkinToneButton(val color: Color, val onClick: () -> Unit)
+internal data class SkinToneButton(val color: Color, val name: String, val onClick: () -> Unit)
 
 @Composable
 private fun ToneSwatch(theme: PanelTheme, color: Color) {
@@ -215,6 +227,11 @@ private fun RepeatingButton(
             .semantics {
                 contentDescription = description
                 role = Role.Button
+                // A screen reader clicks instead of pressing and holding: one character per click.
+                onClick {
+                    tick.value()
+                    true
+                }
             },
         contentAlignment = Alignment.Center
     ) { content() }
