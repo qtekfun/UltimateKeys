@@ -64,6 +64,18 @@ class PresetsTest {
     }
 
     @Test
+    fun `the gesture trail stands out from the keys in every variant of every preset`() {
+        Presets.all.forEach { style ->
+            listOf(style.light to "light", style.dark to "dark").forEach { (p, variant) ->
+                assertTrue(
+                    contrastRatio(p.gestureTrail, p.keyLetter) >= 1.5,
+                    "trail on letter key, ${style.id}/$variant"
+                )
+            }
+        }
+    }
+
+    @Test
     fun `lookup by id and the default`() {
         assertEquals(Presets.Soft, Presets.byId("soft"))
         assertEquals(null, Presets.byId("nope"))

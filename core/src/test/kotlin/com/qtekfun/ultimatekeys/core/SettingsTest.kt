@@ -37,8 +37,20 @@ class SettingsTest {
                 }
             )
         assertEquals(KeyboardSettings(), repo.settings.first())
-        repo.update { it.copy(numberRow = true, heightPercent = 999, letterLayoutId = "en_qwerty") }
+        repo.update {
+            it.copy(
+                numberRow = true,
+                heightPercent = 999,
+                letterLayoutId = "en_qwerty",
+                gestureTyping = false,
+                gestureTrail = false,
+                gestureSensitivity = 900
+            )
+        }
         val s = repo.settings.first()
+        assertEquals(false, s.gestureTyping)
+        assertEquals(false, s.gestureTrail)
+        assertEquals(100, s.gestureSensitivity)
         assertEquals(true, s.numberRow)
         assertEquals(130, s.heightPercent)
         assertEquals("en_qwerty", s.letterLayoutId)

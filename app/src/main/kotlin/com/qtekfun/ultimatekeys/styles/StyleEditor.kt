@@ -425,7 +425,10 @@ private val paletteFields = listOf(
         it.panelSurface
     }, { p, c -> p.copy(panelSurface = c) }),
     PaletteField(R.string.col_panel_text, { it.panelText }, { p, c -> p.copy(panelText = c) }),
-    PaletteField(R.string.col_private, { it.privateTint }, { p, c -> p.copy(privateTint = c) })
+    PaletteField(R.string.col_private, { it.privateTint }, { p, c -> p.copy(privateTint = c) }),
+    PaletteField(R.string.col_gesture_trail, {
+        it.gestureTrail
+    }, { p, c -> p.copy(gestureTrail = c) })
 )
 
 @Composable

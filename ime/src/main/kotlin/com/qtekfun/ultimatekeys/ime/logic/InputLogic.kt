@@ -39,6 +39,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
     private var shiftIsAutomatic = false
     private var undo: AutoCorrectUndo? = null
     private var rejectedCorrection: String? = null
+    private var gestureUndo: GestureUndo? = null
 
     var suggestionHook: SuggestionHook? = null
 
@@ -54,6 +55,15 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val separator: String
     )
 
+    /**
+     * A word typed by gesture, as inserted: [lead] (a space when it had to be separated from the word
+     * before), the word and the space after it. Kept until the next edit so that backspace can take
+     * it back and the strip can swap it for an alternative; its learning waits until then too.
+     */
+    private data class GestureUndo(val lead: String, val word: String, val contextBefore: String) {
+        val inserted: String get() = "$lead$word "
+    }
+
     fun onStartInput(
         editor: EditorConnection,
         context: EditorContext,
@@ -64,6 +74,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         this.editor = editor
         this.context = context
         composing.clear()
+        gestureUndo = null
         lastSpaceAt = NEVER
         autoSpace = false
         val page = when (context.kind) {
@@ -80,6 +91,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
     }
 
     fun onFinishInput() {
+        settleGesture()
         editor?.finishComposingText()
         composing.clear()
         editor = null
@@ -104,7 +116,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val output = applyShift(text)
         ed.beginBatchEdit()
         try {
-            undo = null
+            clearUndo()
             if (!tryCompose(ed, output) && !finishWord(ed, output)) {
                 smartPunctuationFix(ed, output)
                 ed.commitText(output)
@@ -141,7 +153,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
-            undo = null
+            clearUndo()
             if (composing.isNotEmpty()) {
                 composing.clear()
                 ed.setComposingText(word)
@@ -208,7 +220,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val now = clock()
         ed.beginBatchEdit()
         try {
-            undo = null
+            clearUndo()
             if (finishWord(ed, " ")) {
                 lastSpaceAt = now
             } else if (shouldInsertDoubleSpacePeriod(ed, now)) {
@@ -230,7 +242,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
-            undo = null
+            clearUndo()
             finishWord(ed, null)
             when {
                 context.enterRunsAction -> ed.performEditorAction(context.actionId)
@@ -250,11 +262,11 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
-            if (undoAutoCorrect(ed)) {
+            if (undoGesture(ed) || undoAutoCorrect(ed)) {
                 afterTyping()
                 return
             }
-            undo = null
+            clearUndo()
             when {
                 ed.selectedText().isNotEmpty() -> ed.commitText("")
 
@@ -289,6 +301,112 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         if (count > 0) ed.deleteSurroundingText(count, 0)
         lastSpaceAt = NEVER
         afterTyping()
+    }
+
+    // endregion
+
+    // region Gesture typing
+
+    /** The text before the cursor, as the suggestion side wants it for context. */
+    fun contextText(): String = editor?.let { contextBefore(it) }.orEmpty()
+
+    /**
+     * Types a word the person glided over the letters: a space first when it would otherwise stick to the
+     * word before, the word (in the case shift asks for) and a space after it that punctuation may
+     * swallow. [alternatives] are the other candidates; the strip offers them (see [replaceGestureWord]).
+     * Returns false when nothing was typed (no editor, or a field that is not for text).
+     */
+    fun commitGestureWord(word: String, alternatives: List<String> = emptyList()): Boolean {
+        val ed = editor ?: return false
+        if (!context.isTextual || word.isEmpty()) return false
+        ed.beginBatchEdit()
+        try {
+            clearUndo()
+            finishWord(ed, null)
+            val before = contextBefore(ed)
+            val shown = applyGestureCase(word)
+            val lead = if (needsSpaceBefore(ed.textBeforeCursor(1))) " " else ""
+            ed.commitText("$lead$shown ")
+            gestureUndo = GestureUndo(lead, shown, before)
+            autoSpace = true
+            lastSpaceAt = NEVER
+            suggestionHook?.onGestureCommitted(
+                shown,
+                contextBefore(ed),
+                alternatives.map(::applyGestureCase)
+            )
+        } finally {
+            ed.endBatchEdit()
+        }
+        afterTyping()
+        return true
+    }
+
+    /** True while the last thing typed is a gesture word that [replaceGestureWord] can still swap. */
+    val canReplaceGestureWord: Boolean get() = gestureUndo != null
+
+    /** Swaps the word just typed by gesture for [word] (already in the wanted case), keeping its spacing. */
+    fun replaceGestureWord(word: String, alternatives: List<String> = emptyList()): Boolean {
+        val ed = editor ?: return false
+        val pending = gestureUndo ?: return false
+        if (word.isEmpty() || !gestureStillBeforeCursor(ed, pending)) return false
+        ed.beginBatchEdit()
+        try {
+            ed.deleteSurroundingText(pending.inserted.length, 0)
+            ed.commitText("${pending.lead}$word ")
+            gestureUndo = pending.copy(word = word)
+            autoSpace = true
+            suggestionHook?.onGestureCommitted(word, contextBefore(ed), alternatives)
+        } finally {
+            ed.endBatchEdit()
+        }
+        return true
+    }
+
+    /** Backspace right after a gesture word takes the whole word (and its spacing) back. */
+    private fun undoGesture(ed: EditorConnection): Boolean {
+        val pending = gestureUndo ?: return false
+        if (composing.isNotEmpty() || ed.selectedText().isNotEmpty() ||
+            !gestureStillBeforeCursor(ed, pending)
+        ) {
+            settleGesture()
+            return false
+        }
+        gestureUndo = null
+        ed.deleteSurroundingText(pending.inserted.length, 0)
+        autoSpace = false
+        lastSpaceAt = NEVER
+        suggestionHook?.onComposingChanged("", contextBefore(ed))
+        return true
+    }
+
+    private fun gestureStillBeforeCursor(ed: EditorConnection, pending: GestureUndo): Boolean =
+        ed.textBeforeCursor(pending.inserted.length).toString() == pending.inserted
+
+    /** The gesture word stays: from now on it counts as typed, so the engine may learn it. */
+    private fun settleGesture() {
+        val pending = gestureUndo ?: return
+        gestureUndo = null
+        suggestionHook?.onWordFinished(pending.word, pending.contextBefore, false)
+    }
+
+    private fun clearUndo() {
+        undo = null
+        settleGesture()
+    }
+
+    private fun needsSpaceBefore(previous: CharSequence): Boolean {
+        val c = previous.lastOrNull() ?: return false
+        return c.isLetterOrDigit() || c in SPACE_SWALLOWING || c in CLOSERS
+    }
+
+    private fun applyGestureCase(word: String): String {
+        if (mutableState.value.page != Page.LETTERS) return word
+        return when (mutableState.value.shift) {
+            ShiftState.OFF -> word
+            ShiftState.LOCKED -> word.uppercase(locale)
+            ShiftState.ONCE -> word.replaceFirstChar { it.uppercase(locale) }
+        }
     }
 
     // endregion

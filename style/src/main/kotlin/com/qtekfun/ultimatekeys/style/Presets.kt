@@ -43,7 +43,8 @@ object Presets {
         light = palette(
             background = 0xFFFFFF, letter = 0xEDEDED, function = 0xD0D0D0, action = 0xFFD400,
             actionText = 0x000000, text = 0x000000, hint = 0x3D3D3D, press = 0xBDBDBD,
-            popup = 0xFFFFFF, divider = 0x808080, border = 0x000000, tint = 0x6A00FF
+            popup = 0xFFFFFF, divider = 0x808080, border = 0x000000, tint = 0x6A00FF,
+            trail = 0x6A00FF
         ),
         dark = palette(
             background = 0x000000, letter = 0x1C1C1C, function = 0x2E2E2E, action = 0xFFD400,
@@ -197,7 +198,8 @@ object Presets {
         divider: Int,
         border: Int,
         tint: Int,
-        shadow: Int = 0x33000000
+        shadow: Int = 0x33000000,
+        trail: Int = action
     ) = Palette(
         keyLetter = ArgbColor.rgb(letter),
         keyFunction = ArgbColor.rgb(function),
@@ -217,6 +219,7 @@ object Presets {
         panelBackground = ArgbColor.rgb(background),
         panelSurface = ArgbColor.rgb(letter),
         panelText = ArgbColor.rgb(text),
-        privateTint = ArgbColor.rgb(tint)
+        privateTint = ArgbColor.rgb(tint),
+        gestureTrail = ArgbColor.rgb(trail)
     )
 }

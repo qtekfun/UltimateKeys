@@ -34,6 +34,8 @@ class FakeEngine(
     override fun addToUserDictionary(word: String, locale: Locale) {
         userWords += word
     }
+
+    override fun userDictionaryWords(locale: Locale): List<String> = userWords.toList()
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)

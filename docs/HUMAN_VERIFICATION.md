@@ -46,3 +46,10 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Panel look in each preset, light and dark, and the open/close transition (none, fade, slide) with the three-button and gesture navigation bars.
 - [ ] Backspace on the panel bar repeats while held.
 - [ ] Panels are exclusive: opening emoji or clipboard while dictating cancels the dictation; the mic key closes an open panel. With the style showing tool icons and the mic in the suggestion bar, the strip shows private toggle, clipboard, emoji and mic without crowding the suggestions.
+## Phase 10 — Gesture typing
+
+- [ ] Real gesture typing feel on the Find X8 Pro (plan 10.8): the distance before a swipe becomes a gesture (slider "Gesture sensitivity"), the trail, accuracy on everyday Spanish and English words, short words, and gliding right after typing a word by hand.
+- [ ] Gesture candidates latency on the phone: debug build, read `gesture lift-to-candidates` under the `UKLatency` tag (target under 50 ms; `docs/gesture/RESULTS.md` has the desktop figure).
+- [ ] Gesture typing does not leak into private mode: glide a word in an incognito field or with private mode on, then check the word is not suggested later.
+- [ ] Gesture typing on both letter layouts (Spanish and English), the number row on, and a 70% / 130% keyboard height.
+- [ ] The first launch after install: gestures start working a moment after typing does (the word lists are read in the background).

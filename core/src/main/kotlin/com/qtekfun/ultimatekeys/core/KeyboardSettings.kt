@@ -27,7 +27,13 @@ data class KeyboardSettings(
     /** Preferred skin tone of the emoji panel: 0 is none, 1..5 light to dark. */
     val emojiSkinTone: Int = 0,
     /** Recently used emoji, newest first, separated by spaces. */
-    val emojiRecents: String = ""
+    val emojiRecents: String = "",
+    /** Gesture typing: glide over the letters to type a word. */
+    val gestureTyping: Boolean = true,
+    /** Draw the line the finger leaves while gliding. */
+    val gestureTrail: Boolean = true,
+    /** 0 = a long glide is needed to start a gesture, 100 = a short one is enough. */
+    val gestureSensitivity: Int = DEFAULT_GESTURE_SENSITIVITY
 ) {
     fun sanitized(): KeyboardSettings = copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
@@ -36,7 +42,8 @@ data class KeyboardSettings(
         hapticIntensity = hapticIntensity.coerceIn(PERCENT_RANGE),
         soundVolume = soundVolume.coerceIn(PERCENT_RANGE),
         clipboardMaxItems = clipboardMaxItems.coerceIn(CLIPBOARD_ITEMS_RANGE),
-        emojiSkinTone = emojiSkinTone.coerceIn(SKIN_TONE_RANGE)
+        emojiSkinTone = emojiSkinTone.coerceIn(SKIN_TONE_RANGE),
+        gestureSensitivity = gestureSensitivity.coerceIn(PERCENT_RANGE)
     )
 
     companion object {
@@ -44,6 +51,7 @@ data class KeyboardSettings(
         const val DEFAULT_BOTTOM_MARGIN_DP = 12
         const val DEFAULT_LONG_PRESS_MS = 350
         const val DEFAULT_HAPTIC = 50
+        const val DEFAULT_GESTURE_SENSITIVITY = 50
         val HEIGHT_RANGE = 70..130
         val BOTTOM_MARGIN_RANGE = 0..48
         val LONG_PRESS_RANGE = 150..800

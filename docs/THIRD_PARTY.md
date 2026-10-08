@@ -112,3 +112,15 @@ Material Symbols (outlined, 24 px Android vectors, Apache License 2.0) from `goo
 
 `.github/workflows/ci.yml` downloads the model, verifies the checksum and caches it under the key
 `whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins arrive with Phase 7.
+## Papers behind gesture typing
+
+The `:gesture` module (Phase 10) is original code. These papers were read for their ideas and are cited in `docs/gesture/DESIGN.md`; none of their code or data is used.
+
+- S. Zhai and P.-O. Kristensson, "Shorthand writing on stylus keyboard", CHI 2003.
+- P.-O. Kristensson and S. Zhai, "SHARK2: a large vocabulary shorthand writing system for pen-based computers", UIST 2004.
+- P.-O. Kristensson and S. Zhai, "Relaxing stylus typing precision by geometric pattern matching", IUI 2005.
+- S. Zhai and P.-O. Kristensson, "The word-gesture keyboard: reimagining keyboard interaction", Communications of the ACM 55(9), 2012.
+- J. O. Wobbrock, A. D. Wilson and Y. Li, "Gestures without libraries, toolkits or training: a $1 recognizer for user interface prototypes", UIST 2007.
+- G. M. Chaikin, "An algorithm for high-speed curve generation", Computer Graphics and Image Processing 3(4), 1974.
+
+The word frequencies used by gesture typing are the ones of the pinned word lists listed above; no new data source was added.

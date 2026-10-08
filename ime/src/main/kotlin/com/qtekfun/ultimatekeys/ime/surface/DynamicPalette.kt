@@ -94,7 +94,8 @@ object DynamicPalette {
                 panelBackground = n(T900),
                 panelSurface = v(T800),
                 panelText = n(T100),
-                privateTint = a(T200)
+                privateTint = a(T200),
+                gestureTrail = a(T200)
             )
         } else {
             Palette(
@@ -116,7 +117,8 @@ object DynamicPalette {
                 panelBackground = v(T100),
                 panelSurface = n(T0),
                 panelText = n(T900),
-                privateTint = a(T600)
+                privateTint = a(T600),
+                gestureTrail = a(T600)
             )
         }
     }

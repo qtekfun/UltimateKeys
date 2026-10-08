@@ -46,7 +46,7 @@ data class Style(
     fun palette(dark: Boolean): Palette = if (dark) this.dark else light
 
     companion object {
-        const val CURRENT_SCHEMA_VERSION = 1
+        const val CURRENT_SCHEMA_VERSION = 2
         const val MAX_ID = 64
         const val MAX_NAME = 40
         const val MAX_DESCRIPTION = 200
@@ -86,7 +86,9 @@ data class Palette(
     val panelBackground: ArgbColor,
     val panelSurface: ArgbColor,
     val panelText: ArgbColor,
-    val privateTint: ArgbColor
+    val privateTint: ArgbColor,
+    /** The line a finger leaves while gesture typing. */
+    val gestureTrail: ArgbColor
 ) {
     companion object {
         val DefaultLight = Palette(
@@ -108,7 +110,8 @@ data class Palette(
             panelBackground = ArgbColor.rgb(0xE6E8EC),
             panelSurface = ArgbColor.rgb(0xFFFFFF),
             panelText = ArgbColor.rgb(0x1A1B1E),
-            privateTint = ArgbColor.rgb(0x7B3FD6)
+            privateTint = ArgbColor.rgb(0x7B3FD6),
+            gestureTrail = ArgbColor.rgb(0x2F5BFF)
         )
         val DefaultDark = Palette(
             keyLetter = ArgbColor.rgb(0x2B2D31),
@@ -129,7 +132,8 @@ data class Palette(
             panelBackground = ArgbColor.rgb(0x121214),
             panelSurface = ArgbColor.rgb(0x2B2D31),
             panelText = ArgbColor.rgb(0xEDEDED),
-            privateTint = ArgbColor.rgb(0xB48CFF)
+            privateTint = ArgbColor.rgb(0xB48CFF),
+            gestureTrail = ArgbColor.rgb(0x4F7CFF)
         )
     }
 }

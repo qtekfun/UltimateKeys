@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -46,7 +47,7 @@ object StyleCodec {
     }
 
     /** One step that upgrades a style object from schema version `from` to `from + 1`. */
-    private val migrations: Map<Int, (JsonObject) -> JsonObject> = emptyMap()
+    private val migrations: Map<Int, (JsonObject) -> JsonObject> = mapOf(1 to ::addGestureTrail)
 
     fun encode(style: Style): String = json.encodeToString(Style.serializer(), style.sanitized())
 
@@ -81,6 +82,28 @@ object StyleCodec {
         } catch (e: IllegalArgumentException) {
             failure(e)
         }
+    }
+
+    /**
+     * Version 1 to 2: palettes gained the gesture trail colour (the key action colour is a fit for any
+     * look) and the private mode tint, which version 1 files written before it existed lack.
+     */
+    private fun addGestureTrail(root: JsonObject): JsonObject {
+        val updated = root.toMutableMap()
+        for ((variant, fallbackTint) in listOf(
+            "light" to Palette.DefaultLight,
+            "dark" to Palette.DefaultDark
+        )) {
+            val palette = root[variant] as? JsonObject ?: continue
+            val extra = palette.toMutableMap()
+            if ("gestureTrail" !in extra) palette["keyAction"]?.let { extra["gestureTrail"] = it }
+            if ("privateTint" !in extra) {
+                extra["privateTint"] =
+                    json.encodeToJsonElement(ArgbColor.serializer(), fallbackTint.privateTint)
+            }
+            updated[variant] = JsonObject(extra)
+        }
+        return JsonObject(updated)
     }
 
     private fun failure(e: Exception): StyleLoadResult =
