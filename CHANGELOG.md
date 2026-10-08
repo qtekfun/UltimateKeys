@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-08
+
 ### Added
 
 - Keyboard styles: seven original built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), each with light and dark colors, bundled open fonts and Material You colors. A style editor with a live preview, contrast warnings, duplicate and reset, plus import, export and sharing of `.ukstyle` files.
@@ -46,7 +48,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/qtekfun/UltimateKeys/releases/tag/v0.1.0
