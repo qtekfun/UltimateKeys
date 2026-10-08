@@ -1,0 +1,1 @@
+Ajustes nuevos: listas agrupadas en tarjetas redondeadas, una pantalla principal corta con subpantallas, y el título ya no queda bajo la barra de estado. Nuevos estilos Dracula y OLED. La versión de la app aparece al pie de la pantalla principal. Elige la distribución de letras en Ajustes, Escritura.
