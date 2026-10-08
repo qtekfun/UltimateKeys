@@ -21,6 +21,7 @@ import com.qtekfun.ultimatekeys.ime.logic.ShiftState
 import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
+import com.qtekfun.ultimatekeys.layouts.LayoutKey
 import com.qtekfun.ultimatekeys.style.FontChoice
 import com.qtekfun.ultimatekeys.style.PopupKind
 import com.qtekfun.ultimatekeys.style.PressAnimation
@@ -130,20 +131,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     ) {
         val key = placed.key
         val isEnter = key is ActionKey && key.action == KeyAction.ENTER
-        val isSpace = key is ActionKey && key.action == KeyAction.SPACE
-        val base = when {
-            isEnter -> style.actionKey
-            isSpace -> style.spaceKey
-            key is CharKey -> style.letterKey
-            else -> style.functionKey
-        }
-        val fill = if (pressed &&
-            style.pressAnimation != PressAnimation.SCALE
-        ) {
-            style.pressed
-        } else {
-            base
-        }
+        val fill = keyFill(key, pressed, style)
         val shrink = if (pressed && style.pressAnimation == PressAnimation.SCALE) {
             placed.height * PRESS_SHRINK
         } else {
@@ -168,6 +156,16 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             is CharKey -> drawCharKey(scope, placed, key, state, style, dimens)
             is ActionKey -> drawActionKey(scope, placed, key, state, ink, labels, dimens)
         }
+    }
+
+    private fun keyFill(key: LayoutKey, pressed: Boolean, style: SurfaceStyle): Color {
+        val base = when {
+            key is ActionKey && key.action == KeyAction.ENTER -> style.actionKey
+            key is ActionKey && key.action == KeyAction.SPACE -> style.spaceKey
+            key is CharKey -> style.letterKey
+            else -> style.functionKey
+        }
+        return if (pressed && style.pressAnimation != PressAnimation.SCALE) style.pressed else base
     }
 
     private fun drawShadow(

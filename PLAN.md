@@ -70,7 +70,7 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 - [x] 3.2 Theming runtime: the keyboard surface, suggestion bar and panels read everything from the active Style; live updates without IME restart.
 - [x] 3.3 Material You dynamic colors and light/dark variants per style.
 - [x] 3.4 Bundle open fonts (at least 4, e.g. Inter, Roboto Flex, Atkinson Hyperlegible, a rounded one) and Material Symbols; licenses recorded.
-- [ ] 3.5 At least 7 original presets with clearly different looks; names and descriptions are ours.
+- [x] 3.5 At least 7 original presets with clearly different looks; names and descriptions are ours.
 - [ ] 3.6 Style editor in `:app`: grouped controls, live keyboard preview, reset, duplicate, contrast warning (WCAG AA).
 - [ ] 3.7 Import/export `.ukstyle` via SAF and share sheet; round-trip tests.
 - [ ] 3.8 Bottom-row arrangement and suggestion-bar layout options wired into `:layouts` / `:ime`.

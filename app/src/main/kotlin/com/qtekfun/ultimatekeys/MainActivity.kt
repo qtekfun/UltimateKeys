@@ -100,6 +100,13 @@ private fun HomeScreen(repository: SettingsRepository) {
             modifier = Modifier.fillMaxWidth()
         )
         Button(onClick = {
+            context.startActivity(
+                Intent(context, com.qtekfun.ultimatekeys.styles.StylesActivity::class.java)
+            )
+        }) {
+            Text(stringResource(R.string.styles_open))
+        }
+        Button(onClick = {
             context.startActivity(Intent(context, UserDictionaryActivity::class.java))
         }) {
             Text(stringResource(R.string.user_dictionary_open))

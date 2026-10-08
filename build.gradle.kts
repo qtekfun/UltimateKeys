@@ -27,7 +27,11 @@ kover {
                     "com.qtekfun.ultimatekeys.ime.Feedback",
                     "com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface*",
                     "com.qtekfun.ultimatekeys.ime.surface.SurfaceRenderer*",
-                    "com.qtekfun.ultimatekeys.ime.surface.TempStyle*",
+                    "com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview*",
+                    "com.qtekfun.ultimatekeys.ime.surface.FontCatalog",
+                    "com.qtekfun.ultimatekeys.ime.surface.AngleGradient",
+                    "com.qtekfun.ultimatekeys.ime.surface.ToneSource\$Companion",
+                    "com.qtekfun.ultimatekeys.styles.*",
                     "com.qtekfun.ultimatekeys.core.SettingsStoreKt*",
                 )
                 

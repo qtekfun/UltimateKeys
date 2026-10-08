@@ -63,3 +63,18 @@ class InMemoryStyleRepository(initialActive: String = Presets.default.id) : Styl
         if (activeIdState.value == id) activeIdState.value = Presets.default.id
     }
 }
+
+/** An imported or duplicated style as a new custom style: an id nobody else has, same content otherwise. */
+fun asNewCustom(style: Style, existing: List<Style>, name: String = style.name): Style {
+    val taken = existing.map { it.id }.toSet()
+    val base = style.sanitized().id
+    var id = base
+    var n = 1
+    while (id in taken || Presets.isPreset(id)) id = "$base-${n++}"
+    return style.sanitized().copy(
+        id = id,
+        name = name.trim().take(Style.MAX_NAME).ifBlank {
+            style.name
+        }
+    )
+}

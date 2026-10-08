@@ -72,3 +72,19 @@ class StyleRepositoryTest {
         )
     }
 }
+
+class AsNewCustomTest {
+    @Test
+    fun `an imported style never overwrites a preset or an existing custom style`() {
+        val existing = listOf(Style(id = "mine"), Style(id = "mine-1"))
+        assertEquals("mine-2", asNewCustom(Style(id = "mine"), existing).id)
+        assertEquals("soft-1", asNewCustom(Presets.Soft, existing).id)
+        assertEquals("fresh", asNewCustom(Style(id = "fresh"), existing).id)
+    }
+
+    @Test
+    fun `a new name replaces the old one and is bounded`() {
+        assertEquals("Copy", asNewCustom(Style(name = "Old"), emptyList(), "Copy").name)
+        assertEquals("Old", asNewCustom(Style(name = "Old"), emptyList(), "  ").name)
+    }
+}
