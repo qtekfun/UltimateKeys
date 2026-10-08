@@ -151,7 +151,7 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 9 — Release material and 1.0
 
-- [ ] 9.1 Original app icon (adaptive + monochrome), Ultimate family style.
+- [x] 9.1 Original app icon (adaptive + monochrome), Ultimate family style.
 - [ ] 9.2 Screenshots generated from screenshot tests into `fastlane/metadata/android/*/images/phoneScreenshots/` (show several presets).
 - [ ] 9.3 Store texts EN + ES and 1.0.0 changelog; no references to other products.
 - [ ] 9.4 Final README: features, style engine, flavors, privacy statement, install (GitHub, Obtainium, F-Droid status), build, credits.

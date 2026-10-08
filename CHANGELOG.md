@@ -11,6 +11,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [0.3.0] - 2026-10-08
 
+### Changed
+
+- New launcher icon: an adaptive icon with a keyboard glyph, plus a monochrome (themed) version.
+
 ### Added
 
 - Bottom margin below the keys, adjustable in settings (0-48 dp), and the keyboard no longer draws under the system navigation bar.
