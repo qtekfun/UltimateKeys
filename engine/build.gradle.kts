@@ -3,6 +3,7 @@
 
 plugins {
     id("uk.android.library")
+    id("uk.android.native")
 }
 
 android {

@@ -23,6 +23,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val d = KeyboardSettings()
         return KeyboardSettings(
             heightPercent = this[HEIGHT] ?: d.heightPercent,
+            bottomMarginDp = this[BOTTOM_MARGIN] ?: d.bottomMarginDp,
             numberRow = this[NUMBER_ROW] ?: d.numberRow,
             longPressDelayMs = this[LONG_PRESS] ?: d.longPressDelayMs,
             hapticIntensity = this[HAPTIC] ?: d.hapticIntensity,
@@ -30,12 +31,15 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
             autoCapitalize = this[AUTO_CAP] ?: d.autoCapitalize,
             doubleSpacePeriod = this[DOUBLE_SPACE] ?: d.doubleSpacePeriod,
             smartPunctuation = this[SMART_PUNCT] ?: d.smartPunctuation,
+            showSuggestions = this[SHOW_SUGGESTIONS] ?: d.showSuggestions,
+            autoCorrect = this[AUTO_CORRECT] ?: d.autoCorrect,
             letterLayoutId = this[LAYOUT] ?: d.letterLayoutId
         ).sanitized()
     }
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(s: KeyboardSettings) {
         this[HEIGHT] = s.heightPercent
+        this[BOTTOM_MARGIN] = s.bottomMarginDp
         this[NUMBER_ROW] = s.numberRow
         this[LONG_PRESS] = s.longPressDelayMs
         this[HAPTIC] = s.hapticIntensity
@@ -43,11 +47,14 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[AUTO_CAP] = s.autoCapitalize
         this[DOUBLE_SPACE] = s.doubleSpacePeriod
         this[SMART_PUNCT] = s.smartPunctuation
+        this[SHOW_SUGGESTIONS] = s.showSuggestions
+        this[AUTO_CORRECT] = s.autoCorrect
         this[LAYOUT] = s.letterLayoutId
     }
 
     private companion object {
         val HEIGHT = intPreferencesKey("height_percent")
+        val BOTTOM_MARGIN = intPreferencesKey("bottom_margin_dp")
         val NUMBER_ROW = booleanPreferencesKey("number_row")
         val LONG_PRESS = intPreferencesKey("long_press_delay_ms")
         val HAPTIC = intPreferencesKey("haptic_intensity")
@@ -55,6 +62,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val AUTO_CAP = booleanPreferencesKey("auto_capitalize")
         val DOUBLE_SPACE = booleanPreferencesKey("double_space_period")
         val SMART_PUNCT = booleanPreferencesKey("smart_punctuation")
+        val SHOW_SUGGESTIONS = booleanPreferencesKey("show_suggestions")
+        val AUTO_CORRECT = booleanPreferencesKey("auto_correct")
         val LAYOUT = stringPreferencesKey("letter_layout_id")
     }
 }

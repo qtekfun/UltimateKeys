@@ -46,3 +46,42 @@ class KeyboardControllerTest {
         assertTrue(letters.rows.flatMap { it.keys }.any { it is CharKey && it.label == "ñ" })
     }
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class SuggestionWiringTest {
+    @Test
+    fun `tapping a strip slot commits the suggestion and learning follows settings`() = runTest {
+        val engine = com.qtekfun.ultimatekeys.ime.suggest.FakeEngine(
+            suggestions = { _, _ -> listOf(com.qtekfun.ultimatekeys.engine.Suggestion("hola", 9)) }
+        )
+        val logic = InputLogic()
+        val editor = com.qtekfun.ultimatekeys.ime.logic.FakeEditorConnection()
+        val controller = KeyboardController(
+            logic,
+            FakeSettingsRepository(),
+            backgroundScope,
+            null,
+            engine,
+            kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+        ) {}
+        runCurrent()
+        logic.onStartInput(
+            editor,
+            com.qtekfun.ultimatekeys.ime.logic.EditorContext.from(
+                android.text.InputType.TYPE_CLASS_TEXT,
+                0
+            ),
+            restarting = false,
+            initialCursor = 0
+        )
+        "hol".forEach { logic.onText(it.toString()) }
+        runCurrent()
+        assertEquals(listOf("", "hola", ""), controller.suggestions.state.value.slots)
+        controller.onSuggestionTapped(0)
+        assertEquals("hol", editor.text.toString())
+        controller.onSuggestionTapped(1)
+        assertEquals("hola ", editor.text.toString())
+        runCurrent()
+        assertEquals("hola", engine.learned.last().first)
+    }
+}

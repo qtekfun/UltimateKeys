@@ -13,6 +13,7 @@
     <string name="try_it_here">Pruébalo aquí</string>
     <string name="settings_title">Ajustes</string>
     <string name="setting_height">Altura del teclado (%)</string>
+    <string name="setting_bottom_margin">Margen inferior (dp)</string>
     <string name="setting_long_press">Retardo de pulsación larga (ms)</string>
     <string name="setting_haptics">Vibración al pulsar</string>
     <string name="setting_sound">Volumen del sonido de teclas</string>
@@ -20,4 +21,17 @@
     <string name="setting_auto_capitalize">Mayúscula automática</string>
     <string name="setting_double_space">Doble espacio inserta un punto</string>
     <string name="setting_smart_punctuation">Espaciado inteligente de puntuación</string>
+    <string name="setting_suggestions">Mostrar sugerencias</string>
+    <string name="setting_autocorrect">Autocorrección</string>
+    <string name="user_dictionary_open">Mi diccionario y palabras aprendidas</string>
+    <string name="user_dictionary_title">Mi diccionario</string>
+    <string name="user_dictionary_add">Palabra nueva</string>
+    <string name="user_dictionary_add_button">Añadir</string>
+    <string name="user_dictionary_import">Importar</string>
+    <string name="user_dictionary_export">Exportar</string>
+    <string name="user_dictionary_empty">Aún no hay palabras.</string>
+    <string name="user_dictionary_remove">Quitar</string>
+    <string name="clear_learned">Borrar datos aprendidos</string>
+    <string name="clear_learned_message">Esto olvida todo lo que el teclado aprendió y tus palabras añadidas. No se puede deshacer.</string>
+    <string name="clear_learned_confirm">Borrar</string>
 </resources>

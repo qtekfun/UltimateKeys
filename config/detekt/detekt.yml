@@ -18,6 +18,10 @@ naming:
       - Composable
 
 complexity:
+  LongMethod:
+    # Compose screens read top to bottom; splitting them only to satisfy a line count hurts.
+    ignoreAnnotated:
+      - Composable
   TooManyFunctions:
     thresholdInInterfaces: 16
     thresholdInClasses: 16

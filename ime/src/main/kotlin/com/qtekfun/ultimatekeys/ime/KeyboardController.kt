@@ -5,15 +5,20 @@ package com.qtekfun.ultimatekeys.ime
 
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.core.SettingsRepository
+import com.qtekfun.ultimatekeys.engine.NoopSuggestionEngine
+import com.qtekfun.ultimatekeys.engine.SuggestionEngine
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.logic.InputOptions
 import com.qtekfun.ultimatekeys.ime.logic.Page
+import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
 import java.util.Locale
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -27,14 +32,23 @@ class KeyboardController(
     private val repository: SettingsRepository,
     private val scope: CoroutineScope,
     private val feedback: Feedback?,
+    private val engine: SuggestionEngine = NoopSuggestionEngine,
+    suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val logLatency: ((String) -> Unit)? = null,
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
         repository.settings.stateIn(scope, SharingStarted.Eagerly, KeyboardSettings())
     val latency = LatencyTracker()
+    val suggestions = SuggestionController(
+        engine = engine,
+        scope = scope,
+        dispatcher = suggestionDispatcher,
+        locale = { logic.locale }
+    )
 
     init {
+        logic.suggestionHook = suggestions
         repository.settings.onEach(::apply).launchIn(scope)
     }
 
@@ -42,7 +56,9 @@ class KeyboardController(
         logic.options = InputOptions(
             autoCapitalize = s.autoCapitalize,
             doubleSpacePeriod = s.doubleSpacePeriod,
-            smartPunctuation = s.smartPunctuation
+            smartPunctuation = s.smartPunctuation,
+            composeWords = s.showSuggestions,
+            autoCorrect = s.autoCorrect && s.showSuggestions
         )
         logic.locale = Locale.forLanguageTag(LayoutRepository.load(s.letterLayoutId).locale ?: "en")
     }
@@ -85,6 +101,12 @@ class KeyboardController(
             KeyAction.SWITCH_SYMBOLS -> logic.showPage(Page.SYMBOLS_1)
             KeyAction.SWITCH_SYMBOLS_2 -> logic.showPage(Page.SYMBOLS_2)
         }
+    }
+
+    /** A tap on slot [index] of the suggestion strip. */
+    fun onSuggestionTapped(index: Int) {
+        val word = suggestions.state.value.slots.getOrNull(index).orEmpty()
+        if (word.isNotEmpty()) logic.commitWithAutoSpace(word)
     }
 
     fun onGlobeLongPress() = showImePicker()

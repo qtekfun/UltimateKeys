@@ -99,6 +99,11 @@ private fun HomeScreen(repository: SettingsRepository) {
             keyboardOptions = KeyboardOptions.Default,
             modifier = Modifier.fillMaxWidth()
         )
+        Button(onClick = {
+            context.startActivity(Intent(context, UserDictionaryActivity::class.java))
+        }) {
+            Text(stringResource(R.string.user_dictionary_open))
+        }
         SettingsSection(settings, ::update)
     }
 }
@@ -144,6 +149,11 @@ private fun SettingsSection(
             KeyboardSettings.HEIGHT_RANGE
         ) { v -> update { it.copy(heightPercent = v) } }
         SliderSetting(
+            R.string.setting_bottom_margin,
+            settings.bottomMarginDp,
+            KeyboardSettings.BOTTOM_MARGIN_RANGE
+        ) { v -> update { it.copy(bottomMarginDp = v) } }
+        SliderSetting(
             R.string.setting_long_press,
             settings.longPressDelayMs,
             KeyboardSettings.LONG_PRESS_RANGE
@@ -158,6 +168,12 @@ private fun SettingsSection(
             settings.soundVolume,
             KeyboardSettings.PERCENT_RANGE
         ) { v -> update { it.copy(soundVolume = v) } }
+        SwitchSetting(R.string.setting_suggestions, settings.showSuggestions) { v ->
+            update { it.copy(showSuggestions = v) }
+        }
+        SwitchSetting(R.string.setting_autocorrect, settings.autoCorrect) { v ->
+            update { it.copy(autoCorrect = v) }
+        }
         SwitchSetting(R.string.setting_number_row, settings.numberRow) { v ->
             update { it.copy(numberRow = v) }
         }

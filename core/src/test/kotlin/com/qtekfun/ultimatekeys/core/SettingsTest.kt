@@ -15,11 +15,13 @@ class SettingsTest {
     fun `sanitized clamps every range`() {
         val s = KeyboardSettings(
             heightPercent = 500,
+            bottomMarginDp = 999,
             longPressDelayMs = 1,
             hapticIntensity = -4,
             soundVolume = 900
         ).sanitized()
         assertEquals(130, s.heightPercent)
+        assertEquals(48, s.bottomMarginDp)
         assertEquals(150, s.longPressDelayMs)
         assertEquals(0, s.hapticIntensity)
         assertEquals(100, s.soundVolume)

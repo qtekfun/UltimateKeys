@@ -4,9 +4,12 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +38,7 @@ import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 @Composable
 fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifier) {
     val state by controller.logic.state.collectAsState()
+    val strip by controller.suggestions.state.collectAsState()
     val settings by controller.settings.collectAsState()
     val density = LocalDensity.current
     val style = if (isSystemInDarkTheme()) TempStyle.Dark else TempStyle.Light
@@ -76,15 +80,29 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     DisposableEffect(layout) { onDispose { gestures.cancelAll() } }
 
     val renderer = remember { SurfaceRenderer() }
-    Canvas(
+    // The system bar area below the keys carries the keyboard's own background, like a margin.
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(SurfaceSpec.totalHeightDp(layout.rows.size, settings.heightPercent).dp)
-            .onSizeChanged { widthPx = it.width.toFloat() }
-            .semantics { contentDescription = description }
-            .pointerInput(gestures) { trackPointers(gestures) }
+            .background(style.background)
+            .navigationBarsPadding()
     ) {
-        renderer.draw(this, geometry, state, presses, style, labels, dimens)
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(
+                    SurfaceSpec.totalHeightDp(
+                        layout.rows.size,
+                        settings.heightPercent,
+                        settings.bottomMarginDp
+                    ).dp
+                )
+                .onSizeChanged { widthPx = it.width.toFloat() }
+                .semantics { contentDescription = description }
+                .pointerInput(gestures) { trackPointers(gestures) }
+        ) {
+            renderer.draw(this, geometry, state, presses, style, labels, dimens, strip.slots)
+        }
     }
 }
 
@@ -103,7 +121,7 @@ private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.trackPoi
                         change.position.y
                     )
 
-                    change.changedToUp() -> gestures.up(id)
+                    change.changedToUp() -> gestures.up(id, change.position.x)
 
                     change.pressed -> gestures.move(id, change.position.x, change.position.y)
                 }

@@ -4,6 +4,7 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 import com.qtekfun.ultimatekeys.ime.KeyboardController
+import com.qtekfun.ultimatekeys.ime.suggest.SuggestionState
 import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
@@ -27,6 +28,7 @@ data class GestureMetrics(
  * Interprets touches: multi-touch key presses, key slide correction, long-press alternatives with
  * slide-to-select, delete repeat and selection drag, spacebar cursor control. Main thread only.
  */
+@Suppress("TooManyFunctions")
 class SurfaceGestures(
     private val controller: KeyboardController,
     private val scope: CoroutineScope,
@@ -52,9 +54,14 @@ class SurfaceGestures(
     }
 
     private val presses = LinkedHashMap<Long, Press>()
+    private val stripPresses = HashMap<Long, Int>()
 
     fun down(id: Long, x: Float, y: Float) {
         val geo = geometry ?: return
+        if (y < geo.top) {
+            stripPresses[id] = slotAt(x, geo.width)
+            return
+        }
         val placed = geo.keyAt(x, y) ?: return
         val press = Press(placed, x)
         press.dragSteps = DragSteps(metrics.dragStep)
@@ -196,7 +203,16 @@ class SurfaceGestures(
         }
     }
 
-    fun up(id: Long) {
+    private fun slotAt(x: Float, width: Float): Int =
+        (x / width * SuggestionState.SLOTS).toInt().coerceIn(0, SuggestionState.SLOTS - 1)
+
+    fun up(id: Long, x: Float = -1f) {
+        val slot = stripPresses.remove(id)
+        if (slot != null) {
+            val width = geometry?.width ?: 0f
+            if (x < 0f || slotAt(x, width) == slot) controller.onSuggestionTapped(slot)
+            return
+        }
         val press = presses.remove(id) ?: return
         press.cancelJob()
         val started = System.nanoTime()
@@ -206,6 +222,7 @@ class SurfaceGestures(
     }
 
     fun cancel(id: Long) {
+        stripPresses.remove(id)
         presses.remove(id)?.cancelJob()
         publishState()
     }
@@ -213,6 +230,7 @@ class SurfaceGestures(
     fun cancelAll() {
         presses.values.forEach { it.cancelJob() }
         presses.clear()
+        stripPresses.clear()
         publishState()
     }
 

@@ -14,7 +14,8 @@ data class InputOptions(
     val doubleSpacePeriod: Boolean = true,
     val smartPunctuation: Boolean = true,
     /** Phase 2 turns this on: letters are then held as composing text. */
-    val composeWords: Boolean = false
+    val composeWords: Boolean = false,
+    val autoCorrect: Boolean = true
 )
 
 /**
@@ -36,12 +37,22 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
     private var lastSpaceAt = NEVER
     private var autoSpace = false
     private var shiftIsAutomatic = false
+    private var undo: AutoCorrectUndo? = null
+    private var rejectedCorrection: String? = null
+
+    var suggestionHook: SuggestionHook? = null
 
     /** Cursor position as last reported by the editor or moved by us. -1 when unknown. */
     var cursor = -1
         private set
 
     val composingText: String get() = composing.toString()
+
+    private data class AutoCorrectUndo(
+        val original: String,
+        val corrected: String,
+        val separator: String
+    )
 
     fun onStartInput(
         editor: EditorConnection,
@@ -80,6 +91,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         if (composing.isNotEmpty() && !stillInWord) {
             // The cursor moved away from the word being composed (tap in the text, app edit).
             composing.clear()
+            suggestionHook?.onComposingChanged("", "")
         }
         refreshAutoShift()
     }
@@ -92,8 +104,8 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val output = applyShift(text)
         ed.beginBatchEdit()
         try {
-            if (!tryCompose(ed, output)) {
-                finishComposing(ed)
+            undo = null
+            if (!tryCompose(ed, output) && !finishWord(ed, output)) {
                 smartPunctuationFix(ed, output)
                 ed.commitText(output)
                 autoSpace = false
@@ -110,10 +122,19 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
-            composing.clear()
-            ed.commitText("$word ")
+            undo = null
+            if (composing.isNotEmpty()) {
+                composing.clear()
+                ed.setComposingText(word)
+                ed.finishComposingText()
+                ed.commitText(" ")
+            } else {
+                ed.commitText("$word ")
+            }
             autoSpace = true
             lastSpaceAt = NEVER
+            suggestionHook?.onWordFinished(word, contextBefore(ed), false)
+            suggestionHook?.onComposingChanged("", contextBefore(ed))
         } finally {
             ed.endBatchEdit()
         }
@@ -125,8 +146,10 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val now = clock()
         ed.beginBatchEdit()
         try {
-            finishComposing(ed)
-            if (shouldInsertDoubleSpacePeriod(ed, now)) {
+            undo = null
+            if (finishWord(ed, " ")) {
+                lastSpaceAt = now
+            } else if (shouldInsertDoubleSpacePeriod(ed, now)) {
                 ed.deleteSurroundingText(1, 0)
                 ed.commitText(". ")
                 lastSpaceAt = NEVER
@@ -145,7 +168,8 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
-            finishComposing(ed)
+            undo = null
+            finishWord(ed, null)
             when {
                 context.enterRunsAction -> ed.performEditorAction(context.actionId)
                 context.multiLine -> ed.commitText("\n")
@@ -164,6 +188,11 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val ed = editor ?: return
         ed.beginBatchEdit()
         try {
+            if (undoAutoCorrect(ed)) {
+                afterTyping()
+                return
+            }
+            undo = null
             when {
                 ed.selectedText().isNotEmpty() -> ed.commitText("")
 
@@ -288,13 +317,68 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         if (!isWordChar) return false
         composing.append(text)
         ed.setComposingText(composing)
+        suggestionHook?.onComposingChanged(composing.toString(), contextBefore(ed))
         return true
+    }
+
+    /**
+     * Ends the composing word with [separator] (null for none), applying the autocorrection.
+     * Returns true when [separator] was committed here.
+     */
+    private fun finishWord(ed: EditorConnection, separator: String?): Boolean {
+        if (composing.isEmpty()) return false
+        val original = composing.toString()
+        val before = contextBefore(ed)
+        val candidate = suggestionHook?.autoCorrectFor(original)
+        val corrected = candidate?.takeIf {
+            options.autoCorrect && separator != null && it != original &&
+                original != rejectedCorrection
+        }
+        val word = corrected ?: original
+        composing.clear()
+        rejectedCorrection = null
+        ed.setComposingText(word)
+        ed.finishComposingText()
+        if (separator != null) ed.commitText(separator)
+        undo =
+            if (corrected != null &&
+                separator != null
+            ) {
+                AutoCorrectUndo(original, corrected, separator)
+            } else {
+                null
+            }
+        suggestionHook?.onWordFinished(word, before, corrected != null)
+        suggestionHook?.onComposingChanged("", contextBefore(ed))
+        return separator != null
+    }
+
+    /** Backspace right after an autocorrection restores what the user typed. */
+    private fun undoAutoCorrect(ed: EditorConnection): Boolean {
+        val pending = undo ?: return false
+        undo = null
+        val replaced = pending.corrected + pending.separator
+        if (composing.isNotEmpty() || ed.selectedText().isNotEmpty()) return false
+        if (ed.textBeforeCursor(replaced.length).toString() != replaced) return false
+        ed.deleteSurroundingText(replaced.length, 0)
+        ed.setComposingText(pending.original)
+        composing.append(pending.original)
+        rejectedCorrection = pending.original
+        suggestionHook?.onAutoCorrectRejected(pending.original)
+        suggestionHook?.onComposingChanged(pending.original, contextBefore(ed))
+        return true
+    }
+
+    private fun contextBefore(ed: EditorConnection): String {
+        val before = ed.textBeforeCursor(CONTEXT_CHARS).toString()
+        return before.dropLast(composing.length.coerceAtMost(before.length))
     }
 
     private fun finishComposing(ed: EditorConnection) {
         if (composing.isNotEmpty()) {
             ed.finishComposingText()
             composing.clear()
+            suggestionHook?.onComposingChanged("", contextBefore(ed))
         }
     }
 
@@ -305,6 +389,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         } else {
             ed.setComposingText(composing)
         }
+        suggestionHook?.onComposingChanged(composing.toString(), contextBefore(ed))
     }
 
     /** Removes the auto-inserted space before closing punctuation. */
@@ -377,6 +462,7 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         const val DOUBLE_TAP_MS = 400L
         const val DOUBLE_SPACE_MS = 600L
         const val WORD_LOOKBEHIND = 64
+        const val CONTEXT_CHARS = 120
         const val SPACE_SWALLOWING = ".,;:!?)"
         const val CLOSERS = ")]\"'"
     }

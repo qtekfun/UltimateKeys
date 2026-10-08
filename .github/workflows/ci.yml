@@ -90,3 +90,49 @@ jobs:
           path: |
             */build/reports/androidTests/
           retention-days: 14
+
+  reproducible-build:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      # Two clean checkouts in different directories: the unsigned release APKs must be identical.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+          path: build-a
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+          path: build-b
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Build twice
+        run: |
+          for dir in build-a build-b; do
+            (cd "$dir" && ./gradlew --no-daemon --no-build-cache assembleFullRelease assembleLiteRelease)
+          done
+
+      - name: Compare the APKs
+        run: |
+          status=0
+          for flavor in full lite; do
+            a="build-a/app/build/outputs/apk/$flavor/release/app-$flavor-release-unsigned.apk"
+            b="build-b/app/build/outputs/apk/$flavor/release/app-$flavor-release-unsigned.apk"
+            if cmp -s "$a" "$b"; then
+              echo "$flavor: identical"
+            else
+              echo "::error::$flavor release APKs differ between two clean builds"
+              status=1
+            fi
+          done
+          exit $status
