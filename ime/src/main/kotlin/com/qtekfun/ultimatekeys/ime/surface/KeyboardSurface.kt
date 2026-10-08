@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.panels.PanelHost
+import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
 import com.qtekfun.ultimatekeys.ime.voice.VoicePanel
 import com.qtekfun.ultimatekeys.style.MicPlacement
 import com.qtekfun.ultimatekeys.style.PanelTransition
@@ -112,11 +114,13 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val dictation = controller.dictation
     val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
     val dictating = dictation != null && dictationState != DictationState.Idle
+    val showTools = activeStyle.suggestionBar.toolIcons == ToolIcons.SHOWN
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
     gestures.stripToggleVisible = showToggle
     gestures.stripMicVisible = showMic
+    gestures.stripToolsVisible = showTools
     gestures.metrics = with(density) {
         GestureMetrics(
             slop = 12.dp.toPx(),
@@ -129,7 +133,18 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     // Fingers still down on the keys must not type into the panel that replaces them.
     LaunchedEffect(dictating) { gestures.cancelAll() }
 
-    val renderer = remember(context) { SurfaceRenderer(FontCatalog(context.assets)) }
+    val fonts = remember(context) { FontCatalog(context.assets) }
+    val renderer = remember(fonts) { SurfaceRenderer(fonts) }
+    val panelTheme = remember(activeStyle, systemDark, tones, fonts, rowDp) {
+        PanelTheme.resolve(activeStyle, systemDark, tones, fonts, rowDp)
+    }
+    val keysHeightDp = SurfaceSpec.totalHeightDp(
+        layout.rows.size,
+        settings.heightPercent,
+        settings.bottomMarginDp,
+        activeStyle,
+        settings.numberRow
+    )
     // The system bar area below the keys carries the keyboard's own background, like a margin.
     Box(
         modifier = modifier
@@ -137,13 +152,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             .background(style.background)
             .navigationBarsPadding()
     ) {
-        val totalHeight = SurfaceSpec.totalHeightDp(
-            layout.rows.size,
-            settings.heightPercent,
-            settings.bottomMarginDp,
-            activeStyle,
-            settings.numberRow
-        ).dp
+        val totalHeight = keysHeightDp.dp
         val fadeMs = if (activeStyle.motion.transition == PanelTransition.NONE) {
             0
         } else {
@@ -189,11 +198,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                         style,
                         labels,
                         dimens,
-                        StripState(strip.slots, privacy.isPrivate, showToggle, showMic)
+                        StripState(strip.slots, privacy.isPrivate, showToggle, showMic, showTools)
                     )
                 }
             }
         }
+        PanelHost(controller, panelTheme, keysHeightDp - settings.bottomMarginDp)
     }
 }
 

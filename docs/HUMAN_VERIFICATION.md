@@ -35,3 +35,14 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] In a password field and with private mode on, dictated words do not appear in the suggestion bar afterwards.
 - [ ] Real-time factor and latency of `tiny` and `base` on the device (`UKVoice` log tag in a debug build); check that the threads run on the fast cores.
 - [ ] Voice panel look in every built-in style, light and dark, with the microphone in the bottom row and in the suggestion bar.
+
+## Phase 5 — Clipboard and emoji
+
+- [ ] Copy text in a few apps (browser, messaging, notes): it appears in the clipboard panel; tapping it inserts it; pin, delete and clear all behave.
+- [ ] Copy from a password manager (sensitive flag, Android 13+): nothing is stored. Copy while private mode is on: nothing is stored.
+- [ ] Retention: with 1 hour selected, clips older than an hour disappear when the panel opens; pinned clips stay.
+- [ ] Emoji panel on the Find X8 Pro: scrolling is smooth, emoji newer than the device's emoji font are hidden (no empty boxes), skin tone button cycles and applies to hands and people.
+- [ ] Emoji search with the on-panel keys in English and Spanish ("corazon", "heart", "españa"); feel of the small search keyboard.
+- [ ] Panel look in each preset, light and dark, and the open/close transition (none, fade, slide) with the three-button and gesture navigation bars.
+- [ ] Backspace on the panel bar repeats while held.
+- [ ] Panels are exclusive: opening emoji or clipboard while dictating cancels the dictation; the mic key closes an open panel. With the style showing tool icons and the mic in the suggestion bar, the strip shows private toggle, clipboard, emoji and mic without crowding the suggestions.

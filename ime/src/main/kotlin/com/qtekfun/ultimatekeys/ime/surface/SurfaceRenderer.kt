@@ -89,6 +89,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
     }
 
+    @Suppress("LongMethod")
     private fun drawStrip(
         scope: DrawScope,
         geometry: KeyGeometry,
@@ -97,7 +98,13 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         dimens: SurfaceDimens
     ) {
         if (geometry.top <= 0f) return
-        val layout = StripLayout(geometry.width, geometry.top, strip.showToggle, strip.showMic)
+        val layout = StripLayout(
+            geometry.width,
+            geometry.top,
+            strip.showToggle,
+            strip.showMic,
+            if (strip.showTools) STRIP_TOOLS else 0
+        )
         if (strip.isPrivate) {
             scope.drawRect(
                 style.privateTint.copy(alpha = PRIVATE_WASH),
@@ -111,7 +118,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         val cell = layout.cellWidth
         val list = style.barLayout == BarLayout.SCROLLING_LIST
         words.forEachIndexed { index, word ->
-            val left = layout.toggleWidth + cell * index
+            val left = layout.toolsWidth + cell * index
             if (list) {
                 val pad = geometry.top * PILL_PAD
                 val height = geometry.top * PILL_HEIGHT
@@ -161,6 +168,13 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 ink,
                 strip.isPrivate
             )
+        }
+        if (strip.showTools) {
+            val cy = geometry.top / 2f
+            val size = geometry.top * TOGGLE_ICON
+            val clipboardX = layout.toggleWidth + geometry.top / 2f
+            KeyIcons.clipboard(scope, clipboardX, cy, size, style.hint)
+            KeyIcons.smiley(scope, clipboardX + geometry.top, cy, size, style.hint)
         }
         if (strip.showMic) {
             KeyIcons.mic(
@@ -464,6 +478,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val PERCENT = 100f
         const val PRIVATE_WASH = 0.14f
         const val TOGGLE_ICON = 0.5f
+        const val STRIP_TOOLS = 2
         const val PILL_PAD = 0.12f
         const val PILL_HEIGHT = 0.68f
         const val PILL_ALPHA = 0.55f

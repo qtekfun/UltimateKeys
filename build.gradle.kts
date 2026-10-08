@@ -6,6 +6,7 @@ plugins {
     id("uk.root")
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 dependencies {
@@ -34,6 +35,18 @@ kover {
                     "com.qtekfun.ultimatekeys.ime.surface.AngleGradient",
                     "com.qtekfun.ultimatekeys.ime.surface.ToneSource\$Companion",
                     "com.qtekfun.ultimatekeys.styles.*",
+                    // Compose panels (screenshot-tested), Room's generated code and Android glue.
+                    "com.qtekfun.ultimatekeys.ime.panels.*Kt",
+                    "com.qtekfun.ultimatekeys.ime.panels.PanelTheme*",
+                    "com.qtekfun.ultimatekeys.ime.panels.EmojiUi",
+                    "com.qtekfun.ultimatekeys.ime.panels.EmojiActions",
+                    "com.qtekfun.ultimatekeys.ime.panels.ClipboardUi",
+                    "com.qtekfun.ultimatekeys.ime.panels.ClipboardActions",
+                    "com.qtekfun.ultimatekeys.ime.panels.SkinToneButton",
+                    "com.qtekfun.ultimatekeys.clipboard.*_Impl*",
+                    "com.qtekfun.ultimatekeys.clipboard.SystemClipboardWatcher",
+                    "com.qtekfun.ultimatekeys.clipboard.RoomClipStoreKt",
+                    "com.qtekfun.ultimatekeys.emoji.EmojiDataKt",
                     "com.qtekfun.ultimatekeys.core.SettingsStoreKt*",
                     // Dictation: JNI glue, Android audio and permission plumbing and the panel's
                     // drawing. Their logic lives in tested classes; the emulator test covers JNI.

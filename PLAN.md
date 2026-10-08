@@ -96,11 +96,11 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 5 — Clipboard and emoji
 
-- [ ] 5.1 Clipboard history in Room: retention options, max items, pin, delete, clear all; never stores private-mode or sensitive-flagged clips.
-- [ ] 5.2 Clipboard panel UI (styled).
-- [ ] 5.3 Emoji panel: categories, recents, skin tones (styled).
-- [ ] 5.4 CLDR annotations `en`/`es` processed at build time into a compact index; accent-insensitive prefix search with ranking.
-- [ ] 5.5 Tests: retention, sensitive filtering, search ranking in both languages.
+- [x] 5.1 Clipboard history in Room: retention options, max items, pin, delete, clear all; never stores private-mode or sensitive-flagged clips.
+- [x] 5.2 Clipboard panel UI (styled).
+- [x] 5.3 Emoji panel: categories, recents, skin tones (styled).
+- [x] 5.4 CLDR annotations `en`/`es` processed at build time into a compact index; accent-insensitive prefix search with ranking.
+- [x] 5.5 Tests: retention, sensitive filtering, search ranking in both languages.
 
 **DoD:** release `v0.6.0`.
 

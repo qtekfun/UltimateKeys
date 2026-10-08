@@ -38,6 +38,9 @@ class SurfaceGestures(
     /** Whether the private-mode button sits at the left of the suggestion bar. */
     var stripToggleVisible = false
     var stripMicVisible = false
+
+    /** The clipboard and emoji buttons are on the bar. */
+    var stripToolsVisible = false
     var metrics = GestureMetrics(slop = 1f, dragStep = 1f, chooserMinCell = 1f, chooserHeight = 1f)
 
     private class Press(var key: PlacedKey, val downX: Float) {
@@ -208,10 +211,18 @@ class SurfaceGestures(
 
     private fun slotAt(x: Float): Int {
         val geo = geometry ?: return 0
-        val strip = StripLayout(geo.width, geo.top, stripToggleVisible, stripMicVisible)
+        val strip = StripLayout(
+            geo.width,
+            geo.top,
+            stripToggleVisible,
+            stripMicVisible,
+            if (stripToolsVisible) STRIP_TOOLS else 0
+        )
         return when {
             strip.isToggle(x) -> TOGGLE_SLOT
             strip.isMic(x) -> MIC_SLOT
+            strip.extraToolAt(x) == 0 -> CLIPBOARD_SLOT
+            strip.extraToolAt(x) == 1 -> EMOJI_SLOT
             else -> strip.slotAt(x)
         }
     }
@@ -223,6 +234,8 @@ class SurfaceGestures(
                 when (slot) {
                     TOGGLE_SLOT -> controller.togglePrivate()
                     MIC_SLOT -> controller.onAction(KeyAction.MIC)
+                    CLIPBOARD_SLOT -> controller.openClipboard()
+                    EMOJI_SLOT -> controller.onAction(KeyAction.EMOJI)
                     else -> controller.onSuggestionTapped(slot)
                 }
             }
@@ -291,5 +304,8 @@ class SurfaceGestures(
         const val CHAR_STEPS = 5
         const val TOGGLE_SLOT = -1
         const val MIC_SLOT = -2
+        const val CLIPBOARD_SLOT = -3
+        const val EMOJI_SLOT = -4
+        const val STRIP_TOOLS = 2
     }
 }

@@ -86,6 +86,36 @@ internal object KeyIcons {
         )
     }
 
+    /** A clipboard: a board with a clip at the top and two lines of text. */
+    fun clipboard(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
+        val stroke = Stroke(width = unit * STROKE)
+        scope.drawRoundRect(
+            ink,
+            Offset(cx - unit * 0.4f, cy - unit * 0.42f),
+            Size(unit * 0.8f, unit * 1.0f),
+            CornerRadius(unit * 0.1f),
+            style = stroke
+        )
+        scope.drawRoundRect(
+            ink,
+            Offset(cx - unit * 0.18f, cy - unit * 0.55f),
+            Size(unit * 0.36f, unit * 0.22f),
+            CornerRadius(unit * 0.06f)
+        )
+        scope.drawLine(
+            ink,
+            Offset(cx - unit * 0.22f, cy + unit * 0.02f),
+            Offset(cx + unit * 0.22f, cy + unit * 0.02f),
+            unit * STROKE
+        )
+        scope.drawLine(
+            ink,
+            Offset(cx - unit * 0.22f, cy + unit * 0.28f),
+            Offset(cx + unit * 0.1f, cy + unit * 0.28f),
+            unit * STROKE
+        )
+    }
+
     fun mic(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
         val stroke = Stroke(width = unit * STROKE)
         val w = unit * 0.36f
