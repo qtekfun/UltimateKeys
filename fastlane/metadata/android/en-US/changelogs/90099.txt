@@ -1,0 +1,1 @@
+New settings: grouped lists on rounded cards, a short home list and sub-screens, and the title no longer sits under the status bar. New Dracula and OLED styles. The app version is shown at the bottom of the home screen. Choose the letter layout in Settings, Typing.

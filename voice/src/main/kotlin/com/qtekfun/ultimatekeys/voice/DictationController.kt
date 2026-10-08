@@ -167,8 +167,9 @@ class DictationController(
     private fun finish(result: Transcription?) {
         val text = result?.let { TranscriptCleaner.clean(it.text) }.orEmpty()
         if (text.isEmpty()) return fail(DictationError.NO_SPEECH)
-        mutableState.value = DictationState.Idle
+        // Deliver the text first: whoever sees the state go idle can rely on the result being in.
         onResult(DictationResult(text, result?.language.orEmpty()))
+        mutableState.value = DictationState.Idle
     }
 
     private suspend fun ensureLoaded(model: File) {
