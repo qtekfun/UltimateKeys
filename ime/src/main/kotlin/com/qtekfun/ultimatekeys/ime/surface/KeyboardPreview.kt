@@ -25,6 +25,7 @@ import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
 import com.qtekfun.ultimatekeys.style.MicPlacement
 import com.qtekfun.ultimatekeys.style.Style
+import com.qtekfun.ultimatekeys.style.ToolIcons
 
 /**
  * A non-interactive keyboard drawn with [style]; the same renderer as the real keyboard, so what
@@ -96,7 +97,9 @@ fun KeyboardPreview(
                     content.private,
                     content.showToggle,
                     showMic = content.features.voice &&
-                        style.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR
+                        style.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR,
+                    showTools = content.showToggle &&
+                        style.suggestionBar.toolIcons == ToolIcons.SHOWN
                 )
             )
         }
