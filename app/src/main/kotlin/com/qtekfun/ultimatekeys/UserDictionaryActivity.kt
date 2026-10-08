@@ -19,16 +19,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.core.UserWord
 import com.qtekfun.ultimatekeys.core.UserWordsRepository
+import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
 import com.qtekfun.ultimatekeys.engine.SharedEngine
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.ui.UkActionRow
 import com.qtekfun.ultimatekeys.ui.UkBarButton
+import com.qtekfun.ultimatekeys.ui.UkChoiceRow
 import com.qtekfun.ultimatekeys.ui.UkOption
 import com.qtekfun.ultimatekeys.ui.UkRow
 import com.qtekfun.ultimatekeys.ui.UkScreen
-import com.qtekfun.ultimatekeys.ui.UkSegmentedRow
 import com.qtekfun.ultimatekeys.ui.UkTextField
 import com.qtekfun.ultimatekeys.ui.UkTheme
 import com.qtekfun.ultimatekeys.ui.group
@@ -43,7 +46,17 @@ class UserDictionaryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val repository = userWordsRepository()
-        setUkContent { Screen(repository, ::readText, ::writeText, onBack = ::finish) }
+        val settings = settingsRepository()
+        setUkContent {
+            val enabled by settings.settings.collectAsState(initial = KeyboardSettings())
+            Screen(
+                repository,
+                enabled.enabledLanguages.mapNotNull { LanguageCatalog.find(it)?.code }.distinct(),
+                ::readText,
+                ::writeText,
+                onBack = ::finish
+            )
+        }
     }
 
     private fun readText(uri: Uri): String =
@@ -53,8 +66,6 @@ class UserDictionaryActivity : ComponentActivity() {
         contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { it.write(text) }
     }
 }
-
-private val languages = listOf("es", "en")
 
 /** The language's own name in the language of the screen ("Spanish" or "español"). */
 private fun languageName(code: String): String {
@@ -66,12 +77,14 @@ private fun languageName(code: String): String {
 @Composable
 private fun Screen(
     repository: UserWordsRepository,
+    languages: List<String>,
     read: (Uri) -> String,
     write: (Uri, String) -> Unit,
     onBack: () -> Unit
 ) {
     val words by repository.words.collectAsState()
-    var language by rememberSaveable { mutableStateOf(languages.first()) }
+    var chosen by rememberSaveable { mutableStateOf(languages.first()) }
+    val language = chosen.takeIf { it in languages } ?: languages.first()
     var text by rememberSaveable { mutableStateOf("") }
     var confirmClear by remember { mutableStateOf(false) }
     val importer =
@@ -96,11 +109,11 @@ private fun Screen(
     ) {
         section(key = "add", header = R.string.user_dictionary_add) {
             row {
-                UkSegmentedRow(
+                UkChoiceRow(
                     title = stringResource(R.string.user_dictionary_language),
                     options = languageOptions,
                     selected = language,
-                    onSelect = { language = it }
+                    onSelect = { chosen = it }
                 )
             }
             row {

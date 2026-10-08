@@ -35,7 +35,9 @@ data class SurfaceLabels(
     val space: String,
     val symbols: String,
     val letters: String,
-    val moreSymbols: String
+    val moreSymbols: String,
+    /** True when [space] is the name of the active language: it is drawn small, in the hint colour. */
+    val spaceIsLanguage: Boolean = false
 )
 
 /** Sizes in pixels. */
@@ -251,7 +253,17 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         val ink = if (isEnter) style.actionText else style.text
         when (key) {
             is CharKey -> drawCharKey(scope, placed, key, state, style, dimens)
-            is ActionKey -> drawActionKey(scope, placed, key, state, ink, labels, dimens)
+
+            is ActionKey -> drawActionKey(
+                scope,
+                placed,
+                key,
+                state,
+                ink,
+                labels,
+                dimens,
+                style.hint
+            )
         }
     }
 
@@ -331,7 +343,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         state: KeyboardState,
         ink: Color,
         labels: SurfaceLabels,
-        dimens: SurfaceDimens
+        dimens: SurfaceDimens,
+        hintInk: Color
     ) {
         val cx = placed.centerX
         val cy = placed.top + placed.height / 2f
@@ -344,14 +357,19 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
 
             KeyAction.ENTER -> drawEnter(scope, placed, state.enterKind, ink, labels, dimens, unit)
 
-            KeyAction.SPACE -> drawText(
-                scope,
-                labels.space,
-                cx,
-                cy + small / 3f,
-                small,
-                ink.copy(alpha = SPACE_ALPHA)
-            )
+            KeyAction.SPACE -> if (labels.spaceIsLanguage) {
+                val size = fitted(labels.space, small, placed.width * SPACE_FIT)
+                drawText(scope, labels.space, cx, cy + size / 3f, size, hintInk)
+            } else {
+                drawText(
+                    scope,
+                    labels.space,
+                    cx,
+                    cy + small / 3f,
+                    small,
+                    ink.copy(alpha = SPACE_ALPHA)
+                )
+            }
 
             KeyAction.GLOBE -> KeyIcons.globe(scope, cx, cy, unit, ink)
 
@@ -517,6 +535,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val ENLARGED_WIDEN = 1.25f
         const val PRESS_SHRINK = 0.04f
         const val MENU_FIT = 0.9f
+        const val SPACE_FIT = 0.85f
         const val ELEVATION_LAYERS = 3
         const val PERCENT = 100f
         const val PRIVATE_WASH = 0.14f

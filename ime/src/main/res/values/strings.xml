@@ -90,5 +90,6 @@
     <string name="panel_tone_medium_dark">Medium dark</string>
     <string name="panel_tone_dark">Dark</string>
     <string name="globe_menu_settings">Settings</string>
+    <string name="globe_menu_languages">Languages</string>
     <string name="globe_menu_keyboards">Keyboards</string>
 </resources>

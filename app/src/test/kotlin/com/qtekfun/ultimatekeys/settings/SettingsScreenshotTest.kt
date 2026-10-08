@@ -56,7 +56,15 @@ class SettingsScreenshotTest(private val scene: String, private val dark: Boolea
         when (scene) {
             "home" -> HomeScreen(settings, ready, TEST_VERSION, none, insets = insets)
 
-            "typing" -> TypingScreen(settings, update, {}, insets)
+            "typing" -> TypingScreen(settings, update, {}, {}, insets)
+
+            "languages" -> LanguagesScreen(
+                KeyboardSettings(enabledLanguages = listOf("es", "en-US", "fr", "ru")),
+                update,
+                {},
+                insets,
+                java.util.Locale.ENGLISH
+            )
 
             "clipboard" -> ClipboardScreen(settings, update, {}, insets)
 
@@ -78,7 +86,7 @@ class SettingsScreenshotTest(private val scene: String, private val dark: Boolea
 
     companion object {
         private val scenes =
-            listOf("home", "typing", "clipboard", "gestures", "editor", "editor-keys")
+            listOf("home", "typing", "languages", "clipboard", "gestures", "editor", "editor-keys")
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0} dark={1}")

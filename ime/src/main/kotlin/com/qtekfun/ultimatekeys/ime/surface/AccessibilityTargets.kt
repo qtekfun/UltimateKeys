@@ -4,6 +4,7 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_KEYBOARDS
+import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_LANGUAGES
 import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_SETTINGS
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 
@@ -24,6 +25,8 @@ object AccessibilityTargets {
             A11yTarget.KeyboardPicker -> controller.onGlobeMenu(GLOBE_MENU_KEYBOARDS)
 
             A11yTarget.OpenSettings -> controller.onGlobeMenu(GLOBE_MENU_SETTINGS)
+
+            A11yTarget.OpenLanguages -> controller.onGlobeMenu(GLOBE_MENU_LANGUAGES)
 
             A11yTarget.TogglePrivate -> controller.togglePrivate()
 

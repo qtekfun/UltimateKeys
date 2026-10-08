@@ -62,13 +62,16 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val style = remember(activeStyle, systemDark, tones) {
         SurfaceStyle.resolve(activeStyle, systemDark, tones)
     }
-    val labels = rememberLabels()
+    val labels = rememberLabels(
+        languageName = settings.activeLanguage.spaceName.takeIf { settings.showLanguageOnSpace }
+    )
     val description = stringResource(R.string.keyboard_description)
     val privateOn = stringResource(R.string.private_mode_on)
     val privateAction = stringResource(R.string.private_mode_toggle)
     val globeMenu = listOf(
         stringResource(R.string.globe_menu_settings),
-        stringResource(R.string.globe_menu_keyboards)
+        stringResource(R.string.globe_menu_keyboards),
+        stringResource(R.string.globe_menu_languages)
     )
     val screenReader = rememberAccessibilityActive()
     val panelKind by controller.panels.kind.collectAsState()
@@ -280,7 +283,7 @@ private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.trackPoi
 }
 
 @Composable
-private fun rememberLabels(): SurfaceLabels {
+private fun rememberLabels(languageName: String?): SurfaceLabels {
     val enter = mapOf(
         EnterKind.ENTER to stringResource(R.string.key_enter),
         EnterKind.GO to stringResource(R.string.key_go),
@@ -292,7 +295,8 @@ private fun rememberLabels(): SurfaceLabels {
     )
     return SurfaceLabels(
         enter = enter,
-        space = stringResource(R.string.key_space),
+        space = languageName ?: stringResource(R.string.key_space),
+        spaceIsLanguage = languageName != null,
         symbols = "?123",
         letters = "ABC",
         moreSymbols = "=\\<"

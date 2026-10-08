@@ -3,6 +3,9 @@
 
 package com.qtekfun.ultimatekeys.core
 
+import com.qtekfun.ultimatekeys.languages.Language
+import com.qtekfun.ultimatekeys.languages.LanguageCatalog
+
 /** User-facing keyboard settings. Values are always clamped through [sanitized]. */
 data class KeyboardSettings(
     val heightPercent: Int = DEFAULT_HEIGHT_PERCENT,
@@ -20,7 +23,17 @@ data class KeyboardSettings(
     val smartPunctuation: Boolean = true,
     val showSuggestions: Boolean = true,
     val autoCorrect: Boolean = true,
+    /** The letter layout in use; it belongs to one of the [enabledLanguages] (see [sanitized]). */
     val letterLayoutId: String = "es_qwerty",
+    /**
+     * The languages typed and suggested at once, as catalog tags, in the order the language key cycles through
+     * them. At least one and at most [LanguageCatalog.MAX_ENABLED]; Spanish and English by default.
+     */
+    val enabledLanguages: List<String> = LanguageCatalog.DEFAULT_ENABLED,
+    /** The layout chosen for a language that has several, by tag; absent means the language default. */
+    val languageLayouts: Map<String, String> = emptyMap(),
+    /** Draw the name of the active language on the space bar (otherwise the word "space"). */
+    val showLanguageOnSpace: Boolean = true,
     /** A manually switched-on private mode ends when the keyboard closes (otherwise: until turned off). */
     val privateModeEndsOnClose: Boolean = true,
     /** Keep a history of copied text (never in private mode, never for sensitive clips). */
@@ -51,7 +64,21 @@ data class KeyboardSettings(
     /** Download models only on an unmetered connection. */
     val modelDownloadWifiOnly: Boolean = true
 ) {
-    fun sanitized(): KeyboardSettings = copy(
+    /** The language of the layout in use. */
+    val activeLanguage: Language
+        get() = LanguageCatalog.languageOfLayout(letterLayoutId, enabledLanguages)
+            ?: LanguageCatalog.all.first()
+
+    /** The layout the language key switches to when it moves to [tag]. */
+    fun layoutOf(tag: String): String = LanguageCatalog.layoutFor(tag, languageLayouts)
+
+    /** The enabled language after the active one, wrapping around; the active one when it is alone. */
+    fun nextLanguage(): String {
+        val index = enabledLanguages.indexOf(activeLanguage.tag)
+        return enabledLanguages[(index + 1).mod(enabledLanguages.size)]
+    }
+
+    fun sanitized(): KeyboardSettings = sanitizedLanguages().copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
         bottomMarginDp = bottomMarginDp.coerceIn(BOTTOM_MARGIN_RANGE),
         sideMarginDp = sideMarginDp.coerceIn(SIDE_MARGIN_RANGE),
@@ -68,6 +95,21 @@ data class KeyboardSettings(
         dictationMicSide = dictationMicSide.takeIf { it in MIC_SIDES } ?: MIC_LEFT,
         dictationSilenceMs = dictationSilenceMs.coerceIn(DICTATION_SILENCE_RANGE)
     )
+
+    /** Makes the language settings consistent with each other and with the catalog. */
+    private fun sanitizedLanguages(): KeyboardSettings {
+        val enabled = LanguageCatalog.sanitizeEnabled(enabledLanguages)
+        val layouts = LanguageCatalog.sanitizeLayouts(languageLayouts, enabled)
+        val owner = LanguageCatalog.languageOfLayout(letterLayoutId, enabled)
+        val layout = if (owner != null && owner.tag in enabled &&
+            letterLayoutId in owner.layoutIds
+        ) {
+            letterLayoutId
+        } else {
+            LanguageCatalog.layoutFor(enabled.first(), layouts)
+        }
+        return copy(enabledLanguages = enabled, languageLayouts = layouts, letterLayoutId = layout)
+    }
 
     companion object {
         const val DEFAULT_HEIGHT_PERCENT = 100

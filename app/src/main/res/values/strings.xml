@@ -218,7 +218,7 @@
     <string name="dictation_mic_center">Center</string>
     <string name="dictation_mic_right">Right</string>
     <string name="dictation_mic_side_note">Where the microphone sits under the keys. Move it if it overlaps the button Android shows to switch keyboards.</string>
-    <string name="dictation_language_note">Switching language in the middle of a sentence is unreliable with small models; the Small model copes better.</string>
+    <string name="dictation_language_note">Dictation understands Spanish and English only for now, whichever languages the keyboard writes in. Switching language in the middle of a sentence is unreliable with small models; the Small model copes better.</string>
     <string name="dictation_silence_label">Stop after silence</string>
     <string name="dictation_silence_note">How long a pause ends the dictation by itself.</string>
     <string name="nav_back">Back</string>
@@ -241,9 +241,13 @@
     <string name="group_layout">Layout</string>
     <string name="group_typing_help">While typing</string>
     <string name="group_keys_press">Keys</string>
-    <string name="setting_layout">Letter layout</string>
-    <string name="layout_es_qwerty">Spanish (QWERTY)</string>
-    <string name="layout_en_qwerty">English (QWERTY)</string>
+    <string name="section_languages">Languages</string>
+    <string name="languages_footer">Suggestions mix all the enabled languages, so you can write in several without switching. The language key moves through them in this order. Each language uses memory; you can enable up to %1$d.</string>
+    <string name="languages_status_preparing">Preparing the dictionary…</string>
+    <string name="languages_status_failed">Dictionary unavailable</string>
+    <string name="languages_replaces">Replaces %1$s</string>
+    <string name="languages_space_note">The space bar shows the language you are typing in; tap the language key to switch to the next one, hold it for more.</string>
+    <string name="setting_language_on_space">Show the language on the space bar</string>
     <string name="suggestions_learned_note">Words you add and words the keyboard learns stay on this device.</string>
     <string name="gestures_note">Glide your finger over the letters to type a word.</string>
     <string name="feedback_note">Turn the key sound all the way down to keep the keys silent.</string>

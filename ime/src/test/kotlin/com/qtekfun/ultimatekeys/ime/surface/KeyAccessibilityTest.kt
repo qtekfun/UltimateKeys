@@ -45,6 +45,7 @@ class KeyAccessibilityTest {
         globe = "language",
         keyboardPicker = "picker",
         openSettings = "settings",
+        openLanguages = "languages",
         symbols = "symbols",
         letters = "letters",
         moreSymbols = "more",
@@ -164,10 +165,18 @@ class KeyAccessibilityTest {
         assertEquals(
             listOf(
                 A11yAction("picker", A11yTarget.KeyboardPicker),
+                A11yAction("languages", A11yTarget.OpenLanguages),
                 A11yAction("settings", A11yTarget.OpenSettings)
             ),
             globe.actions
         )
+    }
+
+    @Test
+    fun `the language key says which language is active`() {
+        val nodes = KeyAccessibility.keyNodes(geometry, KeyboardState(), labels, "Français")
+        assertEquals("Français", node(nodes, "language").state)
+        assertNull(node(keyNodes(), "language").state)
     }
 
     @Test
@@ -243,8 +252,14 @@ class AccessibilityTargetsTest {
         val logic = InputLogic()
         val editor = FakeEditorConnection()
         var picker = 0
-        val controller =
-            KeyboardController(logic, FakeSettingsRepository(), scope, null) { picker++ }
+        var languages = 0
+        val controller = KeyboardController(
+            logic,
+            FakeSettingsRepository(),
+            scope,
+            null,
+            openLanguages = { languages++ }
+        ) { picker++ }
 
         init {
             logic.onStartInput(editor, EditorContext.from(InputType.TYPE_CLASS_TEXT, 0), false, 0)
@@ -274,6 +289,8 @@ class AccessibilityTargetsTest {
         assertTrue(rig.controller.privacy.isPrivate)
         AccessibilityTargets.activate(rig.controller, A11yTarget.KeyboardPicker)
         assertEquals(1, rig.picker)
+        AccessibilityTargets.activate(rig.controller, A11yTarget.OpenLanguages)
+        assertEquals(1, rig.languages)
         AccessibilityTargets.activate(rig.controller, A11yTarget.OpenClipboard)
         assertEquals(
             com.qtekfun.ultimatekeys.ime.panels.PanelKind.CLIPBOARD,

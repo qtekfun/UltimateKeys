@@ -30,24 +30,18 @@ import com.qtekfun.ultimatekeys.clipboard.clipStore
 import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
-import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
-import com.qtekfun.ultimatekeys.dictionaries.binaryDictionariesDir
-import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
 import com.qtekfun.ultimatekeys.emoji.loadEmojiData
-import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
-import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
 import com.qtekfun.ultimatekeys.engine.SharedEngine
-import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
-import com.qtekfun.ultimatekeys.ime.gesture.GestureSupport
+import com.qtekfun.ultimatekeys.ime.language.AndroidLanguageHost
+import com.qtekfun.ultimatekeys.ime.language.LanguageEngineManager
+import com.qtekfun.ultimatekeys.ime.language.SharedLanguageStatus
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
-import com.qtekfun.ultimatekeys.ime.suggest.LayoutGeometries
 import com.qtekfun.ultimatekeys.ime.surface.FirstShowTimer
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
 import com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions
 import com.qtekfun.ultimatekeys.ime.voice.DictationHost
 import com.qtekfun.ultimatekeys.ime.voice.toDictationConfig
-import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.voice.DictationController
 import com.qtekfun.ultimatekeys.voice.MicrophonePermission
 import com.qtekfun.ultimatekeys.voice.MicrophonePermissionFlow
@@ -55,13 +49,10 @@ import com.qtekfun.ultimatekeys.voice.MicrophoneSource
 import com.qtekfun.ultimatekeys.voice.WhisperTranscriber
 import com.qtekfun.ultimatekeys.voicemodels.SelectedModelSource
 import com.qtekfun.ultimatekeys.voicemodels.modelStore
-import java.io.File
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 
 /** The keyboard. Hosts a Compose view, which needs the lifecycle owners an IME window lacks. */
 class UltimateKeysService :
@@ -80,6 +71,8 @@ class UltimateKeysService :
     private var firstShow: FirstShowTimer? = null
     private lateinit var transcriber: WhisperTranscriber
     private var clipboardWatcher: SystemClipboardWatcher? = null
+    private var languageHost: AndroidLanguageHost? = null
+    private var languages: LanguageEngineManager? = null
 
     override val lifecycle: Lifecycle get() = lifecycleRegistry
     override val savedStateRegistry: SavedStateRegistry
@@ -90,7 +83,6 @@ class UltimateKeysService :
         super.onCreate()
         savedStateController.performRestore(null as Bundle?)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        loadEngineInBackground()
         val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         if (debuggable) {
             firstShow = FirstShowTimer(System::nanoTime) { Log.d("UKLatency", it) }
@@ -128,72 +120,45 @@ class UltimateKeysService :
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
             },
-            openSettings = ::openAppSettings,
+            openSettings = { openAppSettings() },
+            openLanguages = { openAppSettings(MainRoutes.LANGUAGES) },
             logLatency = if (debuggable) { msg -> Log.d("UKLatency", msg) } else null
         )
         clipboardWatcher =
             SystemClipboardWatcher(this, controller.clipboard, scope).also { it.start() }
-        loadGesturesInBackground()
+        startLanguages()
     }
 
-    /** Parses the word lists for gesture typing (a second or two); gestures start working when done. */
-    private fun loadGesturesInBackground() {
-        scope.launch(Dispatchers.Default) {
-            try {
-                val locator = installDictionaries(DEFAULT_LANGUAGES.toSet())
-                val vocabulary = GestureSupport.vocabulary(
-                    locator,
-                    DEFAULT_LANGUAGES.map { Locale.forLanguageTag(it) }
-                )
-                controller.gesture.install(vocabulary)
-            } catch (
-                @Suppress("TooGenericExceptionCaught") e: Throwable
-            ) {
-                // Gesture typing is optional: typing must keep working without it.
-                Log.e("UltimateKeys", "Gesture typing unavailable", e)
-            }
-        }
-    }
-
-    /** Opens the app's home screen (the settings) in its own task, above the keyboard. */
-    private fun openAppSettings() {
+    /** Opens the app (the settings, or [route] inside them) in its own task, above the keyboard. */
+    private fun openAppSettings(route: String? = null) {
         val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        route?.let { intent.putExtra(MainRoutes.EXTRA_ROUTE, it) }
         startActivity(intent)
     }
 
-    /** Builds the dictionaries on first run (seconds) and then switches typing to the real engine. */
-    private fun loadEngineInBackground() {
+    /**
+     * Follows the enabled and active languages: builds the dictionaries of the enabled ones in the background
+     * (seconds, first time only), then switches suggestions and gesture typing to them.
+     */
+    private fun startLanguages() {
         if (!ENGINE_ENABLED) return
-        scope.launch(Dispatchers.IO) {
-            try {
-                val source = installDictionaries(DEFAULT_LANGUAGES.toSet())
-                val builder = DictionaryBuilder { Log.w("UltimateKeys", "dictionary build: $it") }
-                val dictionaries = BinaryDictionaries(
-                    source,
-                    binaryDictionariesDir(),
-                    build = builder::build
-                )
-                dictionaries.prepare(DEFAULT_LANGUAGES)
-                val aosp = AospSuggestionEngine(
-                    File(filesDir, "engine/learned"),
-                    dictionaries.locator(),
-                    geometryFor = { LayoutGeometries.forLocale(it) }
-                )
-                val spanish = Locale.forLanguageTag("es")
-                val english = Locale.forLanguageTag("en-US")
-                engine.swap(
-                    MixedSuggestionEngine(
-                        mapOf(spanish to aosp, english to aosp),
-                        primary = spanish
-                    )
-                )
-            } catch (
-                @Suppress("TooGenericExceptionCaught") e: Throwable
-            ) {
-                // Typing must keep working without suggestions: never let engine problems escape.
-                Log.e("UltimateKeys", "Suggestion engine unavailable", e)
-            }
+        val host = AndroidLanguageHost(
+            context = this,
+            engine = engine,
+            gesture = controller.gesture,
+            layoutFor = { tag -> controller.settings.value.layoutOf(tag) },
+            log = { Log.w("UltimateKeys", it) }
+        )
+        languageHost = host
+        LanguageEngineManager(
+            scope = scope,
+            dispatcher = Dispatchers.IO.limitedParallelism(1),
+            host = host,
+            mutableStatus = SharedLanguageStatus.flow
+        ).also {
+            languages = it
+            it.start(settingsRepository().settings)
         }
     }
 
@@ -282,7 +247,9 @@ class UltimateKeysService :
         clipboardWatcher?.stop()
         scope.cancel()
         transcriber.close()
+        languages?.stop()
         engine.close()
+        languageHost?.close()
         store.clear()
         super.onDestroy()
     }
@@ -293,6 +260,5 @@ class UltimateKeysService :
          * down, so keep the engine behind this flag (see docs/adr/0008).
          */
         const val ENGINE_ENABLED = true
-        val DEFAULT_LANGUAGES = LanguageCatalog.DEFAULT_ENABLED
     }
 }

@@ -25,6 +25,9 @@ sealed interface A11yTarget {
 
     data object OpenSettings : A11yTarget
 
+    /** The Languages screen of the app. */
+    data object OpenLanguages : A11yTarget
+
     data object TogglePrivate : A11yTarget
 
     data object OpenClipboard : A11yTarget
@@ -66,6 +69,7 @@ data class A11yLabels(
     val globe: String,
     val keyboardPicker: String,
     val openSettings: String,
+    val openLanguages: String,
     val symbols: String,
     val letters: String,
     val moreSymbols: String,
@@ -102,9 +106,10 @@ object KeyAccessibility {
         geometry: KeyGeometry,
         state: KeyboardState,
         strip: A11yStrip,
-        labels: A11yLabels
+        labels: A11yLabels,
+        language: String? = null
     ): List<A11yNode> = stripNodes(geometry, strip, labels) +
-        keyNodes(geometry, state, labels) +
+        keyNodes(geometry, state, labels, language) +
         listOfNotNull(marginMicNode(strip, labels))
 
     private fun marginMicNode(strip: A11yStrip, labels: A11yLabels): A11yNode? =
@@ -120,21 +125,25 @@ object KeyAccessibility {
             )
         }
 
-    fun keyNodes(geometry: KeyGeometry, state: KeyboardState, labels: A11yLabels): List<A11yNode> =
-        geometry.keys.mapIndexed { index, placed ->
-            val spoken = describe(placed.key, state, labels)
-            A11yNode(
-                id = "key-$index",
-                left = placed.left,
-                top = placed.top,
-                right = placed.right,
-                bottom = placed.bottom,
-                description = spoken.description,
-                target = spoken.target,
-                state = spoken.state,
-                actions = spoken.actions
-            )
-        }
+    fun keyNodes(
+        geometry: KeyGeometry,
+        state: KeyboardState,
+        labels: A11yLabels,
+        language: String? = null
+    ): List<A11yNode> = geometry.keys.mapIndexed { index, placed ->
+        val spoken = describe(placed.key, state, labels, language)
+        A11yNode(
+            id = "key-$index",
+            left = placed.left,
+            top = placed.top,
+            right = placed.right,
+            bottom = placed.bottom,
+            description = spoken.description,
+            target = spoken.target,
+            state = spoken.state,
+            actions = spoken.actions
+        )
+    }
 
     private class Spoken(
         val description: String,
@@ -143,18 +152,22 @@ object KeyAccessibility {
         val actions: List<A11yAction> = emptyList()
     )
 
-    private fun describe(key: LayoutKey, state: KeyboardState, labels: A11yLabels): Spoken =
-        when (key) {
-            is CharKey -> Spoken(
-                description = letterCase(key.label, state),
-                target = A11yTarget.Type(key.output),
-                actions = key.alternatives.map {
-                    A11yAction(labels.typeAlternative(it), A11yTarget.Type(it))
-                }
-            )
+    private fun describe(
+        key: LayoutKey,
+        state: KeyboardState,
+        labels: A11yLabels,
+        language: String?
+    ): Spoken = when (key) {
+        is CharKey -> Spoken(
+            description = letterCase(key.label, state),
+            target = A11yTarget.Type(key.output),
+            actions = key.alternatives.map {
+                A11yAction(labels.typeAlternative(it), A11yTarget.Type(it))
+            }
+        )
 
-            is ActionKey -> describeAction(key, state, labels)
-        }
+        is ActionKey -> describeAction(key, state, labels, language)
+    }
 
     /** Letters are spoken in the case they will be typed in. */
     private fun letterCase(label: String, state: KeyboardState): String =
@@ -166,7 +179,12 @@ object KeyAccessibility {
             label
         }
 
-    private fun describeAction(key: ActionKey, state: KeyboardState, labels: A11yLabels): Spoken {
+    private fun describeAction(
+        key: ActionKey,
+        state: KeyboardState,
+        labels: A11yLabels,
+        language: String?
+    ): Spoken {
         val target = A11yTarget.Action(key.action)
         return when (key.action) {
             KeyAction.SHIFT -> Spoken(
@@ -188,8 +206,10 @@ object KeyAccessibility {
             KeyAction.GLOBE -> Spoken(
                 labels.globe,
                 target,
+                state = language,
                 actions = listOf(
                     A11yAction(labels.keyboardPicker, A11yTarget.KeyboardPicker),
+                    A11yAction(labels.openLanguages, A11yTarget.OpenLanguages),
                     A11yAction(labels.openSettings, A11yTarget.OpenSettings)
                 )
             )
