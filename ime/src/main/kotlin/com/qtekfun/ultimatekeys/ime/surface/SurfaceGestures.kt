@@ -75,8 +75,15 @@ class SurfaceGestures(
     private val presses = LinkedHashMap<Long, Press>()
     private val stripPresses = HashMap<Long, Int>()
 
+    /** The microphone button in the bottom margin, when there is one. */
+    var marginMic: MarginMic? = null
+
     fun down(id: Long, x: Float, y: Float) {
         val geo = geometry ?: return
+        if (marginMic?.contains(x, y) == true) {
+            stripPresses[id] = MARGIN_MIC_SLOT
+            return
+        }
         if (y < geo.top) {
             stripPresses[id] = slotAt(x)
             return
@@ -272,8 +279,14 @@ class SurfaceGestures(
     fun up(id: Long, x: Float = -1f) {
         val slot = stripPresses.remove(id)
         if (slot != null) {
-            if (x < 0f || slotAt(x) == slot) {
+            val same = if (slot == MARGIN_MIC_SLOT) {
+                x < 0f || marginMic?.containsX(x) == true
+            } else {
+                x < 0f || slotAt(x) == slot
+            }
+            if (same) {
                 when (slot) {
+                    MARGIN_MIC_SLOT -> controller.onAction(KeyAction.MIC)
                     TOGGLE_SLOT -> controller.togglePrivate()
                     MIC_SLOT -> controller.onAction(KeyAction.MIC)
                     CLIPBOARD_SLOT -> controller.openClipboard()
@@ -383,6 +396,7 @@ class SurfaceGestures(
         val EMPTY_TRAIL = FloatArray(0)
         const val TOGGLE_SLOT = -1
         const val MIC_SLOT = -2
+        const val MARGIN_MIC_SLOT = -5
         const val CLIPBOARD_SLOT = -3
         const val EMOJI_SLOT = -4
         const val STRIP_TOOLS = 2

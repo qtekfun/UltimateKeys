@@ -113,6 +113,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
     val dictating = dictation != null && dictationState != DictationState.Idle
     val showTools = activeStyle.suggestionBar.toolIcons == ToolIcons.SHOWN
+    val micInMargin = controller.features.voice &&
+        activeStyle.bottomRow.micPlacement == MicPlacement.BOTTOM_MARGIN
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
@@ -141,8 +143,19 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         settings.heightPercent,
         settings.bottomMarginDp,
         activeStyle,
-        settings.numberRow
+        settings.numberRow,
+        micInMargin
     )
+    val marginMic = if (micInMargin) {
+        MarginMic.of(
+            widthPx,
+            geometry.top + geometry.height,
+            keysHeightDp * density.density
+        )
+    } else {
+        null
+    }
+    gestures.marginMic = marginMic
     // The system bar area below the keys carries the keyboard's own background, like a margin.
     Box(
         modifier = modifier
@@ -192,7 +205,14 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                         style,
                         labels,
                         dimens,
-                        StripState(strip.slots, privacy.isPrivate, showToggle, showMic, showTools)
+                        StripState(
+                            strip.slots,
+                            privacy.isPrivate,
+                            showToggle,
+                            showMic,
+                            showTools,
+                            marginMic
+                        )
                     )
                 }
             }
@@ -208,7 +228,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                     privateOn = privacy.isPrivate,
                     canTogglePrivate = controller.privacy.canToggle,
                     mic = showMic,
-                    tools = showTools
+                    tools = showTools,
+                    marginMic = marginMic
                 ),
                 modifier = Modifier.fillMaxWidth().height(totalHeight)
             )

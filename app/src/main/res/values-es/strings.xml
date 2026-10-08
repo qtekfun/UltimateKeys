@@ -132,6 +132,7 @@
     <string name="opt_row_emoji">[123] [emoji] [espacio] [.] [intro]</string>
     <string name="opt_row_mic">[123] [,] [espacio] [mic] [intro]</string>
     <string name="opt_row_globe">[123] [globo] [espacio] [intro]</string>
+    <string name="opt_mic_margin">Margen inferior (bajo las teclas)</string>
     <string name="opt_mic_row">Fila inferior</string>
     <string name="opt_mic_bar">Barra de sugerencias</string>
     <string name="opt_motion_none">Ninguna</string>

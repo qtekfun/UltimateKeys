@@ -140,6 +140,9 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             )
         }
         drawStripButtons(scope, geometry, strip, layout, style)
+        strip.marginMic?.let {
+            KeyIcons.mic(scope, it.centerX, it.centerY, it.iconSize, style.hint)
+        }
         val words = strip.words
         if (words.isEmpty()) return
         val cell = layout.cellWidth

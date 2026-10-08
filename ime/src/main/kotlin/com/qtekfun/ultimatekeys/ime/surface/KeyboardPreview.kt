@@ -73,12 +73,15 @@ fun KeyboardPreview(
             content.numberRow
         )
     }
+    val micInMargin = content.features.voice &&
+        style.bottomRow.micPlacement == MicPlacement.BOTTOM_MARGIN
     val height = SurfaceSpec.totalHeightDp(
         layout.rows.size,
         content.heightPercent,
         0,
         style,
-        content.numberRow
+        content.numberRow,
+        micInMargin
     )
     Box(modifier.fillMaxWidth().background(surface.background)) {
         Canvas(
@@ -99,7 +102,16 @@ fun KeyboardPreview(
                     showMic = content.features.voice &&
                         style.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR,
                     showTools = content.showToggle &&
-                        style.suggestionBar.toolIcons == ToolIcons.SHOWN
+                        style.suggestionBar.toolIcons == ToolIcons.SHOWN,
+                    marginMic = if (micInMargin) {
+                        MarginMic.of(
+                            widthPx,
+                            geometry.top + geometry.height,
+                            height * density.density
+                        )
+                    } else {
+                        null
+                    }
                 )
             )
         }

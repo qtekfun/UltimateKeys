@@ -91,3 +91,42 @@ class StripLayoutTest {
         assertEquals(listOf(0, 1, 2), listOf(41f, 141f, 339f).map(layout::slotAt))
     }
 }
+
+class MarginMicTest {
+    @Test
+    fun `the zone fills the margin under the keys at the right edge`() {
+        val zone = MarginMic.of(width = 400f, keysBottom = 300f, totalHeight = 340f)!!
+        assertEquals(400f, zone.right)
+        assertEquals(300f, zone.top)
+        assertEquals(340f, zone.bottom)
+        assertEquals(336f, zone.left, 64f)
+        assertEquals(20f, zone.iconSize)
+        assertTrue(zone.contains(390f, 320f))
+        assertFalse(zone.contains(100f, 320f))
+        assertFalse(zone.contains(390f, 250f))
+    }
+
+    @Test
+    fun `there is no zone without a margin or a width`() {
+        assertEquals(null, MarginMic.of(400f, 300f, 300f))
+        assertEquals(null, MarginMic.of(0f, 300f, 340f))
+    }
+
+    @Test
+    fun `the margin grows to fit the microphone but never shrinks a bigger one`() {
+        assertEquals(40f, SurfaceSpec.marginDp(12, micInMargin = true))
+        assertEquals(60f, SurfaceSpec.marginDp(60, micInMargin = true))
+        assertEquals(12f, SurfaceSpec.marginDp(12, micInMargin = false))
+        val plain = SurfaceSpec.totalHeightDp(4, 100, 12, Style())
+        val withMic = SurfaceSpec.totalHeightDp(4, 100, 12, Style(), micInMargin = true)
+        assertEquals(28f, withMic - plain, 0.001f)
+    }
+
+    @Test
+    fun `by default the dictation key is in the margin, not in a key of the bottom row`() {
+        assertEquals(
+            com.qtekfun.ultimatekeys.style.MicPlacement.BOTTOM_MARGIN,
+            Style().bottomRow.micPlacement
+        )
+    }
+}

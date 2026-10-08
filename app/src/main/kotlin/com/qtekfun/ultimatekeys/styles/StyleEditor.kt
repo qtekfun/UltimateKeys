@@ -372,6 +372,7 @@ private fun BottomRowControls(style: Style, onChange: (Style) -> Unit) {
         ChoiceRow(
             R.string.ctl_mic,
             listOf(
+                Choice(MicPlacement.BOTTOM_MARGIN, stringResource(R.string.opt_mic_margin)),
                 Choice(MicPlacement.BOTTOM_ROW, stringResource(R.string.opt_mic_row)),
                 Choice(MicPlacement.SUGGESTION_BAR, stringResource(R.string.opt_mic_bar))
             ),
