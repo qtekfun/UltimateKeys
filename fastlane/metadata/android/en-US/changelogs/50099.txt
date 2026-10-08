@@ -1,0 +1,1 @@
+Private mode: it turns on by itself in incognito tabs and password fields, or by hand. While it is on nothing is learned.

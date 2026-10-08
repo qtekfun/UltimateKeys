@@ -1,0 +1,1 @@
+Seven original keyboard styles in light and dark, a style editor with live preview, bottom-row arrangements, and import, export and sharing of .ukstyle files.

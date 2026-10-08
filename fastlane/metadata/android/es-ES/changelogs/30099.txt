@@ -1,0 +1,1 @@
+Sugerencias y autocorrección de hasta tres palabras, predicción de la palabra siguiente, ajuste del margen inferior y un nuevo icono.

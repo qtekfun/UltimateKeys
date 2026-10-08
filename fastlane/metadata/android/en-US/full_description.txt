@@ -1,9 +1,32 @@
-UltimateKeys is a modern keyboard that works entirely offline.
+UltimateKeys is a modern keyboard that works entirely offline. There are no analytics, no ads and no cloud, and you can make it look exactly the way you want.
 
-Early development: this version cannot be used to type yet.
+<b>Make it yours</b>
+• Seven original built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), each with a light and a dark variant.
+• A style editor with a live preview: key shape, gaps, borders, shadows, fonts, colors, gradients, popups, suggestion bar, bottom row and panels are all settings.
+• Material You colors, and a warning when text would be hard to read.
+• Export, import and share your styles as .ukstyle files.
 
-Goals:
-• A fully configurable look: every visual aspect is a setting.
-• Spanish and English without switching.
-• Private mode, no telemetry, no cloud.
-• Offline voice dictation.
+<b>Type fast, in two languages</b>
+• Spanish and English layouts (with ñ), symbols, numbers and an optional number row.
+• Suggestions, auto-correction and next-word prediction that mix Spanish and English with no switching.
+• Gesture typing: glide over the letters and the word appears.
+• Accents and alternatives on long press, caps lock, cursor control on the space bar, drag on delete to select and remove.
+• Your own dictionary, with import and export.
+
+<b>Private by design</b>
+• Private mode turns on by itself in incognito tabs and password fields, or by hand. While it is on nothing is learned and nothing is saved to the clipboard history.
+• No analytics, no crash reporters, no ads, no accounts, no cloud.
+• The "full" build does not even declare the internet permission. The "lite" build uses the network only to download a speech model when you ask for it.
+• Clear everything the keyboard learned with one tap.
+
+<b>Clipboard and emoji</b>
+• Clipboard history that you control: keep it for an hour, a day, a week or forever, pin what you need, delete the rest. Items that apps mark as sensitive are never stored.
+• Emoji by category, recent emoji, skin tones and search by name in English and Spanish, all offline.
+
+<b>Dictation without a connection</b>
+• Tap the microphone and speak: the text is recognized on your phone with Whisper (whisper.cpp), in Spanish or English.
+• Audio stays in memory and is never written to disk or sent anywhere.
+• Pick the model that suits your phone: a small one that is quick, or a larger one that is more accurate.
+
+<b>Free software</b>
+UltimateKeys is licensed under the GPL-3.0-or-later. It builds on the Android Open Source Project suggestion engine and word lists (Apache-2.0) and on whisper.cpp (MIT). Credits and licenses are listed in the app and in the source repository.
