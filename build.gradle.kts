@@ -3,6 +3,7 @@
 
 plugins {
     base
+    id("uk.root")
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization) apply false
 }
@@ -27,7 +28,12 @@ kover {
                     "com.qtekfun.ultimatekeys.ime.Feedback",
                     "com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface*",
                     "com.qtekfun.ultimatekeys.ime.surface.SurfaceRenderer*",
-                    "com.qtekfun.ultimatekeys.ime.surface.TempStyle*",
+                    "com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview*",
+                    "com.qtekfun.ultimatekeys.ime.surface.KeyIcons",
+                    "com.qtekfun.ultimatekeys.ime.surface.FontCatalog",
+                    "com.qtekfun.ultimatekeys.ime.surface.AngleGradient",
+                    "com.qtekfun.ultimatekeys.ime.surface.ToneSource\$Companion",
+                    "com.qtekfun.ultimatekeys.styles.*",
                     "com.qtekfun.ultimatekeys.core.SettingsStoreKt*",
                 )
                 
@@ -45,4 +51,5 @@ kover {
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn("koverVerify")
+    dependsOn("originalityCheck")
 }

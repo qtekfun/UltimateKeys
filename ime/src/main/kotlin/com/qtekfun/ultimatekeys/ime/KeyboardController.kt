@@ -12,9 +12,14 @@ import com.qtekfun.ultimatekeys.ime.logic.InputOptions
 import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
+import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
+import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
+import com.qtekfun.ultimatekeys.style.Presets
+import com.qtekfun.ultimatekeys.style.Style
+import com.qtekfun.ultimatekeys.style.StyleRepository
 import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -35,10 +40,18 @@ class KeyboardController(
     private val engine: SuggestionEngine = NoopSuggestionEngine,
     suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val logLatency: ((String) -> Unit)? = null,
+    styles: StyleRepository = InMemoryStyleRepository(),
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
         repository.settings.stateIn(scope, SharingStarted.Eagerly, KeyboardSettings())
+
+    /** The style the surface is drawn with; changes apply immediately. */
+    val style: StateFlow<Style> =
+        styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
+
+    /** Optional keys that exist yet; flipped on by the emoji and voice phases. */
+    val features = BottomRowFeatures()
     val latency = LatencyTracker()
     val suggestions = SuggestionController(
         engine = engine,
@@ -63,12 +76,27 @@ class KeyboardController(
         logic.locale = Locale.forLanguageTag(LayoutRepository.load(s.letterLayoutId).locale ?: "en")
     }
 
-    fun layoutFor(page: Page, settings: KeyboardSettings): KeyboardLayout = when (page) {
-        Page.LETTERS -> LayoutRepository.pages(settings.letterLayoutId, settings.numberRow).letters
-        Page.SYMBOLS_1 -> LayoutRepository.load("symbols_1")
-        Page.SYMBOLS_2 -> LayoutRepository.load("symbols_2")
-        Page.NUMERIC -> LayoutRepository.load("numeric")
-        Page.PHONE -> LayoutRepository.load("phone")
+    /** The keys of [page]; the letter and symbol pages follow the style's bottom row. */
+    fun layoutFor(
+        page: Page,
+        settings: KeyboardSettings,
+        style: Style = this.style.value
+    ): KeyboardLayout {
+        val slots = BottomRowPlan.slots(style.bottomRow, features)
+        return when (page) {
+            Page.LETTERS -> BottomRow.apply(
+                LayoutRepository.pages(settings.letterLayoutId, settings.numberRow).letters,
+                slots
+            )
+
+            Page.SYMBOLS_1 -> BottomRow.apply(LayoutRepository.load("symbols_1"), slots)
+
+            Page.SYMBOLS_2 -> BottomRow.apply(LayoutRepository.load("symbols_2"), slots)
+
+            Page.NUMERIC -> LayoutRepository.load("numeric")
+
+            Page.PHONE -> LayoutRepository.load("phone")
+        }
     }
 
     fun keyDown(action: KeyAction?) {
@@ -93,13 +121,23 @@ class KeyboardController(
     fun onAction(action: KeyAction) {
         when (action) {
             KeyAction.SHIFT -> logic.onShiftTap()
+
             KeyAction.DELETE -> logic.onDelete()
+
             KeyAction.ENTER -> logic.onEnter()
+
             KeyAction.SPACE -> logic.onSpace()
+
             KeyAction.GLOBE -> cycleLayout()
+
             KeyAction.SWITCH_LETTERS -> logic.showPage(Page.LETTERS)
+
             KeyAction.SWITCH_SYMBOLS -> logic.showPage(Page.SYMBOLS_1)
+
             KeyAction.SWITCH_SYMBOLS_2 -> logic.showPage(Page.SYMBOLS_2)
+
+            // Their keys only appear once the emoji panel and dictation exist (BottomRowFeatures).
+            KeyAction.EMOJI, KeyAction.MIC -> Unit
         }
     }
 

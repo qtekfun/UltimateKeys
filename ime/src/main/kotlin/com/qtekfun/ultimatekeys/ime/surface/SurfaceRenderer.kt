@@ -21,6 +21,12 @@ import com.qtekfun.ultimatekeys.ime.logic.ShiftState
 import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
+import com.qtekfun.ultimatekeys.layouts.LayoutKey
+import com.qtekfun.ultimatekeys.style.BarLayout
+import com.qtekfun.ultimatekeys.style.FontChoice
+import com.qtekfun.ultimatekeys.style.PopupKind
+import com.qtekfun.ultimatekeys.style.PressAnimation
+import com.qtekfun.ultimatekeys.style.ShadowKind
 
 /** Texts the renderer needs, resolved from resources by the composable. */
 data class SurfaceLabels(
@@ -36,13 +42,17 @@ data class SurfaceDimens(
     val gapX: Float,
     val gapY: Float,
     val corner: Float,
+    val borderWidth: Float,
+    val elevation: Float,
     val labelSize: Float,
     val hintSize: Float,
     val previewHeight: Float
 )
 
 /** Draws the key surface with plain canvas calls: one pass, no per-key composables. */
-class SurfaceRenderer {
+class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
+    private var loadedFont: FontChoice? = null
+    private var loadedWeight = 0
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
         typeface = Typeface.DEFAULT
@@ -53,11 +63,16 @@ class SurfaceRenderer {
         geometry: KeyGeometry,
         state: KeyboardState,
         presses: List<PressView>,
-        style: TempStyle,
+        style: SurfaceStyle,
         labels: SurfaceLabels,
         dimens: SurfaceDimens,
         strip: List<String> = emptyList()
     ) {
+        if (style.font != loadedFont || style.fontWeight != loadedWeight) {
+            text.typeface = fonts.typeface(style.font, style.fontWeight)
+            loadedFont = style.font
+            loadedWeight = style.fontWeight
+        }
         scope.drawRect(style.background)
         drawStrip(scope, geometry, strip, style, dimens)
         val pressedKeys = presses.map { it.key }.toSet()
@@ -78,29 +93,39 @@ class SurfaceRenderer {
         scope: DrawScope,
         geometry: KeyGeometry,
         strip: List<String>,
-        style: TempStyle,
+        style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
         if (strip.isEmpty() || geometry.top <= 0f) return
         val cell = geometry.width / strip.size
+        val list = style.barLayout == BarLayout.SCROLLING_LIST
         strip.forEachIndexed { index, word ->
-            if (index > 0) {
+            if (list) {
+                val pad = geometry.top * PILL_PAD
+                val height = geometry.top * PILL_HEIGHT
+                scope.drawRoundRect(
+                    style.barDivider.copy(alpha = PILL_ALPHA),
+                    Offset(cell * index + pad, (geometry.top - height) / 2f),
+                    Size(cell - 2f * pad, height),
+                    CornerRadius(height / 2f)
+                )
+            } else if (index > 0) {
                 scope.drawLine(
-                    style.hint.copy(alpha = DIVIDER_ALPHA),
+                    style.barDivider,
                     Offset(cell * index, geometry.top * DIVIDER_INSET),
                     Offset(cell * index, geometry.top * (1f - DIVIDER_INSET)),
                     1f
                 )
             }
-            text.isFakeBoldText = index == 1
+            text.isFakeBoldText = (!list && index == 1) || style.barTextBold
             val baseline = geometry.top / 2f + dimens.labelSize * STRIP_BASELINE
             drawText(
                 scope,
                 word,
                 cell * index + cell / 2f,
                 baseline,
-                dimens.labelSize * STRIP_TEXT,
-                style.text
+                dimens.labelSize * STRIP_TEXT * style.barTextSizePercent / PERCENT,
+                style.barText
             )
             text.isFakeBoldText = false
         }
@@ -111,28 +136,76 @@ class SurfaceRenderer {
         placed: PlacedKey,
         state: KeyboardState,
         pressed: Boolean,
-        style: TempStyle,
+        style: SurfaceStyle,
         labels: SurfaceLabels,
         dimens: SurfaceDimens
     ) {
         val key = placed.key
         val isEnter = key is ActionKey && key.action == KeyAction.ENTER
-        val fill = when {
-            pressed -> style.pressed
-            isEnter -> style.actionKey
-            key is CharKey -> style.letterKey
-            else -> style.functionKey
+        val fill = keyFill(key, pressed, style)
+        val shrink = if (pressed && style.pressAnimation == PressAnimation.SCALE) {
+            placed.height * PRESS_SHRINK
+        } else {
+            0f
         }
-        scope.drawRoundRect(
-            color = fill,
-            topLeft = Offset(placed.left, placed.top),
-            size = Size(placed.width, placed.height),
-            cornerRadius = CornerRadius(dimens.corner)
-        )
-        val ink = if (isEnter) Color.White else style.text
+        val topLeft = Offset(placed.left + shrink, placed.top + shrink)
+        val size = Size(placed.width - 2f * shrink, placed.height - 2f * shrink)
+        val radius = CornerRadius(dimens.corner)
+        drawShadow(scope, topLeft, size, radius, style, dimens)
+        scope.drawRoundRect(color = fill, topLeft = topLeft, size = size, cornerRadius = radius)
+        if (style.hasBorder) {
+            scope.drawRoundRect(
+                color = style.keyBorder,
+                topLeft = topLeft,
+                size = size,
+                cornerRadius = radius,
+                style = Stroke(width = dimens.borderWidth)
+            )
+        }
+        val ink = if (isEnter) style.actionText else style.text
         when (key) {
             is CharKey -> drawCharKey(scope, placed, key, state, style, dimens)
             is ActionKey -> drawActionKey(scope, placed, key, state, ink, labels, dimens)
+        }
+    }
+
+    private fun keyFill(key: LayoutKey, pressed: Boolean, style: SurfaceStyle): Color {
+        val base = when {
+            key is ActionKey && key.action == KeyAction.ENTER -> style.actionKey
+            key is ActionKey && key.action == KeyAction.SPACE -> style.spaceKey
+            key is CharKey -> style.letterKey
+            else -> style.functionKey
+        }
+        return if (pressed && style.pressAnimation != PressAnimation.SCALE) style.pressed else base
+    }
+
+    private fun drawShadow(
+        scope: DrawScope,
+        topLeft: Offset,
+        size: Size,
+        radius: CornerRadius,
+        style: SurfaceStyle,
+        dimens: SurfaceDimens
+    ) {
+        when (style.shadow) {
+            ShadowKind.NONE -> Unit
+
+            ShadowKind.BOTTOM_EDGE -> scope.drawRoundRect(
+                style.keyShadow,
+                Offset(topLeft.x, topLeft.y + dimens.elevation),
+                size,
+                radius
+            )
+
+            ShadowKind.ELEVATION -> repeat(ELEVATION_LAYERS) { layer ->
+                val spread = dimens.elevation * (layer + 1) / ELEVATION_LAYERS
+                scope.drawRoundRect(
+                    style.keyShadow.copy(alpha = style.keyShadow.alpha / (layer + 2)),
+                    Offset(topLeft.x - spread / 2f, topLeft.y + spread / 2f),
+                    Size(size.width + spread, size.height + spread),
+                    CornerRadius(radius.x + spread / 2f)
+                )
+            }
         }
     }
 
@@ -141,13 +214,10 @@ class SurfaceRenderer {
         placed: PlacedKey,
         key: CharKey,
         state: KeyboardState,
-        style: TempStyle,
+        style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
-        val upper =
-            state.shift != ShiftState.OFF &&
-                state.page == com.qtekfun.ultimatekeys.ime.logic.Page.LETTERS
-        val label = if (upper) key.label.uppercase() else key.label
+        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
         drawText(
             scope,
             label,
@@ -156,7 +226,7 @@ class SurfaceRenderer {
             dimens.labelSize,
             style.text
         )
-        key.hint?.let {
+        key.hint?.takeIf { style.showHints }?.let {
             drawText(
                 scope,
                 it,
@@ -182,9 +252,9 @@ class SurfaceRenderer {
         val unit = minOf(placed.height, placed.width) * ICON_SCALE
         val small = dimens.labelSize * SMALL_LABEL
         when (key.action) {
-            KeyAction.SHIFT -> drawShift(scope, cx, cy, unit, ink, state.shift)
+            KeyAction.SHIFT -> KeyIcons.shift(scope, cx, cy, unit, ink, state.shift)
 
-            KeyAction.DELETE -> drawBackspace(scope, cx, cy, unit, ink)
+            KeyAction.DELETE -> KeyIcons.backspace(scope, cx, cy, unit, ink)
 
             KeyAction.ENTER -> drawEnter(scope, placed, state.enterKind, ink, labels, dimens, unit)
 
@@ -197,7 +267,11 @@ class SurfaceRenderer {
                 ink.copy(alpha = SPACE_ALPHA)
             )
 
-            KeyAction.GLOBE -> drawGlobe(scope, cx, cy, unit, ink)
+            KeyAction.GLOBE -> KeyIcons.globe(scope, cx, cy, unit, ink)
+
+            KeyAction.EMOJI -> KeyIcons.smiley(scope, cx, cy, unit, ink)
+
+            KeyAction.MIC -> KeyIcons.mic(scope, cx, cy, unit, ink)
 
             KeyAction.SWITCH_LETTERS -> drawText(
                 scope,
@@ -255,80 +329,19 @@ class SurfaceRenderer {
         }
     }
 
-    private fun drawShift(
-        scope: DrawScope,
-        cx: Float,
-        cy: Float,
-        unit: Float,
-        ink: Color,
-        shift: ShiftState
-    ) {
-        val p = Path().apply {
-            moveTo(cx, cy - unit * 0.55f)
-            lineTo(cx + unit * 0.5f, cy)
-            lineTo(cx + unit * 0.2f, cy)
-            lineTo(cx + unit * 0.2f, cy + unit * 0.45f)
-            lineTo(cx - unit * 0.2f, cy + unit * 0.45f)
-            lineTo(cx - unit * 0.2f, cy)
-            lineTo(cx - unit * 0.5f, cy)
-            close()
-        }
-        if (shift == ShiftState.OFF) {
-            scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
-        } else {
-            scope.drawPath(p, ink)
-        }
-        if (shift == ShiftState.LOCKED) {
-            scope.drawLine(
-                ink,
-                Offset(cx - unit * 0.3f, cy + unit * 0.65f),
-                Offset(
-                    cx + unit * 0.3f,
-                    cy + unit * 0.65f
-                ),
-                unit * STROKE
-            )
-        }
-    }
-
-    private fun drawBackspace(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
-        val p = Path().apply {
-            moveTo(cx - unit * 0.6f, cy)
-            lineTo(cx - unit * 0.25f, cy - unit * 0.4f)
-            lineTo(cx + unit * 0.6f, cy - unit * 0.4f)
-            lineTo(cx + unit * 0.6f, cy + unit * 0.4f)
-            lineTo(cx - unit * 0.25f, cy + unit * 0.4f)
-            close()
-        }
-        scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
-        val d = unit * 0.18f
-        val x = cx + unit * 0.12f
-        scope.drawLine(ink, Offset(x - d, cy - d), Offset(x + d, cy + d), unit * STROKE)
-        scope.drawLine(ink, Offset(x - d, cy + d), Offset(x + d, cy - d), unit * STROKE)
-    }
-
-    private fun drawGlobe(scope: DrawScope, cx: Float, cy: Float, unit: Float, ink: Color) {
-        val r = unit * 0.5f
-        val stroke = Stroke(width = unit * STROKE)
-        scope.drawCircle(ink, r, Offset(cx, cy), style = stroke)
-        scope.drawOval(ink, Offset(cx - r * 0.45f, cy - r), Size(r * 0.9f, r * 2f), style = stroke)
-        scope.drawLine(ink, Offset(cx - r, cy), Offset(cx + r, cy), unit * STROKE)
-    }
-
     private fun drawPreview(
         scope: DrawScope,
         placed: PlacedKey,
         state: KeyboardState,
-        style: TempStyle,
+        style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
         val key = placed.key as CharKey
-        val upper =
-            state.shift != ShiftState.OFF &&
-                state.page == com.qtekfun.ultimatekeys.ime.logic.Page.LETTERS
-        val label = if (upper) key.label.uppercase() else key.label
-        val h = dimens.previewHeight
-        val w = placed.width * PREVIEW_WIDEN
+        if (style.popupKind == PopupKind.NONE) return
+        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
+        val enlarged = style.popupKind == PopupKind.ENLARGED_KEY
+        val h = if (enlarged) placed.height else dimens.previewHeight
+        val w = if (enlarged) placed.width * ENLARGED_WIDEN else placed.width * PREVIEW_WIDEN
         val left = (placed.centerX - w / 2f).coerceAtLeast(0f)
         val top = (placed.top - h - dimens.gapY).coerceAtLeast(0f)
         scope.drawRoundRect(style.popup, Offset(left, top), Size(w, h), CornerRadius(dimens.corner))
@@ -338,14 +351,14 @@ class SurfaceRenderer {
             left + w / 2f,
             top + h / 2f + dimens.labelSize * 0.45f,
             dimens.labelSize * PREVIEW_TEXT,
-            style.text
+            style.popupText
         )
     }
 
     private fun drawChooser(
         scope: DrawScope,
         chooser: ChooserView,
-        style: TempStyle,
+        style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
         scope.drawRoundRect(
@@ -364,7 +377,7 @@ class SurfaceRenderer {
                     CornerRadius(dimens.corner)
                 )
             }
-            val ink = if (index == chooser.selected) Color.White else style.text
+            val ink = if (index == chooser.selected) style.actionText else style.popupText
             drawText(
                 scope,
                 item,
@@ -375,6 +388,10 @@ class SurfaceRenderer {
             )
         }
     }
+
+    private fun upperCase(state: KeyboardState, style: SurfaceStyle): Boolean =
+        state.page == com.qtekfun.ultimatekeys.ime.logic.Page.LETTERS &&
+            (style.alwaysUpper || state.shift != ShiftState.OFF)
 
     private fun drawText(
         scope: DrawScope,
@@ -399,6 +416,13 @@ class SurfaceRenderer {
         const val SPACE_ALPHA = 0.6f
         const val STROKE = 0.1f
         const val PREVIEW_WIDEN = 1.3f
+        const val ENLARGED_WIDEN = 1.25f
+        const val PRESS_SHRINK = 0.04f
+        const val ELEVATION_LAYERS = 3
+        const val PERCENT = 100f
+        const val PILL_PAD = 0.12f
+        const val PILL_HEIGHT = 0.68f
+        const val PILL_ALPHA = 0.55f
         const val PREVIEW_TEXT = 1.3f
     }
 }

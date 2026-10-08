@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Keyboard styles: seven original built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), each with light and dark colors, bundled open fonts and Material You colors. A style editor with a live preview, contrast warnings, duplicate and reset, plus import, export and sharing of `.ukstyle` files.
+- Bottom-row arrangements and a suggestion-bar layout chosen by the style.
+
 ## [0.3.0] - 2026-10-08
 
 ### Changed

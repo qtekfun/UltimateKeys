@@ -38,24 +38,30 @@ class KeyGeometry(
     val rowHeight: Float,
     gapX: Float = 0f,
     gapY: Float = 0f,
-    val top: Float = 0f
+    val top: Float = 0f,
+    /** Optional height multiplier per row (1 = [rowHeight]); missing entries mean 1. */
+    rowScales: List<Float> = emptyList()
 ) {
     val keys: List<PlacedKey>
-    val height: Float = layout.rows.size * rowHeight
+    val height: Float = layout.rows.indices.sumOf {
+        (rowHeight * rowScales.getOrElse(it) { 1f }).toDouble()
+    }.toFloat()
 
     init {
         val placed = ArrayList<PlacedKey>()
+        var rowTop = top
         layout.rows.forEachIndexed { rowIndex, row ->
+            val thisRowHeight = rowHeight * rowScales.getOrElse(rowIndex) { 1f }
             val totalWeight = row.keys.sumOf { it.width.toDouble() }.toFloat()
             val available = width - gapX * row.keys.size
             var x = gapX / 2f
-            val rowTop = top + rowIndex * rowHeight
             row.keys.forEach { key ->
                 val w = available * key.width / totalWeight
                 placed +=
-                    PlacedKey(key, x, rowTop + gapY / 2f, x + w, rowTop + rowHeight - gapY / 2f)
+                    PlacedKey(key, x, rowTop + gapY / 2f, x + w, rowTop + thisRowHeight - gapY / 2f)
                 x += w + gapX
             }
+            rowTop += thisRowHeight
         }
         keys = placed
     }

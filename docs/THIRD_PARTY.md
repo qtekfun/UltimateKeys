@@ -48,3 +48,17 @@ these sources is used.
 | Hunspell/LibreOffice `es_ES` and `en_US` dictionaries | Not used for now | Licenses differ per dictionary and must be read file by file. They carry no word frequencies, so suggestions would rank poorly. Possible later source for validity checking only. |
 | Frequency lists derived from OpenSubtitles (for example FrequencyWords) | Rejected | The corpus's redistribution terms are unclear, and a license on the derived list does not clear the underlying data. |
 | Wiktionary-derived frequency lists | Rejected | Share-alike (CC BY-SA) terms are not clearly compatible with shipping inside a GPL-3.0 binary. |
+
+## Fonts and icons (style engine)
+
+All fonts are bundled in `ime/src/main/assets/fonts/` unmodified, each with its licence text (`OFL-*.txt`). They come from the `google/fonts` repository at commit `5e8a3ba899557829a76cfdac30fa512bda91d7ca`.
+
+| Font | File | Licence | SHA-256 |
+|---|---|---|---|
+| Inter (variable) | `Inter-Variable.ttf` | SIL OFL 1.1 | `29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031` |
+| Roboto Flex (variable) | `RobotoFlex-Variable.ttf` | SIL OFL 1.1 | `9b523f7d82593df0107173849ebb8c817471a1df4b4fb2c3cbf40cfd810c8281` |
+| Atkinson Hyperlegible Regular | `AtkinsonHyperlegible-Regular.ttf` | SIL OFL 1.1 | `7fb917c89019896d0b52ee84b7cbb3304c18cb90b19a62f5e32712bd23e97669` |
+| Atkinson Hyperlegible Bold | `AtkinsonHyperlegible-Bold.ttf` | SIL OFL 1.1 | `5a3b0c8cc8ca545155150b4512a1fa248298df121c50d6557e651e61fbdab92f` |
+| Nunito (variable, rounded) | `Nunito-Variable.ttf` | SIL OFL 1.1 | `bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207` |
+
+Material Symbols (outlined, 24 px Android vectors, Apache License 2.0) from `google/material-design-icons` at commit `737e3324305806514d7909874fa1818ae1808232`, stored as `ime/src/main/res/drawable/ms_*.xml`: mic, content_paste, sentiment_satisfied, settings, more_horiz, close, visibility_off, language, backspace, keyboard_return, keyboard_hide, palette.

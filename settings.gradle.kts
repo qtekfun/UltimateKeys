@@ -28,6 +28,7 @@ include(
     ":ime",
     ":layouts",
     ":style",
+    ":screenshots",
     ":engine",
     ":dictionaries",
     ":privacy",

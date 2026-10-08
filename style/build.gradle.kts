@@ -3,8 +3,14 @@
 
 plugins {
     id("uk.android.library")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.qtekfun.ultimatekeys.style"
+}
+
+dependencies {
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.coroutines.core)
 }

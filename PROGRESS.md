@@ -4,13 +4,13 @@
 - None. Signing secrets (`UK_*`) are pending on the owner (see `docs/HUMAN_TASKS.md`); not a blocker.
 
 ## Current phase / branch / open PR
-Phase 2 done on branch `phase/2-suggestions` (PR #4, CI green). Next: squash-merge, release v0.3.0, then Phase 3 on `phase/3-style-engine`. v0.1.0 and v0.2.0 are released.
+Phase 3 — Style engine, branch `phase/3-style-engine` (no PR yet). v0.1.0, v0.2.0 and v0.3.0 are released (v0.3.0 Release workflow succeeded with both APKs).
 
 ## Last completed task
-2.8 and 2.8b. Engine enabled after raising the vendored dictionary size limits (ADR 0008 update). Also added the configurable bottom margin (user request after testing 0.2.0).
+Phase 2 fully (2.9 is a human check, listed in docs/HUMAN_VERIFICATION.md). Also done early: 9.1 launcher icon, configurable bottom margin.
 
 ## Next task
-Release v0.3.0 (docs/CI_CD.md "Making a release"), then Phase 3 task 3.1. Pending human checks: docs/HUMAN_VERIFICATION.md (2.9).
+3.1 `:style` schema (versioned, Kotlin serialization) with every parameter in SPEC.md section 6.
 
 ## Build & check commands
 `./gradlew spotlessApply check assembleFullDebug assembleLiteDebug`
