@@ -53,3 +53,13 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Gesture typing does not leak into private mode: glide a word in an incognito field or with private mode on, then check the word is not suggested later.
 - [ ] Gesture typing on both letter layouts (Spanish and English), the number row on, and a 70% / 130% keyboard height.
 - [ ] The first launch after install: gestures start working a moment after typing does (the word lists are read in the background).
+
+## Phase 9 — Acceptance criteria of SPEC.md section 14 (see `docs/ACCEPTANCE.md`)
+
+- [ ] Airplane mode: with the `full` APK and airplane mode on, dictate a sentence in Spanish and one in English; both are inserted.
+- [ ] Dictating a sentence of about 10 words with `base` returns text in 2 s or less on the Find X8 Pro (note the time and the sentence in `docs/PERFORMANCE.md`).
+- [ ] In an incognito tab of a real browser, private mode turns on by itself (the strip icon is filled and tinted); type a made-up word several times, leave the tab, and check it is never suggested.
+- [ ] A 30-minute session mixing typing in Spanish and English, gestures and dictation, with no crash and no stuck keyboard (also on a Pixel).
+- [ ] Time from tapping a field to the keyboard being drawn is under 300 ms (cold and warm), on the Find X8 Pro.
+- [ ] Before the `1.0.0` tag: read the store texts in `fastlane/metadata/android/*/` and the README against the build you are about to release (flavors, models, the licenses screen), and look at the screenshots there.
+- [ ] After the `1.0.0` tag: build the `lite` APK on another machine and compare it with the published one (`docs/DISTRIBUTION.md`), then open the fdroiddata merge request.
