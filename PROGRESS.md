@@ -23,5 +23,5 @@ Full local gate: `./gradlew spotlessCheck check assembleDebug assembleRelease` (
 - Release cert SHA-256 (from owner): 59989c4961dc6f7b8c7534491180640416af454b2c0860e490fbc31d7fac98bd (use in fdroid AllowedAPKSigningKeys, no space)
 - ADRs 0001-0006 in docs/adr (manual DI, toolchain pins).
 - `originalityCheck` task is due in Phase 3 (3.10); CI_CD lists it in `check` from then.
-- Owner rule: run instrumented tests on the connected Pixel 8 only, never on a local emulator (CI keeps its emulator job). The test restores the phone's own keyboard afterwards.
+- Owner rule (updated 2026-10-08): NEVER use the connected Pixel 8 (no adb install/ime/tests). Use CI emulator and HUMAN_VERIFICATION.md. Avoid /tmp.
 - Use `/tmp/.../scratchpad/regen.sh`-style clean-home run to regenerate `gradle/verification-metadata.xml` whenever dependencies change (include `assembleFullDebugAndroidTest`).
