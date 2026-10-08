@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -200,63 +201,80 @@ private fun Frame(locale: StoreScreenshotTest.Locale, scene: StoreScreenshotTest
         Spacer(Modifier.height(20.dp))
         Spacer(Modifier.weight(1f))
         if (scene != StoreScreenshotTest.Scene.STYLES) {
-            val chat = if (locale == StoreScreenshotTest.Locale.EN) {
-                listOf("Are we still on for tonight?", "Yes! What time works?")
-            } else {
-                listOf("¿Seguimos con el plan de esta noche?", "¡Sí! ¿A qué hora te viene bien?")
-            }
-            chat.forEachIndexed { i, message ->
-                Box(
-                    Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        .align(if (i == 0) Alignment.Start else Alignment.End)
-                        .background(if (i == 0) card else line, RoundedCornerShape(18.dp))
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                ) { BasicText(message, style = TextStyle(ink, 16.sp)) }
-            }
-            Spacer(Modifier.height(12.dp))
-            val text = scene.text.getValue(locale)
-            Box(
-                Modifier.padding(horizontal = 16.dp).fillMaxWidth()
-                    .background(card, RoundedCornerShape(16.dp))
-                    .border(1.dp, line, RoundedCornerShape(16.dp))
-                    .padding(16.dp)
-            ) {
-                BasicText("$text|", style = TextStyle(ink, 18.sp))
-            }
-            Spacer(Modifier.height(10.dp))
+            Conversation(locale, scene, ink, card, line)
         }
-        val style = checkNotNull(Presets.byId(scene.presetId))
-        val content = PreviewContent(
-            layoutId = locale.layout,
-            suggestions = scene.suggestions[locale] ?: listOf("hello", "hi", "hey"),
-            private = scene == StoreScreenshotTest.Scene.PRIVATE
-        )
-        when (scene) {
-            StoreScreenshotTest.Scene.STYLES -> Gallery(locale)
+        Bottom(locale, scene)
+    }
+}
 
-            StoreScreenshotTest.Scene.EMOJI ->
-                PanelPreview(style, dark, PanelPreviewContent(PanelKind.EMOJI))
+@Composable
+private fun ColumnScope.Conversation(
+    locale: StoreScreenshotTest.Locale,
+    scene: StoreScreenshotTest.Scene,
+    ink: Color,
+    card: Color,
+    line: Color
+) {
+    val chat = if (locale == StoreScreenshotTest.Locale.EN) {
+        listOf("Are we still on for tonight?", "Yes! What time works?")
+    } else {
+        listOf("¿Seguimos con el plan de esta noche?", "¡Sí! ¿A qué hora te viene bien?")
+    }
+    chat.forEachIndexed { i, message ->
+        Box(
+            Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                .align(if (i == 0) Alignment.Start else Alignment.End)
+                .background(if (i == 0) card else line, RoundedCornerShape(18.dp))
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) { BasicText(message, style = TextStyle(ink, 16.sp)) }
+    }
+    Spacer(Modifier.height(12.dp))
+    val text = scene.text.getValue(locale)
+    Box(
+        Modifier.padding(horizontal = 16.dp).fillMaxWidth()
+            .background(card, RoundedCornerShape(16.dp))
+            .border(1.dp, line, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        BasicText("$text|", style = TextStyle(ink, 18.sp))
+    }
+    Spacer(Modifier.height(10.dp))
+}
 
-            StoreScreenshotTest.Scene.CLIPBOARD ->
-                PanelPreview(style, dark, PanelPreviewContent(PanelKind.CLIPBOARD))
+@Composable
+private fun Bottom(locale: StoreScreenshotTest.Locale, scene: StoreScreenshotTest.Scene) {
+    val dark = scene.dark
+    val style = checkNotNull(Presets.byId(scene.presetId))
+    val content = PreviewContent(
+        layoutId = locale.layout,
+        suggestions = scene.suggestions[locale] ?: listOf("hello", "hi", "hey"),
+        private = scene == StoreScreenshotTest.Scene.PRIVATE
+    )
+    when (scene) {
+        StoreScreenshotTest.Scene.STYLES -> Gallery(locale)
 
-            StoreScreenshotTest.Scene.VOICE -> Box(Modifier.fillMaxWidth().height(270.dp)) {
-                VoicePanelContent(
-                    state = DictationState.Listening(0.8f, true),
-                    action = null,
-                    isPrivate = false,
-                    colors = VoicePanelColors.resolve(style, dark),
-                    cornerDp = style.panels.cornerRadiusDp,
-                    level = 0.8f,
-                    phase = 0.25f,
-                    onStop = {},
-                    onCancel = {},
-                    onAction = {}
-                )
-            }
+        StoreScreenshotTest.Scene.EMOJI ->
+            PanelPreview(style, dark, PanelPreviewContent(PanelKind.EMOJI))
 
-            else -> KeyboardPreview(style, dark, content = content)
+        StoreScreenshotTest.Scene.CLIPBOARD ->
+            PanelPreview(style, dark, PanelPreviewContent(PanelKind.CLIPBOARD))
+
+        StoreScreenshotTest.Scene.VOICE -> Box(Modifier.fillMaxWidth().height(270.dp)) {
+            VoicePanelContent(
+                state = DictationState.Listening(0.8f, true),
+                action = null,
+                isPrivate = false,
+                colors = VoicePanelColors.resolve(style, dark),
+                cornerDp = style.panels.cornerRadiusDp,
+                level = 0.8f,
+                phase = 0.25f,
+                onStop = {},
+                onCancel = {},
+                onAction = {}
+            )
         }
+
+        else -> KeyboardPreview(style, dark, content = content)
     }
 }
 
