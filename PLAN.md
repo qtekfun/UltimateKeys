@@ -137,8 +137,8 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 8 — Polish, performance, accessibility, translation
 
-- [ ] 8.1 Meet the latency targets in `SPEC.md` §12; optimize and document in `docs/PERFORMANCE.md` (including APK sizes per flavor).
-- [ ] 8.2 Model warm-up on voice panel open, unload after idle; memory caps.
+- [x] 8.1 Meet the latency targets in `SPEC.md` §12; optimize and document in `docs/PERFORMANCE.md` (including APK sizes per flavor).
+- [x] 8.2 Model warm-up on voice panel open, unload after idle; memory caps.
 - [x] 8.3 Accessibility: TalkBack for keys (explore-by-touch) and all panels/settings; 48 dp targets in settings.
 - [x] 8.4 Complete Spanish translation.
 - [x] 8.5 In-app "Open-source licenses" screen generated from `docs/THIRD_PARTY.md` data.

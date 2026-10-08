@@ -13,6 +13,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - The microphone under the keys can also sit in the centre (Dictation settings, Microphone position: left, centre or right).
 
+### Changed
+
+- Dictation frees the speech model after two minutes without use, when the system is short of memory and when the keyboard stops, and loads it ahead of time while the microphone permission is requested.
+
 
 ## [0.9.1] - 2026-10-08
 

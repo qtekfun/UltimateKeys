@@ -64,6 +64,15 @@ class DictationHost(
     /** The microphone key: opens the panel and starts listening. */
     fun open() = controller.start()
 
+    /** Loads the model ahead of time; used while the permission prompt is shown. */
+    fun warmUp() = controller.warmUp()
+
+    /** The system is short of memory: free the model if no dictation is running. */
+    fun trimMemory() = controller.trimMemory()
+
+    /** The keyboard is going away. */
+    fun release() = controller.release()
+
     /** Ends the recording now and transcribes it. */
     fun stop() = controller.stop()
 
@@ -88,7 +97,11 @@ class DictationHost(
 
     fun perform(action: PanelAction) {
         when (action) {
-            PanelAction.ALLOW_MICROPHONE -> actions.requestMicrophone()
+            PanelAction.ALLOW_MICROPHONE -> {
+                // The model loads while the person answers the system prompt.
+                controller.warmUp()
+                actions.requestMicrophone()
+            }
 
             PanelAction.OPEN_SETTINGS -> {
                 controller.dismiss()

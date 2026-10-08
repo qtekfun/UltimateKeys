@@ -96,3 +96,8 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Time from tapping a field to the keyboard being drawn is under 300 ms (cold and warm), on the Find X8 Pro.
 - [ ] Before the `1.0.0` tag: read the store texts in `fastlane/metadata/android/*/` and the README against the build you are about to release (flavors, models, the licenses screen), and look at the screenshots there.
 - [ ] After the `1.0.0` tag: build the `lite` APK on another machine and compare it with the published one (`docs/DISTRIBUTION.md`), then open the fdroiddata merge request.
+
+## Phase 8, performance
+
+- [ ] On the Find X8 Pro, run a debug build and read `UKLatency` in logcat: `first-show` (target under 300 ms), `key-to-commit` p95 (under 16 ms), gesture `lift-to-candidates` (under 50 ms); add the numbers to the table in `docs/PERFORMANCE.md`.
+- [ ] Dictate once, wait two minutes and check the app's memory drops (the speech model is freed), then dictate again and check the model comes back without an error.
