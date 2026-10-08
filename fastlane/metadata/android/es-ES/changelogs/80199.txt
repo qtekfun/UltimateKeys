@@ -1,0 +1,1 @@
+Mantén pulsada la tecla de idiomas para abrir un menú con Ajustes y el selector de teclado. Nuevo ajuste para desactivar el micrófono de dictado. El micrófono está en el margen bajo las teclas.
