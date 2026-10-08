@@ -4,8 +4,9 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 /**
- * The dictation button in the margin under the keys, at the right edge (pixels). Shared by the
- * renderer, the touch handling and the accessibility tree so they always agree.
+ * The dictation button in the margin under the keys, at the left or right edge (pixels). It sits
+ * on the left by default because the system's own keyboard switcher button uses the right.
+ * Shared by the renderer, the touch handling and the accessibility tree.
  */
 data class MarginMic(val left: Float, val top: Float, val right: Float, val bottom: Float) {
     val centerX: Float get() = (left + right) / 2f
@@ -27,15 +28,25 @@ data class MarginMic(val left: Float, val top: Float, val right: Float, val bott
             enabled: Boolean,
             width: Float,
             keysBottom: Float,
-            totalHeight: Float
-        ): MarginMic? = if (enabled) of(width, keysBottom, totalHeight) else null
+            totalHeight: Float,
+            onLeft: Boolean = true
+        ): MarginMic? = if (enabled) of(width, keysBottom, totalHeight, onLeft) else null
 
         /** The zone below the keys, or null when there is no margin to put it in. */
-        fun of(width: Float, keysBottom: Float, totalHeight: Float): MarginMic? {
+        fun of(
+            width: Float,
+            keysBottom: Float,
+            totalHeight: Float,
+            onLeft: Boolean = true
+        ): MarginMic? {
             val height = totalHeight - keysBottom
             if (height <= 0f || width <= 0f) return null
             val zoneWidth = minOf(width, height * WIDTH_RATIO)
-            return MarginMic(width - zoneWidth, keysBottom, width, totalHeight)
+            return if (onLeft) {
+                MarginMic(0f, keysBottom, zoneWidth, totalHeight)
+            } else {
+                MarginMic(width - zoneWidth, keysBottom, width, totalHeight)
+            }
         }
     }
 }

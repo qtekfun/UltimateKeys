@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
@@ -159,7 +160,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         micInMargin,
         widthPx,
         geometry.top + geometry.height,
-        keysHeightDp * density.density
+        keysHeightDp * density.density,
+        settings.dictationMicSide == KeyboardSettings.MIC_LEFT
     )
     gestures.marginMic = marginMic
     gestures.globeMenu = globeMenu

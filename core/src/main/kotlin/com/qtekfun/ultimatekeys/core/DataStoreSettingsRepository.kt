@@ -53,6 +53,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     private fun KeyboardSettings.withDictation(prefs: Preferences) = copy(
         dictationEnabled = prefs[DICTATION_ENABLED] ?: dictationEnabled,
         dictationLanguage = prefs[DICTATION_LANGUAGE] ?: dictationLanguage,
+        dictationMicSide = prefs[DICTATION_MIC_SIDE] ?: dictationMicSide,
         dictationSilenceMs = prefs[DICTATION_SILENCE] ?: dictationSilenceMs,
         dictationModelId = prefs[DICTATION_MODEL] ?: dictationModelId,
         modelDownloadWifiOnly = prefs[MODEL_WIFI_ONLY] ?: modelDownloadWifiOnly
@@ -82,6 +83,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[GESTURE_SENSITIVITY] = s.gestureSensitivity
         this[DICTATION_ENABLED] = s.dictationEnabled
         this[DICTATION_LANGUAGE] = s.dictationLanguage
+        this[DICTATION_MIC_SIDE] = s.dictationMicSide
         this[DICTATION_SILENCE] = s.dictationSilenceMs
         this[DICTATION_MODEL] = s.dictationModelId
         this[MODEL_WIFI_ONLY] = s.modelDownloadWifiOnly
@@ -90,6 +92,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     private companion object {
         val DICTATION_ENABLED = booleanPreferencesKey("dictation_enabled")
         val DICTATION_LANGUAGE = stringPreferencesKey("dictation_language")
+        val DICTATION_MIC_SIDE = stringPreferencesKey("dictation_mic_side")
         val DICTATION_SILENCE = intPreferencesKey("dictation_silence_ms")
         val DICTATION_MODEL = stringPreferencesKey("dictation_model_id")
         val MODEL_WIFI_ONLY = booleanPreferencesKey("model_download_wifi_only")

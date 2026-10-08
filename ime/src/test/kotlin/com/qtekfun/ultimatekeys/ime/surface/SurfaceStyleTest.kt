@@ -95,15 +95,29 @@ class StripLayoutTest {
 class MarginMicTest {
     @Test
     fun `the zone fills the margin under the keys at the right edge`() {
-        val zone = MarginMic.of(width = 400f, keysBottom = 300f, totalHeight = 340f)!!
+        val zone = MarginMic.of(
+            width = 400f,
+            keysBottom = 300f,
+            totalHeight = 340f,
+            onLeft = false
+        )!!
         assertEquals(400f, zone.right)
         assertEquals(300f, zone.top)
         assertEquals(340f, zone.bottom)
-        assertEquals(336f, zone.left, 64f)
+        assertEquals(336f, zone.left, 0.01f)
         assertEquals(20f, zone.iconSize)
         assertTrue(zone.contains(390f, 320f))
         assertFalse(zone.contains(100f, 320f))
         assertFalse(zone.contains(390f, 250f))
+    }
+
+    @Test
+    fun `the zone defaults to the left so it clears the system keyboard switcher`() {
+        val zone = MarginMic.of(width = 400f, keysBottom = 300f, totalHeight = 340f)!!
+        assertEquals(0f, zone.left)
+        assertEquals(64f, zone.right, 0.01f)
+        assertTrue(zone.contains(10f, 320f))
+        assertFalse(zone.contains(390f, 320f))
     }
 
     @Test
