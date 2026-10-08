@@ -37,8 +37,8 @@ import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
 import com.qtekfun.ultimatekeys.style.StyleRepository
-import com.qtekfun.ultimatekeys.voice.DictationState
 import com.qtekfun.ultimatekeys.voice.DictationResult
+import com.qtekfun.ultimatekeys.voice.DictationState
 import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

@@ -313,6 +313,16 @@ class GestureTypingTest {
     }
 
     @Test
+    fun `no gesture starts while a panel replaces the keys`() = runTest {
+        val rig = Rig(this)
+        rig.controller.openClipboard()
+        assertTrue(rig.controller.panelOrDictationOpen)
+        rig.glide("hola", lift = false)
+        assertTrue(rig.last.none { it.mode == PressMode.GESTURE })
+        rig.gestures.cancel(1)
+    }
+
+    @Test
     fun `a held key opens its alternatives instead of starting a gesture`() = runTest {
         val rig = Rig(this)
         val a = rig.center("a")
