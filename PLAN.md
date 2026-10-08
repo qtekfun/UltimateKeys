@@ -49,15 +49,15 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 2 — Suggestion engine
 
-- [ ] 2.1 Vendor AOSP LatinIME `native/jni` at a pinned commit into `third_party/aosp-latinime/` with `LICENSE`, `NOTICE`, `UPSTREAM_COMMIT`.
-- [ ] 2.2 CMake build for all ABIs; adapt JNI registration to our Kotlin classes; record changes in `MODIFICATIONS.md`.
-- [ ] 2.3 `:engine` Kotlin API (`SuggestionEngine`) with JNI bindings: open dictionary, suggest, predict next, validity check, user history learning, user dictionary.
-- [ ] 2.4 `:dictionaries`: select `es` and `en` dictionaries with compatible licenses (document source and license in `docs/THIRD_PARTY.md`); fetch at build time with checksum or vendor; load from assets.
-- [ ] 2.5 Mixed ES/EN: query both, merge with language-confidence weighting from recent context; unit tests with fixed engine fakes and a small real-dictionary integration test.
-- [ ] 2.6 Suggestion strip (basic look), tap to pick, autocorrect on space/punctuation, backspace-undo of autocorrect, next-word prediction.
-- [ ] 2.7 User dictionary screen (add, remove, import/export), "clear learned data".
-- [ ] 2.8 Emulator JNI test for the engine; latency check of suggestion updates against `SPEC.md` §12.
-- [ ] 2.8b Reproducible-build CI job (build release twice in clean dirs, compare APKs); fix native non-determinism or document the fallback in `docs/DISTRIBUTION.md`.
+- [x] 2.1 Vendor AOSP LatinIME `native/jni` at a pinned commit into `third_party/aosp-latinime/` with `LICENSE`, `NOTICE`, `UPSTREAM_COMMIT`.
+- [x] 2.2 CMake build for all ABIs; adapt JNI registration to our Kotlin classes; record changes in `MODIFICATIONS.md`.
+- [x] 2.3 `:engine` Kotlin API (`SuggestionEngine`) with JNI bindings: open dictionary, suggest, predict next, validity check, user history learning, user dictionary.
+- [x] 2.4 `:dictionaries`: select `es` and `en` dictionaries with compatible licenses (document source and license in `docs/THIRD_PARTY.md`); fetch at build time with checksum or vendor; load from assets.
+- [x] 2.5 Mixed ES/EN: query both, merge with language-confidence weighting from recent context; unit tests with fixed engine fakes and a small real-dictionary integration test.
+- [x] 2.6 Suggestion strip (basic look), tap to pick, autocorrect on space/punctuation, backspace-undo of autocorrect, next-word prediction.
+- [x] 2.7 User dictionary screen (add, remove, import/export), "clear learned data".
+- [x] 2.8 Emulator JNI test for the engine; latency check of suggestion updates against `SPEC.md` §12.
+- [x] 2.8b Reproducible-build CI job (build release twice in clean dirs, compare APKs); fix native non-determinism or document the fallback in `docs/DISTRIBUTION.md`.
 - [ ] 2.9 **[HUMAN]** Real typing feel and autocorrect quality check on the Find X8 Pro.
 
 **DoD:** suggestions and autocorrect working in ES, EN and mixed; release `v0.3.0`.

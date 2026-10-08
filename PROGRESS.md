@@ -4,14 +4,13 @@
 - None. Signing secrets (`UK_*`) are pending on the owner (see `docs/HUMAN_TASKS.md`); not a blocker.
 
 ## Current phase / branch / open PR
-Phase 2 — Suggestion engine. Branch `phase/2-suggestions` (no PR yet). v0.1.0 and v0.2.0 are released.
-Two subagents work in parallel in worktrees: `agent/engine-jni` (2.1-2.3 vendored AOSP engine + JNI) and `agent/dictionaries-mixed` (2.4-2.5 dictionaries + mixed ES/EN merge). Merge their branches into `phase/2-suggestions` when they report.
+Phase 2 done on branch `phase/2-suggestions` (PR #4, CI green). Next: squash-merge, release v0.3.0, then Phase 3 on `phase/3-style-engine`. v0.1.0 and v0.2.0 are released.
 
 ## Last completed task
-2.6 (UI-side) — suggestion strip, autocorrect with backspace undo, next-word prediction wiring, against the `SuggestionEngine` interface (fake engines in tests).
+2.8 and 2.8b. Engine enabled after raising the vendored dictionary size limits (ADR 0008 update). Also added the configurable bottom margin (user request after testing 0.2.0).
 
 ## Next task
-Merge the two agent branches; wire the real engine in the service (2.3/2.4); 2.7 user dictionary screen; 2.8 on-device engine test + latency; 2.8b reproducible-build CI job; then PR + release v0.3.0.
+Release v0.3.0 (docs/CI_CD.md "Making a release"), then Phase 3 task 3.1. Pending human checks: docs/HUMAN_VERIFICATION.md (2.9).
 
 ## Build & check commands
 `./gradlew spotlessApply check assembleFullDebug assembleLiteDebug`
