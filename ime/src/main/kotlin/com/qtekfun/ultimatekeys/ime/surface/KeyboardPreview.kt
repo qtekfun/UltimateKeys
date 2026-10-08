@@ -90,7 +90,7 @@ fun KeyboardPreview(
                 surface,
                 labels,
                 dimens,
-                content.suggestions
+                StripState(content.suggestions, content.private, content.showToggle)
             )
         }
     }

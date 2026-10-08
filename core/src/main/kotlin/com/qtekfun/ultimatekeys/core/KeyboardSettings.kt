@@ -16,7 +16,9 @@ data class KeyboardSettings(
     val smartPunctuation: Boolean = true,
     val showSuggestions: Boolean = true,
     val autoCorrect: Boolean = true,
-    val letterLayoutId: String = "es_qwerty"
+    val letterLayoutId: String = "es_qwerty",
+    /** A manually switched-on private mode ends when the keyboard closes (otherwise: until turned off). */
+    val privateModeEndsOnClose: Boolean = true
 ) {
     fun sanitized(): KeyboardSettings = copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),

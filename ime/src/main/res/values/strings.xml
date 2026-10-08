@@ -22,4 +22,6 @@
     <string name="key_letters">Letters</string>
     <string name="key_more_symbols">More symbols</string>
     <string name="keyboard_description">Keyboard</string>
+    <string name="private_mode_on">Private mode is on</string>
+    <string name="private_mode_toggle">Turn private mode on or off</string>
 </resources>

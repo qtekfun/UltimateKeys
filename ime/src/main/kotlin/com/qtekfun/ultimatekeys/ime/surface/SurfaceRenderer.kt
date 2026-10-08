@@ -66,7 +66,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         style: SurfaceStyle,
         labels: SurfaceLabels,
         dimens: SurfaceDimens,
-        strip: List<String> = emptyList()
+        strip: StripState = StripState()
     ) {
         if (style.font != loadedFont || style.fontWeight != loadedWeight) {
             text.typeface = fonts.typeface(style.font, style.fontWeight)
@@ -92,28 +92,50 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     private fun drawStrip(
         scope: DrawScope,
         geometry: KeyGeometry,
-        strip: List<String>,
+        strip: StripState,
         style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
-        if (strip.isEmpty() || geometry.top <= 0f) return
-        val cell = geometry.width / strip.size
+        if (geometry.top <= 0f) return
+        val layout = StripLayout(geometry.width, geometry.top, strip.showToggle)
+        if (strip.isPrivate) {
+            scope.drawRect(
+                style.privateTint.copy(alpha = PRIVATE_WASH),
+                Offset.Zero,
+                Size(geometry.width, geometry.top)
+            )
+        }
+        if (strip.showToggle) {
+            val ink = if (strip.isPrivate) style.privateTint else style.hint
+            KeyIcons.incognito(
+                scope,
+                layout.toggleWidth / 2f,
+                geometry.top / 2f,
+                geometry.top * TOGGLE_ICON,
+                ink,
+                strip.isPrivate
+            )
+        }
+        val words = strip.words
+        if (words.isEmpty()) return
+        val cell = layout.cellWidth
         val list = style.barLayout == BarLayout.SCROLLING_LIST
-        strip.forEachIndexed { index, word ->
+        words.forEachIndexed { index, word ->
+            val left = layout.toggleWidth + cell * index
             if (list) {
                 val pad = geometry.top * PILL_PAD
                 val height = geometry.top * PILL_HEIGHT
                 scope.drawRoundRect(
                     style.barDivider.copy(alpha = PILL_ALPHA),
-                    Offset(cell * index + pad, (geometry.top - height) / 2f),
+                    Offset(left + pad, (geometry.top - height) / 2f),
                     Size(cell - 2f * pad, height),
                     CornerRadius(height / 2f)
                 )
             } else if (index > 0) {
                 scope.drawLine(
                     style.barDivider,
-                    Offset(cell * index, geometry.top * DIVIDER_INSET),
-                    Offset(cell * index, geometry.top * (1f - DIVIDER_INSET)),
+                    Offset(left, geometry.top * DIVIDER_INSET),
+                    Offset(left, geometry.top * (1f - DIVIDER_INSET)),
                     1f
                 )
             }
@@ -122,7 +144,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             drawText(
                 scope,
                 word,
-                cell * index + cell / 2f,
+                left + cell / 2f,
                 baseline,
                 dimens.labelSize * STRIP_TEXT * style.barTextSizePercent / PERCENT,
                 style.barText
@@ -420,6 +442,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val PRESS_SHRINK = 0.04f
         const val ELEVATION_LAYERS = 3
         const val PERCENT = 100f
+        const val PRIVATE_WASH = 0.14f
+        const val TOGGLE_ICON = 0.5f
         const val PILL_PAD = 0.12f
         const val PILL_HEIGHT = 0.68f
         const val PILL_ALPHA = 0.55f

@@ -137,6 +137,7 @@ class UltimateKeysService :
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         moveTo(Lifecycle.State.RESUMED)
+        controller.privacy.onStartInput(info.inputType, info.imeOptions)
         val ic = currentInputConnection ?: return
         controller.logic.onStartInput(
             AndroidEditorConnection(ic),
@@ -148,6 +149,7 @@ class UltimateKeysService :
 
     override fun onFinishInputView(finishingInput: Boolean) {
         controller.logic.onFinishInput()
+        controller.privacy.onKeyboardClosed()
         moveTo(Lifecycle.State.STARTED)
         super.onFinishInputView(finishingInput)
     }

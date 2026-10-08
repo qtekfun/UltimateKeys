@@ -14,6 +14,7 @@
     <string name="settings_title">Settings</string>
     <string name="setting_height">Keyboard height (%)</string>
     <string name="setting_bottom_margin">Bottom margin (dp)</string>
+    <string name="setting_private_ends_on_close">Private mode turned on by hand ends when the keyboard closes</string>
     <string name="setting_long_press">Long-press delay (ms)</string>
     <string name="setting_haptics">Haptic feedback</string>
     <string name="setting_sound">Key sound volume</string>

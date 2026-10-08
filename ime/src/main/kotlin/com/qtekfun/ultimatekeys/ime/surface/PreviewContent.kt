@@ -13,6 +13,8 @@ data class PreviewContent(
     val suggestions: List<String> = listOf("keyboard", "keys", "key"),
     val state: KeyboardState = KeyboardState(enterKind = EnterKind.ENTER),
     val heightPercent: Int = 100,
+    val private: Boolean = false,
+    val showToggle: Boolean = true,
     val features: com.qtekfun.ultimatekeys.ime.BottomRowFeatures =
         com.qtekfun.ultimatekeys.ime.BottomRowFeatures()
 )

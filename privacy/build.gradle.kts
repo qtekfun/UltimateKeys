@@ -8,3 +8,7 @@ plugins {
 android {
     namespace = "com.qtekfun.ultimatekeys.privacy"
 }
+
+dependencies {
+    api(libs.kotlinx.coroutines.core)
+}

@@ -190,6 +190,12 @@ private fun SettingsSection(
         SwitchSetting(R.string.setting_double_space, settings.doubleSpacePeriod) { v ->
             update { it.copy(doubleSpacePeriod = v) }
         }
+        SwitchSetting(
+            R.string.setting_private_ends_on_close,
+            settings.privateModeEndsOnClose
+        ) { v ->
+            update { it.copy(privateModeEndsOnClose = v) }
+        }
         SwitchSetting(R.string.setting_smart_punctuation, settings.smartPunctuation) { v ->
             update { it.copy(smartPunctuation = v) }
         }
