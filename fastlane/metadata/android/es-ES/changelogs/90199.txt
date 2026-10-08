@@ -1,0 +1,1 @@
+El micrófono bajo las teclas pasa a la izquierda para no solaparse con el botón de cambio de teclado, con un ajuste para moverlo. El resultado del dictado se entrega antes de pasar a inactivo.
