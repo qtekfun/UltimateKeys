@@ -11,6 +11,12 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- Two new styles: Dracula (the open Dracula palette) and OLED (pure black behind the keys). Both are always dark.
+
+## [0.8.1] - 2026-10-08
+
+### Added
+
 - Long-press the language key to open a small menu: Settings or the keyboard picker.
 - A setting to turn the dictation microphone off (home screen settings and dictation settings); it then disappears from the keyboard.
 - The letter layout (Spanish or English QWERTY) can be chosen in Settings, Typing.
@@ -103,7 +109,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...v0.6.0

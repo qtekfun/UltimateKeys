@@ -143,6 +143,54 @@ object Presets {
         motion = MotionStyle(PanelTransition.FADE, 220)
     )
 
+    private val draculaPalette = palette(
+        background = 0x282A36, letter = 0x44475A, function = 0x343746, action = 0xBD93F9,
+        actionText = 0x282A36, text = 0xF8F8F2, hint = 0xB8C0E0, press = 0x6272A4,
+        popup = 0x44475A, divider = 0x44475A, border = 0x6272A4, tint = 0xFF79C6,
+        shadow = 0x66000000, trail = 0x50FA7B
+    )
+
+    /** The colours are the open Dracula palette (MIT, see docs/THIRD_PARTY.md); the design is ours. */
+    val Dracula = Style(
+        id = "dracula",
+        name = "Dracula",
+        description = "Purple, pink and green on a dark slate. Always dark.",
+        appearance = Appearance.DARK,
+        light = draculaPalette,
+        dark = draculaPalette,
+        keys = KeyShape(
+            cornerRadiusDp = 8f,
+            gapXDp = 4f,
+            gapYDp = 6f,
+            shadow = ShadowKind.BOTTOM_EDGE,
+            elevationDp = 1.5f
+        ),
+        labels = LabelStyle(font = FontChoice.SYSTEM, weight = 500),
+        background = solid(0x282A36, 0x282A36),
+        feedback = KeyFeedback(PopupKind.BUBBLE, PressAnimation.FADE)
+    )
+
+    private val oledPalette = palette(
+        background = 0x000000, letter = 0x141414, function = 0x0A0A0A, action = 0xE8E8E8,
+        actionText = 0x000000, text = 0xF2F2F2, hint = 0x9A9A9A, press = 0x2E2E2E,
+        popup = 0x1E1E1E, divider = 0x262626, border = 0x333333, tint = 0xFFB454,
+        shadow = 0x00000000, trail = 0xFFB454
+    )
+
+    val Oled = Style(
+        id = "oled",
+        name = "OLED",
+        description = "Pure black behind the keys, to save power on OLED screens. Always dark.",
+        appearance = Appearance.DARK,
+        light = oledPalette,
+        dark = oledPalette,
+        keys = KeyShape(cornerRadiusDp = 12f, gapXDp = 5f, gapYDp = 7f),
+        labels = LabelStyle(font = FontChoice.INTER, weight = 500),
+        background = solid(0x000000, 0x000000),
+        feedback = KeyFeedback(PopupKind.BUBBLE, PressAnimation.FADE),
+        motion = MotionStyle(PanelTransition.FADE, 160)
+    )
+
     val Paper = Style(
         id = "paper",
         name = "Paper",
@@ -170,7 +218,8 @@ object Presets {
         suggestionBar = SuggestionBarStyle(layout = BarLayout.THREE_WITH_DIVIDERS, heightDp = 40)
     )
 
-    val all: List<Style> = listOf(Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper)
+    val all: List<Style> =
+        listOf(Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper, Dracula, Oled)
 
     val default: Style = Ultimate
 
