@@ -130,6 +130,23 @@ class PanelWiringTest {
         assertEquals(40f, StripLayout(420f, 40f, showToggle = true).toolsWidth)
     }
 
+    @Test
+    fun `the strip fits toggle, tools and the microphone together`() {
+        val layout =
+            StripLayout(
+                width = 520f,
+                height = 40f,
+                showToggle = true,
+                showMic = true,
+                extraTools = 2
+            )
+        assertEquals(120f, layout.toolsWidth)
+        assertEquals(120f, layout.cellWidth)
+        assertTrue(layout.isMic(500f))
+        assertEquals(-1, layout.extraToolAt(500f))
+        assertEquals(2, layout.slotAt(479f))
+    }
+
     private suspend fun store(rig: Rig) = rig.store.observe().first().map { it.text }
 
     private companion object {

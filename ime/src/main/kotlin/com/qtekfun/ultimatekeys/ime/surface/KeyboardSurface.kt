@@ -40,11 +40,11 @@ import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.panels.PanelHost
+import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
 import com.qtekfun.ultimatekeys.ime.voice.VoicePanel
 import com.qtekfun.ultimatekeys.style.MicPlacement
 import com.qtekfun.ultimatekeys.style.PanelTransition
-import com.qtekfun.ultimatekeys.ime.panels.PanelHost
-import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
 import com.qtekfun.ultimatekeys.style.ToolIcons
 import com.qtekfun.ultimatekeys.voice.DictationState
 import kotlinx.coroutines.flow.MutableStateFlow
