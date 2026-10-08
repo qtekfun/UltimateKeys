@@ -36,6 +36,10 @@ gradlePlugin {
             id = "uk.android.native"
             implementationClass = "AndroidNativeConventionPlugin"
         }
+        register("root") {
+            id = "uk.root"
+            implementationClass = "RootConventionPlugin"
+        }
         register("quality") {
             id = "uk.quality"
             implementationClass = "QualityConventionPlugin"

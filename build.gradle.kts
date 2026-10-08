@@ -3,6 +3,7 @@
 
 plugins {
     base
+    id("uk.root")
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization) apply false
 }
@@ -50,4 +51,5 @@ kover {
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
     dependsOn("koverVerify")
+    dependsOn("originalityCheck")
 }

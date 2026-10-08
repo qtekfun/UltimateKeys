@@ -8,11 +8,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PresetsTest {
-    private val forbidden = listOf(
-        "gboard", "google keyboard", "swiftkey", "samsung", "apple", "ios",
-        "heliboard", "openboard", "florisboard", "microsoft"
-    )
-
     @Test
     fun `there are at least seven presets with unique ids and names`() {
         assertTrue(Presets.all.size >= 7)
@@ -64,16 +59,6 @@ class PresetsTest {
                 assertTrue(meetsAa(p.barText, p.barBackground), "suggestion text, $where")
                 assertTrue(meetsAa(p.panelText, p.panelSurface), "panel text, $where")
                 assertTrue(contrastRatio(p.hintText, p.keyLetter) >= 3.0, "hint, $where")
-            }
-        }
-    }
-
-    @Test
-    fun `names and descriptions never mention other keyboard products`() {
-        Presets.all.forEach { style ->
-            val text = "${style.id} ${style.name} ${style.description}".lowercase()
-            forbidden.forEach {
-                assertTrue(!text.contains(Regex("\\b${Regex.escape(it)}\\b")), "${style.id}: $it")
             }
         }
     }
