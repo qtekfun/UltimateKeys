@@ -464,15 +464,27 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 )
             }
             val ink = if (index == chooser.selected) style.actionText else style.popupText
+            val size = fitted(
+                item,
+                dimens.labelSize * chooser.textScale,
+                chooser.cellWidth * MENU_FIT
+            )
             drawText(
                 scope,
                 item,
                 x + chooser.cellWidth / 2f,
-                chooser.top + chooser.cellHeight / 2f + dimens.labelSize / 3f,
-                dimens.labelSize,
+                chooser.top + chooser.cellHeight / 2f + size / 3f,
+                size,
                 ink
             )
         }
+    }
+
+    /** [size], reduced when [value] would be wider than [maxWidth]. */
+    private fun fitted(value: String, size: Float, maxWidth: Float): Float {
+        text.textSize = size
+        val width = text.measureText(value)
+        return if (width > maxWidth && width > 0f) size * maxWidth / width else size
     }
 
     private fun upperCase(state: KeyboardState, style: SurfaceStyle): Boolean =
@@ -504,6 +516,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val PREVIEW_WIDEN = 1.3f
         const val ENLARGED_WIDEN = 1.25f
         const val PRESS_SHRINK = 0.04f
+        const val MENU_FIT = 0.9f
         const val ELEVATION_LAYERS = 3
         const val PERCENT = 100f
         const val PRIVATE_WASH = 0.14f

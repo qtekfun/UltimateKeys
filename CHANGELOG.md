@@ -15,6 +15,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
 
+### Changed
+
+- The menu of the language key uses smaller words that always fit their cell.
+
 
 ## [1.0.0] - 2026-10-08
 
