@@ -63,4 +63,5 @@ style:
       - '**/surface/SurfaceRenderer.kt'
       - '**/surface/TempStyle.kt'
       - '**/style/Style.kt'
+      - '**/style/Presets.kt'
       - '**/surface/KeyboardSurface.kt'
