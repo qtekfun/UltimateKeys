@@ -18,6 +18,8 @@ internal fun Project.configureAndroidCommon(android: CommonExtension) {
         compileOptions.targetCompatibility = JavaVersion.VERSION_17
         lint.warningsAsErrors = true
         lint.abortOnError = true
+        // Dependabot owns version bumps; a new upstream release must not turn CI red.
+        lint.disable += setOf("NewerVersionAvailable", "GradleDependency", "AndroidGradlePluginVersion")
         lint.checkReleaseBuilds = true
         testOptions.unitTests.all { it.useJUnitPlatform() }
     }
