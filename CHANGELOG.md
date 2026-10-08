@@ -14,14 +14,19 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - Clipboard history: copied text is kept for 1 hour, 1 day, 7 days or forever (setting), up to a maximum number of clips, with pin, delete and clear all. The clipboard panel opens from the button in the suggestion bar. Nothing is saved in private mode, and clips that apps mark as sensitive are never saved.
 - Emoji panel: categories, recent emoji, a preferred skin tone and offline search by name in English and Spanish (accents optional). It opens from the emoji key or the suggestion-bar button, and both panels follow the style's colors, corners and motion.
 
-## [0.5.0] - 2026-10-08
-
-## [0.4.0] - 2026-10-08
+## [0.6.0] - 2026-10-08
 
 ### Added
 
 - Offline dictation (core): a microphone key (bottom row or suggestion bar, as the style chooses) opens a voice panel with a listening animation and a level meter, stops by itself after a pause, then writes the text at the cursor as a single undo step with the right spacing and capital letters. Speech is recognised on the device by whisper.cpp, in Spanish or English (detected per phrase, or forced); sound is kept in memory only and nothing dictated is learned in private mode. The model is loaded from a local file for now; the model manager arrives in a later release.
+
+## [0.5.0] - 2026-10-08
+
+### Added
+
 - Private mode: turns on by itself in incognito tabs and password fields, or by hand with the button at the left of the suggestion bar. While it is on nothing is learned (no history, no new words), the bar is tinted by the style and shows an icon. Setting: whether a manual switch-on ends when the keyboard closes.
+
+## [0.4.0] - 2026-10-08
 
 ### Added
 
@@ -60,7 +65,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.2.0...v0.3.0
