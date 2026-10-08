@@ -152,4 +152,13 @@
     <string name="col_panel_surface">Superficie de panel</string>
     <string name="col_panel_text">Texto de panel</string>
     <string name="col_private">Tinte del modo privado</string>
+    <string name="clipboard_title">Historial del portapapeles</string>
+    <string name="setting_clipboard_history">Guardar un historial del texto copiado</string>
+    <string name="setting_clipboard_retention">Conservar los elementos durante</string>
+    <string name="setting_clipboard_max">Máximo de elementos guardados</string>
+    <string name="setting_clipboard_note">Los elementos fijados nunca se borran automáticamente. En modo privado no se guarda nada, y los elementos que las apps marcan como sensibles nunca se guardan.</string>
+    <string name="retention_hour">1 hora</string>
+    <string name="retention_day">1 día</string>
+    <string name="retention_week">7 días</string>
+    <string name="retention_forever">Siempre</string>
 </resources>

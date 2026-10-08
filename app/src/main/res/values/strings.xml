@@ -152,4 +152,13 @@
     <string name="col_panel_surface">Panel surface</string>
     <string name="col_panel_text">Panel text</string>
     <string name="col_private">Private mode tint</string>
+    <string name="clipboard_title">Clipboard history</string>
+    <string name="setting_clipboard_history">Keep a history of copied text</string>
+    <string name="setting_clipboard_retention">Keep clips for</string>
+    <string name="setting_clipboard_max">Maximum clips kept</string>
+    <string name="setting_clipboard_note">Pinned clips are never removed automatically. Nothing is saved in private mode, and clips that apps mark as sensitive are never saved.</string>
+    <string name="retention_hour">1 hour</string>
+    <string name="retention_day">1 day</string>
+    <string name="retention_week">7 days</string>
+    <string name="retention_forever">Forever</string>
 </resources>

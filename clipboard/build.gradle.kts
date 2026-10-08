@@ -8,6 +8,8 @@ plugins {
 
 android {
     namespace = "com.qtekfun.ultimatekeys.clipboard"
+    // The Room store is tested against a real SQLite database through Robolectric.
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 ksp {
@@ -19,4 +21,7 @@ dependencies {
     api(libs.kotlinx.coroutines.core)
     api(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
+    testRuntimeOnly(libs.junit.vintage.engine)
 }

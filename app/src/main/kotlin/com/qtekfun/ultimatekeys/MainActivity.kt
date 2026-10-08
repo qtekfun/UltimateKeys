@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -199,8 +200,51 @@ private fun SettingsSection(
         SwitchSetting(R.string.setting_smart_punctuation, settings.smartPunctuation) { v ->
             update { it.copy(smartPunctuation = v) }
         }
+        ClipboardSection(settings, update)
     }
 }
+
+/** The clipboard history options (SPEC section 10). Pinned clips never expire. */
+@Composable
+private fun ClipboardSection(
+    settings: KeyboardSettings,
+    update: ((KeyboardSettings) -> KeyboardSettings) -> Unit
+) {
+    Text(
+        stringResource(R.string.clipboard_title),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(top = 8.dp)
+    )
+    SwitchSetting(R.string.setting_clipboard_history, settings.clipboardEnabled) { v ->
+        update { it.copy(clipboardEnabled = v) }
+    }
+    Text(stringResource(R.string.setting_clipboard_retention))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        RETENTION_CHOICES.forEach { (id, label) ->
+            FilterChip(
+                selected = settings.clipboardRetention == id,
+                onClick = { update { it.copy(clipboardRetention = id) } },
+                label = { Text(stringResource(label)) }
+            )
+        }
+    }
+    SliderSetting(
+        R.string.setting_clipboard_max,
+        settings.clipboardMaxItems,
+        KeyboardSettings.CLIPBOARD_ITEMS_RANGE
+    ) { v -> update { it.copy(clipboardMaxItems = v) } }
+    Text(
+        stringResource(R.string.setting_clipboard_note),
+        style = MaterialTheme.typography.bodySmall
+    )
+}
+
+private val RETENTION_CHOICES = listOf(
+    "hour" to R.string.retention_hour,
+    "day" to R.string.retention_day,
+    "week" to R.string.retention_week,
+    "forever" to R.string.retention_forever
+)
 
 @Composable
 private fun SliderSetting(label: Int, value: Int, range: IntRange, onChange: (Int) -> Unit) {
