@@ -103,9 +103,10 @@ class WhisperJniTest {
         controller.start()
         withTimeout(TIMEOUT_MS) {
             controller.state.first { it is DictationState.Listening }
-            controller.state.first { it == DictationState.Idle }
+            controller.state.first { it == DictationState.Idle || it is DictationState.Failed }
         }
         scope.cancel()
+        assertEquals(DictationState.Idle, controller.state.value)
         assertEquals(1, results.size)
         assertTrue(
             "unexpected text: ${results[0].text}",
@@ -139,7 +140,8 @@ class WhisperJniTest {
 
         override fun read(buffer: FloatArray): Int {
             val count = minOf(buffer.size, maxOf(audio.size - position, 0))
-            audio.copyInto(buffer, 0, position, position + count)
+            // Past the end there is nothing to copy (copyInto rejects a start beyond the array).
+            if (count > 0) audio.copyInto(buffer, 0, position, position + count)
             buffer.fill(0f, count, buffer.size)
             position += buffer.size
             // A real microphone delivers in real time; pace it so the VAD sees speech and silence.

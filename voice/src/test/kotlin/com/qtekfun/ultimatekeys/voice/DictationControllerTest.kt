@@ -259,4 +259,33 @@ class DictationControllerTest {
         controller.dismiss()
         assertEquals(DictationState.Idle, controller.state.value)
     }
+
+    /** Plays a recording, then silence forever, like the emulator test's file source. */
+    private class PlaybackSource(private val audio: FloatArray) : AudioSource {
+        private var position = 0
+
+        override fun start() = Unit
+
+        override fun read(buffer: FloatArray): Int {
+            val count = minOf(buffer.size, maxOf(audio.size - position, 0))
+            if (count > 0) audio.copyInto(buffer, 0, position, position + count)
+            buffer.fill(0f, count, buffer.size)
+            position += buffer.size
+            return buffer.size
+        }
+
+        override fun stop() = Unit
+    }
+
+    @Test
+    fun `a recording that ends in endless silence finishes by itself`() = runTest {
+        // Not a multiple of the frame size, so the last frame is partial.
+        val audio = FloatArray(AudioPrep.samplesFor(2_000) + 77) { 0.1f }
+        source = { PlaybackSource(audio) }
+        val controller = controller()
+        controller.start()
+        advanceUntilIdle()
+        assertEquals(DictationState.Idle, controller.state.value)
+        assertEquals(1, results.size)
+    }
 }
