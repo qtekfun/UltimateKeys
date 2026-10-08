@@ -94,6 +94,24 @@ class GestureVocabulary private constructor(
             return this
         }
 
+        /** Word ids from the most to the least frequent (counting sort; ties keep list order). */
+        private fun byFrequency(frequencies: ByteArray): IntArray {
+            val start = IntArray(MAX_FREQUENCY + 2)
+            frequencies.forEach { start[MAX_FREQUENCY - (it.toInt() and BYTE_MASK) + 1]++ }
+            for (i in 0..MAX_FREQUENCY) start[i + 1] += start[i]
+            val order = IntArray(frequencies.size)
+            frequencies.forEachIndexed { id, f ->
+                order[
+                    start[
+                        MAX_FREQUENCY -
+                            (f.toInt() and BYTE_MASK)
+                    ]++
+                ] =
+                    id
+            }
+            return order
+        }
+
         fun build(): GestureVocabulary {
             val charStart = (charOffsets + text.length).toIntArray()
             val keyBytesArray = keyBytes.toByteArray()
@@ -108,7 +126,8 @@ class GestureVocabulary private constructor(
             for (i in 0 until buckets) bucketStart[i + 1] += bucketStart[i]
             val fill = bucketStart.copyOf(buckets)
             val bucketWords = IntArray(count)
-            for (id in 0 until count) bucketWords[fill[bucketOf[id]]++] = id
+            // Most frequent words first inside every bucket: the decoder meets its best candidates early.
+            for (id in byFrequency(freq.toByteArray())) bucketWords[fill[bucketOf[id]]++] = id
             return GestureVocabulary(
                 languages,
                 text.toString().toCharArray(),

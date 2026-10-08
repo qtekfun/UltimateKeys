@@ -241,10 +241,15 @@ class KeyboardController(
         if (!gesture.ready) return
         val context = logic.contextText()
         val locale = logic.locale
+        val lifted = System.nanoTime()
         scope.launch {
             val words = withContext(suggestionDispatcher) {
                 gesture.decode(path, keyboard, context, locale)
             }
+            logLatency?.invoke(
+                "gesture lift-to-candidates ${(System.nanoTime() - lifted) / NANOS_PER_MS}ms " +
+                    "points=${path.size / 2}"
+            )
             if (words.isNotEmpty()) {
                 logic.commitGestureWord(words.first(), words.drop(1).take(ALTERNATIVES))
             }
@@ -283,6 +288,7 @@ class KeyboardController(
     private companion object {
         const val LOG_EVERY = 20
         const val ALTERNATIVES = 4
+        const val NANOS_PER_MS = 1_000_000L
         const val P50 = 50.0
         const val P95 = 95.0
     }

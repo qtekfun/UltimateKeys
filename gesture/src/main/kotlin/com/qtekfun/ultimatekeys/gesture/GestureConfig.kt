@@ -10,14 +10,15 @@ package com.qtekfun.ultimatekeys.gesture
 data class GestureConfig(
     /** Points both the gesture and every template are resampled to. */
     val resamplePoints: Int = 32,
-    /** Typical shape error (mean point distance after normalising size and position), in bounding box units. */
+    /**
+     * Typical shape error (mean point distance after normalising size and position, in bounding box units).
+     * A channel's cost is its mean distance divided by its sigma, so a smaller sigma weighs it more.
+     */
     val shapeSigma: Float = 0.06f,
     /** Typical location error in key units. */
     val locationSigma: Float = 0.3f,
     /** A point this close to the template counts as exactly on it: it is inside the key. */
     val locationTolerance: Float = 0.3f,
-    /** 1 sums the channel distances, 2 sums their squares (a Gaussian error model). */
-    val channelPower: Float = 1f,
     /** Cost of the least frequent word relative to the most frequent one. */
     val frequencyWeight: Float = 6f,
     /** Cost of a word in a language the context does not support, in nats of language weight. */

@@ -165,13 +165,13 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 10 — Gesture typing (1.1)
 
-- [ ] 10.1 Research note `docs/gesture/DESIGN.md`: algorithm (SHARK2-style template matching: shape + location channels), cited papers, complexity budget.
-- [ ] 10.2 `:gesture` module: path capture and resampling, gesture trail rendering (styled), templates generated from the current layout geometry.
-- [ ] 10.3 Candidate generation (pruning by start/end keys and path length) and scoring combined with the engine's language model and mixed ES/EN weighting.
-- [ ] 10.4 Commit behavior: auto-space between gestured words, alternatives in suggestion strip, backspace removes whole gestured word.
-- [ ] 10.5 Settings: enable, trail on/off, sensitivity.
-- [ ] 10.6 Offline evaluation harness with synthetic gestures for a word list; track top-1 / top-3 accuracy in `docs/gesture/RESULTS.md`; target top-3 ≥ 90% on the 5,000 most common words per language.
-- [ ] 10.7 Latency: candidate list < 50 ms p95 after finger lift.
+- [x] 10.1 Research note `docs/gesture/DESIGN.md`: algorithm (SHARK2-style template matching: shape + location channels), cited papers, complexity budget.
+- [x] 10.2 `:gesture` module: path capture and resampling, gesture trail rendering (styled), templates generated from the current layout geometry.
+- [x] 10.3 Candidate generation (pruning by start/end keys and path length) and scoring combined with the engine's language model and mixed ES/EN weighting.
+- [x] 10.4 Commit behavior: auto-space between gestured words, alternatives in suggestion strip, backspace removes whole gestured word.
+- [x] 10.5 Settings: enable, trail on/off, sensitivity.
+- [x] 10.6 Offline evaluation harness with synthetic gestures for a word list; track top-1 / top-3 accuracy in `docs/gesture/RESULTS.md`; target top-3 ≥ 90% on the 5,000 most common words per language.
+- [x] 10.7 Latency: candidate list < 50 ms p95 after finger lift.
 - [ ] 10.8 **[HUMAN]** Real gesture typing feel on the Find X8 Pro.
 
 **DoD:** release `v1.1.0`; final summary delivered to the owner.

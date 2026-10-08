@@ -3,7 +3,7 @@
 
 package com.qtekfun.ultimatekeys.gesture
 
-import kotlin.math.hypot
+import kotlin.math.sqrt
 
 /**
  * Geometry on paths stored as interleaved coordinates `[x0, y0, x1, y1, ...]`. Allocation-free where it
@@ -17,14 +17,18 @@ object PathMath {
     fun length(path: FloatArray, count: Int = pointCount(path.size)): Float {
         var total = 0f
         for (i in 1 until count) {
-            total += hypot(path[2 * i] - path[2 * i - 2], path[2 * i + 1] - path[2 * i - 1])
+            total += segmentLength(path, i)
         }
         return total
     }
 
     /** Length of the segment that ends at point [index]. */
-    private fun segmentLength(path: FloatArray, index: Int): Float =
-        hypot(path[2 * index] - path[2 * index - 2], path[2 * index + 1] - path[2 * index - 1])
+    private fun segmentLength(path: FloatArray, index: Int): Float = sqrt(
+        squared(path[2 * index] - path[2 * index - 2]) +
+            squared(path[2 * index + 1] - path[2 * index - 1])
+    )
+
+    private fun squared(v: Float): Float = v * v
 
     /**
      * Writes into [out] (size `2 * n`) [n] points spaced at equal arc length along the first [count] points

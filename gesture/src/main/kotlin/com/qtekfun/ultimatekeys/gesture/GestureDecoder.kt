@@ -3,12 +3,15 @@
 
 package com.qtekfun.ultimatekeys.gesture
 
-import kotlin.math.hypot
 import kotlin.math.ln
 import kotlin.math.max
+import kotlin.math.sqrt
 
 /** A word a gesture may mean. A lower [cost] is a better match. */
 data class GestureCandidate(val word: String, val cost: Float, val language: String)
+
+/** How much work one decoding did: words that passed the end-key pruning, and words scored in full. */
+data class GestureStats(val considered: Int, val scored: Int)
 
 /** What the decoder may know besides the finger's path. */
 data class GestureContext(
@@ -50,14 +53,22 @@ class GestureDecoder(
         path: FloatArray,
         keyboard: GestureKeyboard,
         context: GestureContext = GestureContext()
-    ): List<GestureCandidate> {
+    ): List<GestureCandidate> = decodeWithStats(path, keyboard, context).first
+
+    /** Like [decode], and reports the work done (for the complexity budget in docs/gesture/DESIGN.md). */
+    fun decodeWithStats(
+        path: FloatArray,
+        keyboard: GestureKeyboard,
+        context: GestureContext = GestureContext()
+    ): Pair<List<GestureCandidate>, GestureStats> {
         val count = PathMath.pointCount(path.size)
-        if (count < 2 || keyboard.isEmpty) return emptyList()
+        if (count < 2 || keyboard.isEmpty) return NOTHING
         val length = PathMath.length(path, count)
-        if (length < config.minPathUnits * keyboard.unit) return emptyList()
+        if (length < config.minPathUnits * keyboard.unit) return NOTHING
         val languageCosts = languageCosts(context)
         var radius = config.endpointRadius
         var found = emptyList<GestureCandidate>()
+        var stats = GestureStats(0, 0)
         // A finger that landed far from its key finds nothing at first: look again with a wider net.
         repeat(ATTEMPTS) {
             if (found.isEmpty()) {
@@ -65,10 +76,11 @@ class GestureDecoder(
                 run.scanVocabulary()
                 run.scanUserWords(context.userWords)
                 found = run.finish(context)
+                stats = GestureStats(stats.considered + run.considered, stats.scored + run.scored)
                 radius *= RELAX
             }
         }
-        return found
+        return found to stats
     }
 
     /** Extra cost per language: 0 for the most likely language, growing with how unlikely the others are. */
@@ -99,6 +111,10 @@ class GestureDecoder(
         private val costs = FloatArray(config.shortlist)
         private var size = 0
         private val userWordList = ArrayList<String>()
+        var considered = 0
+            private set
+        var scored = 0
+            private set
 
         init {
             PathMath.resample(path, count, n, gesture)
@@ -123,6 +139,7 @@ class GestureDecoder(
         }
 
         private fun consider(id: Int) {
+            considered++
             val languageAndFrequency =
                 languageCost[vocabulary.languageIndex(id)] + frequencyCost(vocabulary.frequency(id))
             if (size == ids.size && languageAndFrequency >= costs[size - 1]) return
@@ -133,9 +150,15 @@ class GestureDecoder(
                 vocabulary.keyStart[id + 1]
             )
             if (!lengthFits(idealLength)) return
-            val cost =
-                languageAndFrequency + matchCost(vocabulary.keys, from, vocabulary.keyStart[id + 1])
-            offer(id, cost)
+            scored++
+            val match =
+                matchCost(
+                    vocabulary.keys,
+                    from,
+                    vocabulary.keyStart[id + 1],
+                    budget(languageAndFrequency)
+                )
+            if (match != Float.MAX_VALUE) offer(id, languageAndFrequency + match)
         }
 
         fun scanUserWords(words: List<String>) {
@@ -144,13 +167,19 @@ class GestureDecoder(
                 if (sequence != null && keyboard.endsNear(sequence, path, count, endpointRadius) &&
                     lengthFits(keyboard.pathLength(sequence, 0, sequence.size))
                 ) {
-                    val cost = frequencyCost(config.userWordFrequency) +
-                        matchCost(sequence, 0, sequence.size)
-                    userWordList += word
-                    offer(-userWordList.size, cost)
+                    val lm = frequencyCost(config.userWordFrequency)
+                    val match = matchCost(sequence, 0, sequence.size, budget(lm))
+                    if (match != Float.MAX_VALUE) {
+                        userWordList += word
+                        offer(-userWordList.size, lm + match)
+                    }
                 }
             }
         }
+
+        /** What a word whose language and frequency already cost [fixed] may still spend on the geometry. */
+        private fun budget(fixed: Float): Float =
+            if (size == ids.size) costs[size - 1] - fixed else Float.MAX_VALUE
 
         private fun lengthFits(idealLength: Float): Boolean {
             if (idealLength.isNaN() || idealLength <= 0f) return false
@@ -161,8 +190,11 @@ class GestureDecoder(
         private fun frequencyCost(frequency: Int): Float =
             config.frequencyWeight * (MAX_FREQUENCY - frequency) / MAX_FREQUENCY
 
-        /** The cost of the two geometric channels for the word whose keys are `keys[from until to]`. */
-        private fun matchCost(keys: ByteArray, from: Int, to: Int): Float {
+        /**
+         * The cost of the two geometric channels for the word whose keys are `keys[from until to]`, or
+         * [Float.MAX_VALUE] as soon as it is certain to exceed [budget].
+         */
+        private fun matchCost(keys: ByteArray, from: Int, to: Int, budget: Float): Float {
             val points = to - from
             if (polyline.size < 2 * points) polyline = FloatArray(2 * points)
             for (i in 0 until points) {
@@ -171,30 +203,31 @@ class GestureDecoder(
                 polyline[2 * i + 1] = keyboard.centerY[key]
             }
             PathMath.resample(polyline, points, n, template)
-            val location = locationDistance()
-            val shape = shapeDistance()
-            val s = shape / config.shapeSigma
-            val l = location / config.locationSigma
-            return if (config.channelPower == 2f) HALF * (s * s + l * l) else s + l
+            val location = locationCost(budget)
+            if (location > budget) return Float.MAX_VALUE
+            val shape = shapeCost(budget - location)
+            return if (shape > budget - location) Float.MAX_VALUE else location + shape
         }
 
-        /** Mean distance, in keys, by which the finger left the tunnel around the template. */
-        private fun locationDistance(): Float {
+        /** Mean distance, in keys, by which the finger left the tunnel around the template, in sigmas. */
+        private fun locationCost(budget: Float): Float {
+            val scale = 1f / (unit * n * config.locationSigma)
+            val tolerance = config.locationTolerance * unit
             var sum = 0f
             for (i in 0 until n) {
-                val d =
-                    hypot(
-                        gesture[2 * i] - template[2 * i],
-                        gesture[2 * i + 1] - template[2 * i + 1]
-                    ) /
-                        unit
-                sum += max(0f, d - config.locationTolerance)
+                val dx = gesture[2 * i] - template[2 * i]
+                val dy = gesture[2 * i + 1] - template[2 * i + 1]
+                sum += max(0f, sqrt(dx * dx + dy * dy) - tolerance)
+                if (sum * scale > budget) return Float.MAX_VALUE
             }
-            return sum / n
+            return sum * scale
         }
 
-        /** Mean distance between the two paths once both are moved to the origin and scaled to one size. */
-        private fun shapeDistance(): Float {
+        /**
+         * Mean distance between the two paths once both are moved to the origin and scaled to one size,
+         * in sigmas.
+         */
+        private fun shapeCost(budget: Float): Float {
             var minX = Float.MAX_VALUE
             var maxX = -Float.MAX_VALUE
             var minY = Float.MAX_VALUE
@@ -211,17 +244,18 @@ class GestureDecoder(
                 if (y < minY) minY = y
                 if (y > maxY) maxY = y
             }
-            val scale = max(max(maxX - minX, maxY - minY), unit)
+            val size = max(max(maxX - minX, maxY - minY), unit)
             val cx = sumX / n
             val cy = sumY / n
+            val scale = 1f / (n * config.shapeSigma)
             var sum = 0f
             for (i in 0 until n) {
-                sum += hypot(
-                    normalized[2 * i] - (template[2 * i] - cx) / scale,
-                    normalized[2 * i + 1] - (template[2 * i + 1] - cy) / scale
-                )
+                val dx = normalized[2 * i] - (template[2 * i] - cx) / size
+                val dy = normalized[2 * i + 1] - (template[2 * i + 1] - cy) / size
+                sum += sqrt(dx * dx + dy * dy)
+                if (sum * scale > budget) return Float.MAX_VALUE
             }
-            return sum / n
+            return sum * scale
         }
 
         /** Moves [source] to its centroid and divides by the larger side of its bounding box. */
@@ -289,6 +323,7 @@ class GestureDecoder(
         const val INITIAL_KEYS = 16
         const val MAX_FREQUENCY = 255f
         const val HALF = 0.5f
+        val NOTHING = emptyList<GestureCandidate>() to GestureStats(0, 0)
         const val ATTEMPTS = 2
         const val RELAX = 1.7f
     }
