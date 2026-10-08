@@ -189,7 +189,16 @@ class SurfaceGestures(
         val total = cell * items.size
         val left = (press.key.centerX - total / 2f).coerceIn(0f, max(0f, geo.width - total))
         val top = max(0f, press.key.top - metrics.chooserHeight - 2f)
-        press.chooser = ChooserView(items, left, top, cell, metrics.chooserHeight, selected = -1)
+        val scale = if (press.key.key is ActionKey) MENU_TEXT_SCALE else 1f
+        press.chooser = ChooserView(
+            items,
+            left,
+            top,
+            cell,
+            metrics.chooserHeight,
+            selected = -1,
+            textScale = scale
+        )
         press.longPressHandled = true
         press.capture = null
     }
@@ -422,6 +431,7 @@ class SurfaceGestures(
         const val MIC_SLOT = -2
         const val MARGIN_MIC_SLOT = -5
         const val MENU_CELL_FACTOR = 2.2f
+        const val MENU_TEXT_SCALE = 0.55f
         const val CLIPBOARD_SLOT = -3
         const val EMOJI_SLOT = -4
         const val STRIP_TOOLS = 2

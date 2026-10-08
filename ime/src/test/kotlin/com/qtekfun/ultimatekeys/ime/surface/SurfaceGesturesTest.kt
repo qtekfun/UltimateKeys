@@ -253,6 +253,27 @@ class SurfaceGesturesTest {
     }
 
     @Test
+    fun `the language key menu uses smaller words than the accent chooser`() = runTest {
+        val r = Rig(this)
+        r.gestures.globeMenu = listOf("Settings", "Keyboards")
+        val globe = r.key(KeyAction.GLOBE)
+        r.gestures.down(1, globe.centerX, globe.top + 10)
+        advanceTimeBy(350)
+        runCurrent()
+        val menu = r.last.single().chooser!!
+        assertEquals(listOf("Settings", "Keyboards"), menu.items)
+        assertTrue(menu.textScale < 1f)
+        r.gestures.up(1)
+        assertEquals(0, r.pickerShown, "lifting without choosing an entry does nothing")
+        val a = r.key("a")
+        r.gestures.down(2, a.centerX, a.top + 10)
+        advanceTimeBy(350)
+        runCurrent()
+        assertEquals(1f, r.last.single().chooser!!.textScale)
+        r.gestures.up(2)
+    }
+
+    @Test
     fun `cancel and unknown pointers are harmless`() = runTest {
         val r = Rig(this)
         r.gestures.move(9, 1f, 1f)
