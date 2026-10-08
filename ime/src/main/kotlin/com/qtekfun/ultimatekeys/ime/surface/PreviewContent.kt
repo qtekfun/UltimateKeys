@@ -14,6 +14,8 @@ data class PreviewContent(
     val state: KeyboardState = KeyboardState(enterKind = EnterKind.ENTER),
     val heightPercent: Int = 100,
     val private: Boolean = false,
+    /** The language being typed: its case rules decide how capitals are drawn. */
+    val locale: java.util.Locale = java.util.Locale.ROOT,
     val showToggle: Boolean = true,
     val features: com.qtekfun.ultimatekeys.ime.BottomRowFeatures =
         com.qtekfun.ultimatekeys.ime.BottomRowFeatures()

@@ -54,6 +54,9 @@ data class SurfaceDimens(
 
 /** Draws the key surface with plain canvas calls: one pass, no per-key composables. */
 class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
+    /** The case rules of the language being typed: the dotted capital I of Turkish. */
+    var locale: java.util.Locale = java.util.Locale.ROOT
+
     private var loadedFont: FontChoice? = null
     private var loadedWeight = 0
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -315,7 +318,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         style: SurfaceStyle,
         dimens: SurfaceDimens
     ) {
-        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
+        val label = if (upperCase(state, style)) key.label.uppercase(locale) else key.label
         drawText(
             scope,
             label,
@@ -442,7 +445,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     ) {
         val key = placed.key as CharKey
         if (style.popupKind == PopupKind.NONE) return
-        val label = if (upperCase(state, style)) key.label.uppercase() else key.label
+        val label = if (upperCase(state, style)) key.label.uppercase(locale) else key.label
         val enlarged = style.popupKind == PopupKind.ENLARGED_KEY
         val h = if (enlarged) placed.height else dimens.previewHeight
         val w = if (enlarged) placed.width * ENLARGED_WIDEN else placed.width * PREVIEW_WIDEN

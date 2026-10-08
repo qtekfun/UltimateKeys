@@ -153,6 +153,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
 
     val fonts = remember(context) { FontCatalog(context.assets) }
     val renderer = remember(fonts) { SurfaceRenderer(fonts) }
+    renderer.locale = settings.activeLanguage.locale
     val panelTheme = remember(activeStyle, systemDark, tones, fonts, rowDp) {
         PanelTheme.resolve(activeStyle, systemDark, tones, fonts, rowDp)
     }
