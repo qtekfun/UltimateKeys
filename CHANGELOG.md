@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-08
+
 ### Added
 
 - Easier edge keys: a configurable side margin that keeps the keys off the screen edge (a touch in the margin still types the nearest key), an option to make the letters at the ends of each row wider, and the system back swipe no longer takes touches meant for the keys at the edges.
@@ -148,7 +150,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...v1.0.0
 [1.0.0-rc.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.2...v1.0.0-rc.1
 [0.9.2]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.1...v0.9.2
