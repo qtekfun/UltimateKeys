@@ -22,6 +22,14 @@ class SettingsTest {
         ).sanitized()
         assertEquals(130, s.heightPercent)
         assertEquals(48, s.bottomMarginDp)
+        assertEquals(
+            KeyboardSettings.MIC_LEFT,
+            KeyboardSettings(dictationMicSide = "middle").sanitized().dictationMicSide
+        )
+        assertEquals(
+            KeyboardSettings.MIC_RIGHT,
+            KeyboardSettings(dictationMicSide = "right").sanitized().dictationMicSide
+        )
         assertEquals(150, s.longPressDelayMs)
         assertEquals(0, s.hapticIntensity)
         assertEquals(100, s.soundVolume)

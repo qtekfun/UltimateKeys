@@ -34,6 +34,10 @@ internal fun DictationSettingsScreen(
     onBack: () -> Unit,
     insets: ScreenInsets = ScreenInsets.current()
 ) {
+    val sides = listOf(
+        UkOption(KeyboardSettings.MIC_LEFT, stringResource(R.string.dictation_mic_left)),
+        UkOption(KeyboardSettings.MIC_RIGHT, stringResource(R.string.dictation_mic_right))
+    )
     val languages = LANGUAGES.map { (code, label) -> UkOption(code, stringResource(label)) }
     UkScreen(
         title = stringResource(R.string.dictation_title),
@@ -45,6 +49,11 @@ internal fun DictationSettingsScreen(
         group {
             toggle(R.string.setting_dictation_enabled, settings.dictationEnabled) { v ->
                 update { it.copy(dictationEnabled = v) }
+            }
+        }
+        section(footer = R.string.dictation_mic_side_note) {
+            choice(R.string.dictation_mic_side, sides, settings.dictationMicSide) { v ->
+                update { it.copy(dictationMicSide = v) }
             }
         }
         section(footer = R.string.dictation_language_note) {

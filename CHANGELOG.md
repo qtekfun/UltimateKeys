@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- The microphone under the keys now sits on the left by default, so it no longer overlaps the button Android shows to switch keyboards. Dictation settings has a Microphone position choice (left or right).
+
+
 ## [0.9.0] - 2026-10-08
 
 ### Added
