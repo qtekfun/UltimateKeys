@@ -16,6 +16,7 @@
     <string name="setting_height">Altura del teclado (%)</string>
     <string name="setting_bottom_margin">Margen inferior (dp)</string>
     <string name="setting_private_ends_on_close">El modo privado activado a mano termina al cerrar el teclado</string>
+    <string name="setting_dictation_enabled">Mostrar el micrófono de dictado</string>
     <string name="setting_long_press">Retardo de pulsación larga (ms)</string>
     <string name="setting_haptics">Vibración al pulsar</string>
     <string name="setting_sound">Volumen del sonido de teclas</string>

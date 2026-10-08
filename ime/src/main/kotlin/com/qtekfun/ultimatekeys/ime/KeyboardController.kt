@@ -51,6 +51,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/** Positions in the menu of the language key. */
+const val GLOBE_MENU_SETTINGS = 0
+const val GLOBE_MENU_KEYBOARDS = 1
+
 /** Connects the surface, the typing logic, the settings and the feedback. Main thread only. */
 class KeyboardController(
     val logic: InputLogic,
@@ -69,6 +73,7 @@ class KeyboardController(
     emojiLoader: suspend () -> EmojiData = {
         EmojiData(EmojiCatalog(emptyList()), EmojiSearch(emptyList()))
     },
+    private val openSettings: () -> Unit = {},
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
@@ -82,7 +87,11 @@ class KeyboardController(
         styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
 
     /** Optional keys that exist yet; the microphone appears once dictation is wired in. */
-    val features = BottomRowFeatures(emoji = true, voice = dictation != null)
+    val features: BottomRowFeatures
+        get() = BottomRowFeatures(
+            emoji = true,
+            voice = dictation != null && settings.value.dictationEnabled
+        )
 
     /** The clipboard history; nothing reaches it while typing is private. */
     val clipboard = ClipboardHistory(
@@ -201,7 +210,7 @@ class KeyboardController(
 
             KeyAction.SWITCH_SYMBOLS_2 -> logic.showPage(Page.SYMBOLS_2)
 
-            KeyAction.MIC -> {
+            KeyAction.MIC -> if (features.voice) {
                 panels.close()
                 dictation?.open()
             }
@@ -273,7 +282,13 @@ class KeyboardController(
     /** The private-mode button in the suggestion bar. */
     fun togglePrivate() = privacy.toggleManual()
 
-    fun onGlobeLongPress() = showImePicker()
+    /** The entries of the menu that opens on a long press of the language key, in order. */
+    fun onGlobeMenu(index: Int) {
+        when (index) {
+            GLOBE_MENU_SETTINGS -> openSettings()
+            GLOBE_MENU_KEYBOARDS -> showImePicker()
+        }
+    }
 
     private fun cycleLayout() {
         scope.launch {

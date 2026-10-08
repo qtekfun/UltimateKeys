@@ -34,6 +34,8 @@ data class KeyboardSettings(
     val gestureTrail: Boolean = true,
     /** 0 = a long glide is needed to start a gesture, 100 = a short one is enough. */
     val gestureSensitivity: Int = DEFAULT_GESTURE_SENSITIVITY,
+    /** Show the dictation microphone; off hides it everywhere and ignores the key. */
+    val dictationEnabled: Boolean = true,
     /** Dictation language: `auto` (Spanish or English per utterance), `es` or `en`. */
     val dictationLanguage: String = DICTATION_AUTO,
     /** Silence after speech that ends a dictation, in milliseconds. */

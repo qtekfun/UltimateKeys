@@ -23,6 +23,8 @@ sealed interface A11yTarget {
     /** The input-method picker, normally a long press on the globe key. */
     data object KeyboardPicker : A11yTarget
 
+    data object OpenSettings : A11yTarget
+
     data object TogglePrivate : A11yTarget
 
     data object OpenClipboard : A11yTarget
@@ -63,6 +65,7 @@ data class A11yLabels(
     val delete: String,
     val globe: String,
     val keyboardPicker: String,
+    val openSettings: String,
     val symbols: String,
     val letters: String,
     val moreSymbols: String,
@@ -185,7 +188,10 @@ object KeyAccessibility {
             KeyAction.GLOBE -> Spoken(
                 labels.globe,
                 target,
-                actions = listOf(A11yAction(labels.keyboardPicker, A11yTarget.KeyboardPicker))
+                actions = listOf(
+                    A11yAction(labels.keyboardPicker, A11yTarget.KeyboardPicker),
+                    A11yAction(labels.openSettings, A11yTarget.OpenSettings)
+                )
             )
 
             KeyAction.EMOJI -> Spoken(labels.emoji, target)

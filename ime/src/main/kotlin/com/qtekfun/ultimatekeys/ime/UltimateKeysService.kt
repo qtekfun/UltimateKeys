@@ -3,6 +3,7 @@
 
 package com.qtekfun.ultimatekeys.ime
 
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.inputmethodservice.InputMethodService
 import android.os.Bundle
@@ -115,6 +116,7 @@ class UltimateKeysService :
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
             },
+            openSettings = ::openAppSettings,
             logLatency = if (debuggable) { msg -> Log.d("UKLatency", msg) } else null
         )
         clipboardWatcher =
@@ -139,6 +141,13 @@ class UltimateKeysService :
                 Log.e("UltimateKeys", "Gesture typing unavailable", e)
             }
         }
+    }
+
+    /** Opens the app's home screen (the settings) in its own task, above the keyboard. */
+    private fun openAppSettings() {
+        val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 
     /** Builds the dictionaries on first run (seconds) and then switches typing to the real engine. */

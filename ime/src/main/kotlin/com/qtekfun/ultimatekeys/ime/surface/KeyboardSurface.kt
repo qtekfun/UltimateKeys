@@ -64,11 +64,21 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val description = stringResource(R.string.keyboard_description)
     val privateOn = stringResource(R.string.private_mode_on)
     val privateAction = stringResource(R.string.private_mode_toggle)
+    val globeMenu = listOf(
+        stringResource(R.string.globe_menu_settings),
+        stringResource(R.string.globe_menu_keyboards)
+    )
     val screenReader = rememberAccessibilityActive()
     val panelKind by controller.panels.kind.collectAsState()
 
     val layout =
-        remember(state.page, settings.letterLayoutId, settings.numberRow, activeStyle.bottomRow) {
+        remember(
+            state.page,
+            settings.letterLayoutId,
+            settings.numberRow,
+            activeStyle.bottomRow,
+            controller.features
+        ) {
             controller.layoutFor(state.page, settings, activeStyle)
         }
     var widthPx by remember { mutableFloatStateOf(0f) }
@@ -152,6 +162,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         keysHeightDp * density.density
     )
     gestures.marginMic = marginMic
+    gestures.globeMenu = globeMenu
     // The system bar area below the keys carries the keyboard's own background, like a margin.
     Box(
         modifier = modifier

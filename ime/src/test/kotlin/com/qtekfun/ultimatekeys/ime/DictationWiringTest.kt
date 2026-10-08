@@ -113,7 +113,8 @@ class DictationWiringTest {
         val logic: InputLogic,
         val editor: FakeEditorConnection,
         val engine: FakeEngine,
-        val host: DictationHost
+        val host: DictationHost,
+        val settings: FakeSettingsRepository
     )
 
     private fun TestScope.rig(): Rig {
@@ -136,9 +137,10 @@ class DictationWiringTest {
             permission,
             backgroundScope
         )
+        val settings = FakeSettingsRepository()
         keyboard = KeyboardController(
             logic,
-            FakeSettingsRepository(),
+            settings,
             backgroundScope,
             null,
             engine,
@@ -151,7 +153,23 @@ class DictationWiringTest {
             restarting = false,
             initialCursor = 0
         )
-        return Rig(keyboard, logic, editor, engine, host)
+        return Rig(keyboard, logic, editor, engine, host, settings)
+    }
+
+    @Test
+    fun `turning the microphone off in the settings hides it and ignores the key`() = runTest {
+        val rig = rig()
+        runCurrent()
+        assertTrue(rig.controller.features.voice)
+        rig.settings.update { it.copy(dictationEnabled = false) }
+        runCurrent()
+        assertFalse(rig.controller.features.voice)
+        rig.controller.onAction(KeyAction.MIC)
+        runCurrent()
+        assertEquals(DictationState.Idle, rig.host.state.value)
+        rig.settings.update { it.copy(dictationEnabled = true) }
+        runCurrent()
+        assertTrue(rig.controller.features.voice)
     }
 
     @Test
