@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-08
+
 ### Added
 
 - Clipboard history: copied text is kept for 1 hour, 1 day, 7 days or forever (setting), up to a maximum number of clips, with pin, delete and clear all. The clipboard panel opens from the button in the suggestion bar. Nothing is saved in private mode, and clips that apps mark as sensitive are never saved.
@@ -65,7 +67,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.3.0...v0.4.0
