@@ -26,6 +26,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.material3)
+    // Reads assets/licenses/components.json (already used by :layouts, no new artifact).
+    implementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(projects.dictionaries)
     androidTestImplementation(projects.engine)

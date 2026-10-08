@@ -15,10 +15,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,8 +42,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.qtekfun.ultimatekeys.Heading
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview
@@ -135,7 +140,7 @@ private fun StylesScreen(repository: StyleRepository, onClose: () -> Unit) {
     }
 
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp)) {
-        Row(
+        FlowRow(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -144,10 +149,10 @@ private fun StylesScreen(repository: StyleRepository, onClose: () -> Unit) {
                 Text(stringResource(R.string.style_import))
             }
         }
-        Text(
+        Heading(
             stringResource(R.string.styles_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(vertical = 12.dp)
+            MaterialTheme.typography.headlineSmall,
+            Modifier.padding(vertical = 12.dp)
         )
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(Presets.all + custom, key = { it.id }) { style ->
@@ -201,33 +206,61 @@ private fun StyleCard(
                 builtIn -> stringResource(R.string.style_builtin)
                 else -> ""
             }
-            Text("${style.name}  $status", style = MaterialTheme.typography.titleMedium)
-            if (style.description.isNotBlank()) Text(style.description)
-            KeyboardPreview(
-                style = style,
-                dark = com.qtekfun.ultimatekeys.ime.surface.SurfaceStyle.isDark(style, dark),
-                content = PreviewContent(heightPercent = THUMB_HEIGHT_PERCENT)
+            Text(
+                if (status.isEmpty()) style.name else "${style.name}  $status",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() }
             )
+            if (style.description.isNotBlank()) Text(style.description)
+            val previewLabel = stringResource(R.string.style_preview, style.name)
+            Box(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
+                KeyboardPreview(
+                    style = style,
+                    dark = com.qtekfun.ultimatekeys.ime.surface.SurfaceStyle.isDark(style, dark),
+                    content = PreviewContent(heightPercent = THUMB_HEIGHT_PERCENT)
+                )
+            }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = actions.onUse, enabled = !active) {
+                Button(
+                    onClick = actions.onUse,
+                    enabled = !active,
+                    modifier = Modifier.described(actionLabel(R.string.style_select, style.name))
+                ) {
                     Text(stringResource(R.string.style_select))
                 }
                 if (!builtIn) {
-                    OutlinedButton(onClick = actions.onEdit) {
+                    OutlinedButton(
+                        onClick = actions.onEdit,
+                        modifier = Modifier.described(actionLabel(R.string.style_edit, style.name))
+                    ) {
                         Text(stringResource(R.string.style_edit))
                     }
                 }
-                OutlinedButton(onClick = actions.onDuplicate) {
+                OutlinedButton(
+                    onClick = actions.onDuplicate,
+                    modifier = Modifier.described(actionLabel(R.string.style_duplicate, style.name))
+                ) {
                     Text(stringResource(R.string.style_duplicate))
                 }
-                OutlinedButton(onClick = actions.onExport) {
+                OutlinedButton(
+                    onClick = actions.onExport,
+                    modifier = Modifier.described(actionLabel(R.string.style_export, style.name))
+                ) {
                     Text(stringResource(R.string.style_export))
                 }
-                OutlinedButton(onClick = actions.onShare) {
+                OutlinedButton(
+                    onClick = actions.onShare,
+                    modifier = Modifier.described(actionLabel(R.string.style_share, style.name))
+                ) {
                     Text(stringResource(R.string.style_share))
                 }
                 if (!builtIn) {
-                    OutlinedButton(onClick = actions.onDelete) {
+                    OutlinedButton(
+                        onClick = actions.onDelete,
+                        modifier = Modifier.described(
+                            actionLabel(R.string.style_delete, style.name)
+                        )
+                    ) {
                         Text(stringResource(R.string.style_delete))
                     }
                 }
@@ -235,6 +268,13 @@ private fun StyleCard(
         }
     }
 }
+
+/** What a button says to a screen reader: its action and the style it acts on ("Edit, Classic"). */
+@Composable
+private fun actionLabel(action: Int, styleName: String): String =
+    stringResource(R.string.a11y_action_on_style, stringResource(action), styleName)
+
+private fun Modifier.described(text: String): Modifier = semantics { contentDescription = text }
 
 /** Reads at most [limit] bytes, so a huge file cannot fill the memory. */
 private fun java.io.InputStream.readUpTo(limit: Int): ByteArray {

@@ -4,14 +4,17 @@
 package com.qtekfun.ultimatekeys.styles
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -24,6 +27,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview
@@ -52,6 +60,7 @@ import com.qtekfun.ultimatekeys.style.ToolIcons
  * Edits [initial] with a live preview on top. [onSave] gets the edited style; the editor never
  * writes anything itself, so cancelling is just leaving.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StyleEditor(
     initial: Style,
@@ -64,17 +73,24 @@ fun StyleEditor(
     val warnings = remember(draft) { ContrastCheck.warnings(draft) }
 
     Column(modifier.fillMaxSize()) {
-        KeyboardPreview(draft, previewDark)
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        val previewLabel = stringResource(R.string.style_preview, draft.name)
+        Box(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
+            KeyboardPreview(draft, previewDark)
+        }
+        FlowRow(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            OutlinedButton(onClick = { previewDark = false }, enabled = previewDark) {
-                Text(stringResource(R.string.style_preview_light))
-            }
-            OutlinedButton(onClick = { previewDark = true }, enabled = !previewDark) {
-                Text(stringResource(R.string.style_preview_dark))
-            }
+            FilterChip(
+                selected = !previewDark,
+                onClick = { previewDark = false },
+                label = { Text(stringResource(R.string.style_preview_light)) }
+            )
+            FilterChip(
+                selected = previewDark,
+                onClick = { previewDark = true },
+                label = { Text(stringResource(R.string.style_preview_dark)) }
+            )
         }
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
@@ -90,7 +106,8 @@ fun StyleEditor(
             if (warnings.isNotEmpty()) {
                 Text(
                     stringResource(R.string.style_contrast_warning),
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
                 )
             }
             AppearanceControls(draft) { draft = it }
@@ -109,7 +126,7 @@ fun StyleEditor(
                 draft = draft.copy(dark = it)
             }
         }
-        Row(
+        FlowRow(
             Modifier.fillMaxWidth().padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {

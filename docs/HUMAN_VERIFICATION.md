@@ -25,6 +25,18 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] First launch after install: dictionaries build in the background without freezing typing (`UltimateKeys` log tag, no native crash).
 - [ ] Suggestion latency on a real device (`docs/PERFORMANCE.md`; the emulator test asserts p95 < 30 ms for engine calls only).
 
+## Phase 8 — Accessibility, translation, licenses
+
+- [ ] TalkBack on the keyboard (Settings, Accessibility, TalkBack on): touching a key says its name (letters in the case they will be typed), a double tap types it, "activate on lift" works if enabled; swipe right/left moves through the suggestion bar and then the key rows in reading order; there is no key announced twice and no empty "Keyboard" stop that does nothing.
+- [ ] TalkBack: shift says "off / on, next letter in capitals / caps lock on" and changes as you double tap it; enter says the editor action (Go, Search, Send, Next, Done); the globe key's actions menu offers "Choose keyboard"; keys with long-press alternatives list them in the actions menu and typing one inserts it.
+- [ ] TalkBack: private mode button reads its state; clipboard, emoji and microphone buttons in the bar are announced and open their panels; with a panel open only the panel is explorable; the microphone panel reads "Listening", the hint and the errors, and the round button stops dictation.
+- [ ] TalkBack in the emoji panel (category buttons say "selected", skin tone says its current tone, cells say the emoji), the clipboard panel (paste, pin and delete are separate stops, the pinned state is spoken) and the backspace button (a double tap deletes one character).
+- [ ] TalkBack on the app screens: home, styles, style editor (section headers say expanded/collapsed, sliders read "label: value", switches toggle on a double tap anywhere on the row), my dictionary and the licenses screen; focus order follows the visual order.
+- [ ] Switch Access or Voice Access ("tap q", "tap shift") can press keys; with large font (200%) and display size the app screens still fit and nothing is clipped.
+- [ ] Typing feel with TalkBack off is unchanged (no extra latency): compare `docs/PERFORMANCE.md` figures before and after on the Find X8 Pro.
+- [ ] Spanish: switch the phone to Spanish and read every screen of the app and every panel of the keyboard for wording that sounds unnatural or is cut off.
+- [ ] Licenses screen: every link opens, the GPL, Apache, MIT, SIL OFL and Unicode texts scroll and are readable in light and dark.
+
 ## Phase 6 — Voice core
 
 - [ ] Dictation quality in Spanish, English and mixed sentences on the Find X8 Pro with a real `base` model (plan 6.9); note which language the auto-detection picks for short phrases and whether forcing a language helps.
