@@ -9,6 +9,15 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-08
+
+First stable release. Everything below was introduced step by step in 0.1.0 to 0.9.2 and 1.0.0-rc.1; the full history is in those sections.
+
+- A private, offline keyboard with Spanish and English layouts, suggestions, auto-correction and next-word prediction that mix both languages, and gesture typing.
+- Nine built-in styles and a style editor with live preview, `.ukstyle` import, export and sharing, Material You colours and contrast warnings.
+- Private mode, clipboard history with retention and pins, emoji with offline search, and offline dictation with Whisper (`full` bundles the Base model, `lite` downloads one).
+- Redesigned settings, screen reader support, complete Spanish translation and an open-source licenses screen.
+
 ## [1.0.0-rc.1] - 2026-10-08
 
 First release candidate of 1.0.0.
@@ -134,7 +143,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.0-rc.1...v1.0.0
 [1.0.0-rc.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.2...v1.0.0-rc.1
 [0.9.2]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/qtekfun/UltimateKeys/compare/v0.9.0...v0.9.1

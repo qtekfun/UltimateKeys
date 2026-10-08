@@ -156,7 +156,7 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 - [x] 9.3 Store texts EN + ES and 1.0.0 changelog; no references to other products.
 - [x] 9.4 Final README: features, style engine, flavors, privacy statement, install (GitHub, Obtainium, F-Droid status), build, credits.
 - [x] 9.5 Check every acceptance criterion in `SPEC.md` §14 that can be automated; list the rest in `docs/HUMAN_VERIFICATION.md`.
-- [ ] 9.6 Release `1.0.0-rc.1` (pre-release); fix anything found, more `rc.N` if needed; then release `1.0.0` with both APKs and checksums.
+- [x] 9.6 Release `1.0.0-rc.1` (pre-release); fix anything found, more `rc.N` if needed; then release `1.0.0` with both APKs and checksums.
 - [ ] 9.7 Finalize `fdroid/com.qtekfun.ultimatekeys.yml` (`Binaries`, `AllowedAPKSigningKeys` placeholder, `UpdateCheckMode: Tags`) and verify reproducibility of the tagged build; **[HUMAN]** submit to fdroiddata.
 <!-- 9.7 prepared (recipe, reproducibility notes in docs/DISTRIBUTION.md); open: verify the tagged 1.0.0 build and submit to fdroiddata -->
 

@@ -1,1 +1,1 @@
-UltimateKeys 1.0: un teclado privado y sin conexión con siete estilos originales y editor de estilos, escritura en español e inglés con sugerencias y gestos, modo privado, historial del portapapeles, búsqueda de emoji y dictado por voz sin conexión.
+UltimateKeys 1.0: un teclado privado y sin conexión con nueve estilos y editor de estilos, escritura en español e inglés con sugerencias y gestos, modo privado, historial del portapapeles, búsqueda de emoji y dictado por voz sin conexión. Ajustes rediseñados y compatibilidad con lectores de pantalla.
