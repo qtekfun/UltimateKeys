@@ -73,6 +73,23 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # The `tiny` model is only used by the whisper JNI test; it is never committed. The cache key
+      # is the pinned SHA-256, so a changed pin invalidates the cache and the download is verified.
+      - name: Cache the Whisper tiny test model
+        id: whisper-model
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/whisper-test
+          key: whisper-tiny-q5_1-818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7
+
+      - name: Download the Whisper tiny test model
+        if: steps.whisper-model.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "$HOME/whisper-test"
+          curl -fsSL --retry 3 -o "$HOME/whisper-test/model.bin" \
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny-q5_1.bin"
+          echo "818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7  $HOME/whisper-test/model.bin" | sha256sum -c -
+
       - name: Instrumented tests
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
@@ -80,7 +97,16 @@ jobs:
           arch: x86_64
           target: default
           disable-animations: true
-          script: ./gradlew connectedFullDebugAndroidTest
+          script: |
+            ./gradlew installFullDebug installFullDebugAndroidTest
+            adb shell mkdir -p /data/local/tmp/ukwhisper
+            adb push $HOME/whisper-test/model.bin /data/local/tmp/ukwhisper/model.bin
+            adb push third_party/whisper.cpp/samples/jfk.wav /data/local/tmp/ukwhisper/sample.wav
+            adb shell chmod -R a+rX /data/local/tmp/ukwhisper
+            adb shell "run-as com.qtekfun.ultimatekeys sh -c 'mkdir -p files/whisper-test'"
+            adb shell "run-as com.qtekfun.ultimatekeys sh -c 'cat > files/whisper-test/model.bin' < /data/local/tmp/ukwhisper/model.bin"
+            adb shell "run-as com.qtekfun.ultimatekeys sh -c 'cat > files/whisper-test/sample.wav' < /data/local/tmp/ukwhisper/sample.wav"
+            ./gradlew connectedFullDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.requireWhisper=true
 
       - name: Upload reports
         if: failure()

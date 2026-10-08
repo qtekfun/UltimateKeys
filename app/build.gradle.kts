@@ -29,6 +29,7 @@ dependencies {
 
     androidTestImplementation(projects.dictionaries)
     androidTestImplementation(projects.engine)
+    androidTestImplementation(projects.voice)
     androidTestImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
