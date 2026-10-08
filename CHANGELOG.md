@@ -15,6 +15,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- Offline dictation (core): a microphone key (bottom row or suggestion bar, as the style chooses) opens a voice panel with a listening animation and a level meter, stops by itself after a pause, then writes the text at the cursor as a single undo step with the right spacing and capital letters. Speech is recognised on the device by whisper.cpp, in Spanish or English (detected per phrase, or forced); sound is kept in memory only and nothing dictated is learned in private mode. The model is loaded from a local file for now; the model manager arrives in a later release.
 - Private mode: turns on by itself in incognito tabs and password fields, or by hand with the button at the left of the suggestion bar. While it is on nothing is learned (no history, no new words), the bar is tinted by the style and shows an icon. Setting: whether a manual switch-on ends when the keyboard closes.
 
 ### Added

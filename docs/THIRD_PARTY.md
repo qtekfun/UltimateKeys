@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 | Component | Use | License | Status |
 |---|---|---|---|
 | AOSP LatinIME native engine | Suggestions and autocorrect | Apache-2.0 | Planned (Phase 2), vendored in `third_party/aosp-latinime/` |
-| whisper.cpp | Offline speech-to-text | MIT | Planned (Phase 6), git submodule |
+| whisper.cpp (with its bundled ggml) | Offline speech-to-text | MIT | Phase 6, git submodule `third_party/whisper.cpp`, unmodified (see below) |
 | AOSP LatinIME word lists `es`, `en` | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
 | Unicode CLDR annotations | Emoji search keywords | Unicode License | Planned (Phase 5) |
 | Open fonts and Material Symbols | Style engine | OFL / Apache-2.0 | Planned (Phase 3) |
@@ -62,3 +62,27 @@ All fonts are bundled in `ime/src/main/assets/fonts/` unmodified, each with its 
 | Nunito (variable, rounded) | `Nunito-Variable.ttf` | SIL OFL 1.1 | `bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207` |
 
 Material Symbols (outlined, 24 px Android vectors, Apache License 2.0) from `google/material-design-icons` at commit `737e3324305806514d7909874fa1818ae1808232`, stored as `ime/src/main/res/drawable/ms_*.xml`: mic, content_paste, sentiment_satisfied, settings, more_horiz, close, visibility_off, language, backspace, keyboard_return, keyboard_hide, palette.
+
+## whisper.cpp (`:voice`)
+
+- Source: `https://github.com/ggml-org/whisper.cpp`, git submodule at `third_party/whisper.cpp`, pinned to the release tag
+  `v1.9.5` (commit `d1be6fde11ac6e0407606b4e42fe72d34add8037`, the latest stable release on 2026-10-08). It includes its own
+  copy of ggml. License: MIT ("Copyright (c) 2023-2026 The ggml authors"), compatible with GPL-3.0-or-later and F-Droid.
+- Unmodified: our code is only `voice/src/main/cpp/uk_whisper_jni.cpp` and `voice/src/main/cpp/CMakeLists.txt`, which build
+  the submodule with the CPU backend only (no GPU, no OpenMP, no dynamic backends), `-O3`, NEON on ARM and deterministic
+  flags. Because nothing is changed there is no `MODIFICATIONS.md`; if a patch is ever needed it must be recorded in this
+  section and in `third_party/whisper.cpp.MODIFICATIONS.md`.
+- Updating the pin: fetch the tags inside the submodule, check out the new release tag, commit the new submodule pointer,
+  update this section and run the whisper JNI emulator test.
+- The release APKs ship the compiled library only; the MIT license text is `third_party/whisper.cpp/LICENSE` and is listed
+  in the in-app licenses screen (Phase 8).
+
+### Test model and sample (CI only, never committed)
+
+| File | Use | Source (pinned) | SHA-256 | License |
+|---|---|---|---|---|
+| `ggml-tiny-q5_1.bin` (about 32 MB) | Emulator JNI smoke test of `:voice` | `https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny-q5_1.bin` | `818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7` | MIT (OpenAI Whisper weights converted by the whisper.cpp project; the repository card states `license: mit`) |
+| `samples/jfk.wav` (352 KB) | Audio the smoke test transcribes | Inside the submodule at the pinned tag | n/a | Speech excerpt shipped by whisper.cpp for its own tests |
+
+`.github/workflows/ci.yml` downloads the model, verifies the checksum and caches it under the key
+`whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins arrive with Phase 7.
