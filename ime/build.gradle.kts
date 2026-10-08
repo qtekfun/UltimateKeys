@@ -16,6 +16,7 @@ dependencies {
     api(projects.engine)
     api(projects.privacy)
     api(projects.voice)
+    implementation(projects.voiceModels)
     api(projects.clipboard)
     api(projects.emoji)
     api(projects.gesture)

@@ -58,6 +58,12 @@ kover {
                     "com.qtekfun.ultimatekeys.voice.RecordAudioPermissionActivity*",
                     "com.qtekfun.ultimatekeys.ime.voice.VoicePanelKt*",
                     "com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions",
+                    // Model manager: Compose screens and per-flavor Android glue (WorkManager, assets).
+                    // Their logic (catalog, store, downloader, importer, controller) is in :voice-models.
+                    "com.qtekfun.ultimatekeys.UltimateKeysApp",
+                    "com.qtekfun.ultimatekeys.models.*",
+                    "com.qtekfun.ultimatekeys.voicemodels.ModelsAndroidKt",
+                    "com.qtekfun.ultimatekeys.voicemodels.ModelCatalogHolder",
                 )
                 
             }

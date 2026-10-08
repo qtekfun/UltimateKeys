@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "source": {
+    "repository": "https://huggingface.co/ggerganov/whisper.cpp",
+    "commit": "5359861c739e955e79d9a303bcbc70fb988958b1"
+  },
+  "models": [
+    {
+      "id": "base",
+      "name": "Base",
+      "file": "ggml-base-q5_1.bin",
+      "bytes": 59707625,
+      "sha256": "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base-q5_1.bin",
+      "license": "MIT"
+    },
+    {
+      "id": "small",
+      "name": "Small",
+      "file": "ggml-small-q5_1.bin",
+      "bytes": 190085487,
+      "sha256": "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small-q5_1.bin",
+      "license": "MIT"
+    }
+  ]
+}

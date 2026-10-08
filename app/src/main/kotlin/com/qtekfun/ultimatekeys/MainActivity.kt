@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.core.SettingsRepository
 import com.qtekfun.ultimatekeys.core.settingsRepository
+import com.qtekfun.ultimatekeys.models.ModelsActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -111,6 +112,19 @@ private fun HomeScreen(repository: SettingsRepository) {
             context.startActivity(Intent(context, UserDictionaryActivity::class.java))
         }) {
             Text(stringResource(R.string.user_dictionary_open))
+        }
+        Button(onClick = {
+            context.startActivity(Intent(context, ModelsActivity::class.java))
+        }) {
+            Text(stringResource(R.string.models_open))
+        }
+        Button(onClick = {
+            context.startActivity(
+                Intent(context, ModelsActivity::class.java)
+                    .putExtra(ModelsActivity.EXTRA_SETTINGS, true)
+            )
+        }) {
+            Text(stringResource(R.string.dictation_settings_open))
         }
         SettingsSection(settings, ::update)
     }

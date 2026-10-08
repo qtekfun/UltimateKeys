@@ -41,13 +41,14 @@ import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
 import com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions
 import com.qtekfun.ultimatekeys.ime.voice.DictationHost
-import com.qtekfun.ultimatekeys.voice.DictationConfig
+import com.qtekfun.ultimatekeys.ime.voice.toDictationConfig
 import com.qtekfun.ultimatekeys.voice.DictationController
-import com.qtekfun.ultimatekeys.voice.DirectoryModelSource
 import com.qtekfun.ultimatekeys.voice.MicrophonePermission
 import com.qtekfun.ultimatekeys.voice.MicrophonePermissionFlow
 import com.qtekfun.ultimatekeys.voice.MicrophoneSource
 import com.qtekfun.ultimatekeys.voice.WhisperTranscriber
+import com.qtekfun.ultimatekeys.voicemodels.SelectedModelSource
+import com.qtekfun.ultimatekeys.voicemodels.modelStore
 import java.io.File
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
@@ -90,9 +91,11 @@ class UltimateKeysService :
                 scope = scope,
                 transcriber = transcriber,
                 microphone = { MicrophoneSource() },
-                models = DirectoryModelSource(File(filesDir, "models")),
+                models = SelectedModelSource(modelStore()) {
+                    controller.settings.value.dictationModelId
+                },
                 permission = MicrophonePermission.of(this),
-                config = { DictationConfig() },
+                config = { controller.settings.value.toDictationConfig() },
                 onResult = { controller.onDictationResult(it) }
             ),
             actions = AndroidDictationActions(this),

@@ -85,4 +85,33 @@ class SettingsTest {
         assertEquals(5, s.emojiSkinTone)
         assertEquals("a b", s.emojiRecents)
     }
+
+    @Test
+    fun `dictation settings round trip, clamp and reject unknown languages`() = runTest {
+        val file = Files.createTempFile("settings", ".preferences_pb").toFile().apply { delete() }
+        val repo = DataStoreSettingsRepository(
+            PreferenceDataStoreFactory.create(scope = backgroundScope) { file }
+        )
+        val defaults = repo.settings.first()
+        assertEquals("auto", defaults.dictationLanguage)
+        assertEquals(1500, defaults.dictationSilenceMs)
+        assertEquals("", defaults.dictationModelId)
+        assertEquals(true, defaults.modelDownloadWifiOnly)
+        repo.update {
+            it.copy(
+                dictationLanguage = "es",
+                dictationSilenceMs = 99_999,
+                dictationModelId = "small",
+                modelDownloadWifiOnly = false
+            )
+        }
+        val s = repo.settings.first()
+        assertEquals("es", s.dictationLanguage)
+        assertEquals(5000, s.dictationSilenceMs)
+        assertEquals("small", s.dictationModelId)
+        assertEquals(false, s.modelDownloadWifiOnly)
+        repo.update { it.copy(dictationLanguage = "fr", dictationSilenceMs = 1) }
+        assertEquals("auto", repo.settings.first().dictationLanguage)
+        assertEquals(500, repo.settings.first().dictationSilenceMs)
+    }
 }
