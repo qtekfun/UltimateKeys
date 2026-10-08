@@ -13,7 +13,9 @@ data class ChooserView(
     val top: Float,
     val cellWidth: Float,
     val cellHeight: Float,
-    val selected: Int
+    val selected: Int,
+    /** Text size relative to the key labels; the language key's menu uses smaller words. */
+    val textScale: Float = 1f
 ) {
     val right: Float get() = left + cellWidth * items.size
 
