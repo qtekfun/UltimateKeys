@@ -21,6 +21,7 @@ enum class EmojiCategory(val id: String, val icon: String) {
 }
 
 /** The five Fitzpatrick skin tones; [NONE] is the default yellow form. */
+@Suppress("MagicNumber")
 enum class SkinTone(val modifier: Int?) {
     NONE(null),
     LIGHT(0x1F3FB),

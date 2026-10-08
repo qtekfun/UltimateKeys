@@ -6,7 +6,7 @@ import groovy.json.JsonSlurper
 /**
  * Turns the Unicode emoji list (`emoji-test.txt`) and the CLDR annotations into the compact assets
  * the emoji panel reads. Pure functions, unit-tested in build-logic; the Gradle task only fetches
- * and writes. Output formats are described in `docs/adr/0010-emoji-data.md`.
+ * and writes. Output formats are described in `docs/adr/0012-clipboard-and-emoji.md`.
  */
 object EmojiDataProcessor {
     /** One keyboard emoji and the skin-tone forms of it. */

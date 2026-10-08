@@ -31,7 +31,7 @@ enum class PanelKind { NONE, EMOJI, CLIPBOARD }
  * call back; everything that decides something lives here so it can be tested without a screen.
  * Main thread only.
  */
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 class PanelsController(
     private val scope: CoroutineScope,
     private val settings: SettingsRepository,

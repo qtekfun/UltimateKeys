@@ -89,6 +89,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
     }
 
+    @Suppress("LongMethod")
     private fun drawStrip(
         scope: DrawScope,
         geometry: KeyGeometry,

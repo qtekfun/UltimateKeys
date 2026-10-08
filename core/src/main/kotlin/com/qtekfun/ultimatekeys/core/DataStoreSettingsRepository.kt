@@ -19,6 +19,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         store.edit { prefs -> prefs.write(transform(prefs.toSettings()).sanitized()) }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun Preferences.toSettings(): KeyboardSettings {
         val d = KeyboardSettings()
         return KeyboardSettings(

@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 | AOSP LatinIME native engine | Suggestions and autocorrect | Apache-2.0 | Planned (Phase 2), vendored in `third_party/aosp-latinime/` |
 | whisper.cpp (with its bundled ggml) | Offline speech-to-text | MIT | Phase 6, git submodule `third_party/whisper.cpp`, unmodified (see below) |
 | AOSP LatinIME word lists `es`, `en` | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
-| Unicode CLDR annotations | Emoji search keywords | Unicode License | Planned (Phase 5) |
+| Unicode CLDR annotations and emoji list | Emoji search keywords, categories and skin-tone forms | Unicode License v3 | Phase 5, processed at build time (see below) |
 | Open fonts and Material Symbols | Style engine | OFL / Apache-2.0 | Planned (Phase 3) |
 
 Libraries from Gradle (AndroidX, Kotlin, kotlinx, JUnit) are listed by their licenses in the in-app licenses screen (Phase 8).
@@ -48,6 +48,32 @@ these sources is used.
 | Hunspell/LibreOffice `es_ES` and `en_US` dictionaries | Not used for now | Licenses differ per dictionary and must be read file by file. They carry no word frequencies, so suggestions would rank poorly. Possible later source for validity checking only. |
 | Frequency lists derived from OpenSubtitles (for example FrequencyWords) | Rejected | The corpus's redistribution terms are unclear, and a license on the derived list does not clear the underlying data. |
 | Wiktionary-derived frequency lists | Rejected | Share-alike (CC BY-SA) terms are not clearly compatible with shipping inside a GPL-3.0 binary. |
+
+## Emoji data (`:emoji`)
+
+Pins live in `emoji/sources.properties`. The Gradle task `:emoji:generateEmojiData` downloads each file, verifies its
+SHA-256, caches it under `$GRADLE_USER_HOME/ultimatekeys-emoji/` (no network when the verified file is cached) and
+writes the compact assets `emoji/catalog.txt` and `emoji/search_<lang>.tsv` (format and rationale:
+`docs/adr/0012-clipboard-and-emoji.md`). The processing code is unit-tested in `build-logic`.
+
+| Data | Source (pinned) | SHA-256 | License |
+|---|---|---|---|
+| Emoji list: groups, order, skin-tone forms | `https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt` (Unicode emoji 17.0; versioned directories are immutable) | `1d8a944f88d7952f7ef7c5167fef3c67995bcae24543949710231b03a201acda` | Unicode License v3 |
+| CLDR annotations `en` | `unicode-org/cldr-json` at commit `91c267402229a59e3ef2774544f001bf959e8809` (tag 48.2.3), `cldr-json/cldr-annotations-full/annotations/en/annotations.json` | `f22083cb86dffb63a643d5bacb5d9899f82d2fa5d388ad4f3aed72184acef505` | Unicode License v3 |
+| CLDR annotations `es` | same commit, `.../annotations/es/annotations.json` | `339cdf9ae5fe6d3250d3c53b95ff6d8a4dae96c7c0d279756ee7a73c43c84b56` | Unicode License v3 |
+| CLDR derived annotations `en` (flags, hair, other sequences) | same commit, `cldr-json/cldr-annotations-derived-full/annotationsDerived/en/annotations.json` | `15c9457afa703a32dcc78d54626418a91e820fe0ddd67b7d491c4c4d9f5846ab` | Unicode License v3 |
+| CLDR derived annotations `es` | same commit, `.../annotationsDerived/es/annotations.json` | `f9f43c327c5b76dbd337496738c0f5c526ee1c803dd683d60100b5fce85ab79e` | Unicode License v3 |
+
+Attribution: Copyright (c) 1991-2025 Unicode, Inc. Licensed under the Unicode License v3
+(`https://www.unicode.org/license.txt`, also the `LICENSE` file of `cldr-json` at the pinned commit). The license is
+permissive (use, copy, modify, distribute, sell, provided the notice and permission text accompany copies), is
+approved by the OSI, and is compatible with GPL-3.0 and accepted by F-Droid. The generated assets keep names and
+keywords unmodified apart from dropping duplicates and keywords that equal the name; the license text ships with the
+app in the licenses screen (Phase 8). Emoji glyphs are drawn by the device's own emoji font; no emoji artwork is
+bundled.
+
+Room (`androidx.room`, Apache-2.0) stores the clipboard history, with KSP (`com.google.devtools.ksp`, Apache-2.0) as
+its annotation processor (no kapt, see ADR 0006).
 
 ## Fonts and icons (style engine)
 
