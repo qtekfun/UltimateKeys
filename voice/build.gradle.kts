@@ -3,8 +3,13 @@
 
 plugins {
     id("uk.android.library")
+    id("uk.android.native")
 }
 
 android {
     namespace = "com.qtekfun.ultimatekeys.voice"
+}
+
+dependencies {
+    api(libs.kotlinx.coroutines.core)
 }
