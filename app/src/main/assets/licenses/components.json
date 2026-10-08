@@ -34,6 +34,15 @@
       "thirdPartyRows": ["whisper.cpp (with its bundled ggml)"]
     },
     {
+      "name": "Whisper speech models (base, small)",
+      "category": "data",
+      "use": "Dictation models, bundled in the full build or downloaded in the lite build",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2022 OpenAI; ggml conversion by the whisper.cpp project",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp",
+      "thirdPartyRows": ["Whisper models `base`, `small`"]
+    },
+    {
       "name": "AOSP LatinIME word lists (es, en)",
       "category": "data",
       "use": "Dictionaries for the suggestion engine",
@@ -154,6 +163,15 @@
         "org.jetbrains.kotlinx:kotlinx-coroutines-android",
         "org.jetbrains.kotlinx:kotlinx-serialization-json"
       ]
+    },
+    {
+      "name": "WorkManager",
+      "category": "libraries",
+      "use": "Resumable model downloads (lite build only)",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) The Android Open Source Project",
+      "url": "https://developer.android.com/jetpack/androidx/releases/work",
+      "modules": ["androidx.work:work-runtime"]
     },
     {
       "name": "Kotlin Symbol Processing and Room compiler",

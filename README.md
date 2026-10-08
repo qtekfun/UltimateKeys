@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 A modern Android keyboard that is private, fully offline and looks the way you want. Written from scratch in Kotlin, with offline voice dictation.
 
-> Status: pre-1.0 (0.x). The keyboard, styles, private mode, clipboard, emoji, gesture typing and dictation core work today. Model download and the model manager, accessibility work and the full Spanish translation arrive before 1.0. See [CHANGELOG.md](CHANGELOG.md) for what each version has.
+> Status: pre-1.0 (0.x). The keyboard, styles, private mode, clipboard, emoji, gesture typing and dictation core work today. Accessibility work and the full Spanish translation arrive before 1.0. See [CHANGELOG.md](CHANGELOG.md) for what each version has.
 
 <p align="center">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_typing.png" width="19%" alt="Typing in Spanish and English">
@@ -28,9 +28,9 @@ Available today (see the changelog for the version that introduced each one):
 - **Private mode**: starts by itself in incognito tabs and password fields, or by hand. While it is on nothing is learned and nothing is stored in the clipboard history.
 - **Clipboard history**: keep clips for an hour, a day, a week or forever, with pin, delete and clear all. Items that apps flag as sensitive are never stored.
 - **Emoji**: categories, recents, skin tones and offline search by name in English and Spanish.
-- **Offline dictation**: a microphone key opens a voice panel; speech is recognized on the device by whisper.cpp in Spanish or English, with sound kept in memory only. For now the Whisper model is loaded from a local file.
+- **Offline dictation**: a microphone key opens a voice panel; speech is recognized on the device by whisper.cpp in Spanish or English, with sound kept in memory only. The Whisper model is bundled (`full`), downloaded (`lite`) or imported from a file, and chosen in the model manager.
 
-Coming before 1.0: the model manager with downloading in the `lite` build and a bundled model in the `full` build (0.8.0), accessibility work, a complete Spanish translation and the open-source licenses screen (0.9.0).
+Coming before 1.0: final polish and acceptance checks (see docs/ACCEPTANCE.md).
 
 ## Style engine
 
@@ -45,8 +45,8 @@ Every visual aspect of the keyboard is a parameter of a **style**: key corner ra
 
 | Flavor | Whisper model | Network permission |
 |---|---|---|
-| `full` | `base`, bundled in the APK (planned for 0.8.0) | none: it is not even declared, and the build fails if it appears |
-| `lite` | downloaded from a pinned URL and verified by SHA-256, or imported from a file (planned for 0.8.0) | only for the model downloader |
+| `full` | `base`, bundled in the APK, copied to app storage on first run | none: it is not even declared, and the build fails if it appears |
+| `lite` | downloaded from a pinned URL and verified by SHA-256, or imported from a file; a model manager lets you choose, delete and import | only for the model downloader |
 
 Both share the package id `com.qtekfun.ultimatekeys`, the version code and the signing key, so one can be replaced by the other. Today both flavors load a model from a local file.
 
@@ -54,7 +54,7 @@ Both share the package id `com.qtekfun.ultimatekeys`, the version code and the s
 
 - No analytics, crash reporters, ads, accounts or cloud, in any build.
 - The `full` flavor has no `INTERNET` permission; CI checks the merged manifest (`verifyFullHasNoInternet`).
-- The `lite` flavor will use the network only to download a speech model that you ask for.
+- The `lite` flavor uses the network only to download a speech model that you ask for.
 - Audio from dictation lives in memory only; nothing is written to disk.
 - In private mode nothing is learned (typing, gestures or dictation) and nothing is stored in the clipboard history. Clear everything the keyboard learned at any time from the settings.
 

@@ -66,6 +66,18 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Gesture typing on both letter layouts (Spanish and English), the number row on, and a 70% / 130% keyboard height.
 - [ ] The first launch after install: gestures start working a moment after typing does (the word lists are read in the background).
 
+## Phase 7 — Models and flavors
+
+- [ ] `full` on a clean install: open the keyboard, tap the microphone and dictate a sentence in Spanish and one in English with no network at all (airplane mode). The first dictation right after install may report "no model" for a second while the bundled model is copied (check how long it takes on the Find X8 Pro).
+- [ ] `full`: Models screen lists Base as in use; delete it, dictate (panel says there is no model, "Choose a model" opens the manager), press "Install the bundled model" and dictate again.
+- [ ] `lite` on a clean install: the panel's "Choose a model" opens the manager; download Base on Wi-Fi: progress moves, the file is usable afterwards. Repeat with Small and switch between them with "Use".
+- [ ] `lite` resume: start the Small download, turn Wi-Fi off in the middle (status says waiting), turn it on: it continues from where it stopped (not from 0). Force-stop the app in the middle and reopen: same.
+- [ ] `lite` Wi-Fi only: with the switch on and only mobile data, the download waits; with the switch off it runs on mobile data. Cancel removes the partial download (storage in Settings drops back).
+- [ ] Import: pick a real `ggml-*.bin` from storage (Downloads, an SD card or a cloud provider through the picker): a catalog file installs without a warning, another valid Whisper file asks for confirmation and shows its size and checksum, a text file or a photo is rejected with a clear message. Cancel at the warning leaves nothing installed.
+- [ ] Dictation settings: language "Spanish" and "English" force the language even when speaking the other one; "Automatic" picks per utterance; changing the pause length changes when the dictation stops by itself.
+- [ ] Both screens in light and dark, large font size and a narrow screen: nothing is cut off; Spanish and English texts read well.
+- [ ] Check the merged APKs once with `aapt2 dump permissions`: `full` has no INTERNET or ACCESS_NETWORK_STATE; `lite` has INTERNET.
+
 ## Phase 9 — Acceptance criteria of SPEC.md section 14 (see `docs/ACCEPTANCE.md`)
 
 - [ ] Airplane mode: with the `full` APK and airplane mode on, dictate a sentence in Spanish and one in English; both are inserted.

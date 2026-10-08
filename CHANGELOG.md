@@ -19,6 +19,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - The home screen shows the app version and build number.
 - TalkBack and other screen readers can use the keyboard: every key, suggestion and bar button is announced and activated (explore by touch, double tap), shift says its state, enter says the editor action, long-press alternatives are in the actions menu, and the emoji, clipboard and dictation panels are fully labelled. Typing without a screen reader is unaffected.
 - Open-source licenses screen on the home screen: every component, font, icon set, data set and library with its license, link and full license text (GPL-3.0, Apache-2.0, MIT, SIL OFL 1.1, Unicode).
+- Dictation models: the `full` build ships the Base model (works offline from the first start, and the app still has no network permission at all); the `lite` build downloads Base or Small from a fixed, checksum-verified address (resumes after interruptions, Wi-Fi only by default, can be cancelled). Both builds can import a model file; files the app does not recognise are installed only after a warning.
+- Model manager and dictation settings screens: install, delete and choose the model, dictation language (automatic, Spanish or English) and how long a pause ends the dictation. The voice panel's "Choose a model" button opens the manager. Spanish translation included.
 
 ### Changed
 

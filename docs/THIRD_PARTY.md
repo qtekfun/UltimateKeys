@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 |---|---|---|---|
 | AOSP LatinIME native engine | Suggestions and autocorrect | Apache-2.0 | Planned (Phase 2), vendored in `third_party/aosp-latinime/` |
 | whisper.cpp (with its bundled ggml) | Offline speech-to-text | MIT | Phase 6, git submodule `third_party/whisper.cpp`, unmodified (see below) |
+| Whisper models `base`, `small` | Dictation models (data, never committed) | MIT | Phase 7, bundled (`base`, `full`) or downloaded (`lite`) with SHA-256, see `docs/MODELS.md` |
 | AOSP LatinIME word lists `es`, `en` | Dictionaries for the engine | Apache-2.0 | Phase 2, fetched at build time with SHA-256 (see below) |
 | Unicode CLDR annotations and emoji list | Emoji search keywords, categories and skin-tone forms | Unicode License v3 | Phase 5, processed at build time (see below) |
 | Open fonts and Material Symbols | Style engine | OFL / Apache-2.0 | Planned (Phase 3) |
@@ -111,7 +112,9 @@ Material Symbols (outlined, 24 px Android vectors, Apache License 2.0) from `goo
 | `samples/jfk.wav` (352 KB) | Audio the smoke test transcribes | Inside the submodule at the pinned tag | n/a | Speech excerpt shipped by whisper.cpp for its own tests |
 
 `.github/workflows/ci.yml` downloads the model, verifies the checksum and caches it under the key
-`whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins arrive with Phase 7.
+`whisper-tiny-q5_1-<sha256>`. The production models (`base`, `small`) and their pins are in `docs/MODELS.md` and
+`voice-models/src/main/assets/models.json` (same repository and commit; MIT). The `full` flavor bundles `base`; the `lite`
+flavor downloads either. Neither file is ever committed.
 ## Papers behind gesture typing
 
 The `:gesture` module (Phase 10) is original code. These papers were read for their ideas and are cited in `docs/gesture/DESIGN.md`; none of their code or data is used.

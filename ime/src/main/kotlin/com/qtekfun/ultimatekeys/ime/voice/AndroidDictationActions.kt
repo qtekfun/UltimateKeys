@@ -13,9 +13,15 @@ class AndroidDictationActions(private val context: Context) : DictationActions {
 
     override fun openAppSettings() = MicrophonePermissionFlow.openAppSettings(context)
 
-    // Until the model manager exists, the app's own screen is where models will be chosen.
+    // The model manager lives in the app module (which owns the flavors), so it is started by name.
     override fun openModels() {
-        val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        launch?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let(context::startActivity)
+        val intent = Intent()
+            .setClassName(context.packageName, MODELS_ACTIVITY)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }
+
+    private companion object {
+        const val MODELS_ACTIVITY = "com.qtekfun.ultimatekeys.models.ModelsActivity"
     }
 }

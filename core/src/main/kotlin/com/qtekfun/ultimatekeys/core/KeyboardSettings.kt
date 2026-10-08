@@ -33,7 +33,15 @@ data class KeyboardSettings(
     /** Draw the line the finger leaves while gliding. */
     val gestureTrail: Boolean = true,
     /** 0 = a long glide is needed to start a gesture, 100 = a short one is enough. */
-    val gestureSensitivity: Int = DEFAULT_GESTURE_SENSITIVITY
+    val gestureSensitivity: Int = DEFAULT_GESTURE_SENSITIVITY,
+    /** Dictation language: `auto` (Spanish or English per utterance), `es` or `en`. */
+    val dictationLanguage: String = DICTATION_AUTO,
+    /** Silence after speech that ends a dictation, in milliseconds. */
+    val dictationSilenceMs: Int = DEFAULT_DICTATION_SILENCE_MS,
+    /** Id of the model chosen for dictation; empty means the first installed one. */
+    val dictationModelId: String = "",
+    /** Download models only on an unmetered connection. */
+    val modelDownloadWifiOnly: Boolean = true
 ) {
     fun sanitized(): KeyboardSettings = copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
@@ -43,7 +51,11 @@ data class KeyboardSettings(
         soundVolume = soundVolume.coerceIn(PERCENT_RANGE),
         clipboardMaxItems = clipboardMaxItems.coerceIn(CLIPBOARD_ITEMS_RANGE),
         emojiSkinTone = emojiSkinTone.coerceIn(SKIN_TONE_RANGE),
-        gestureSensitivity = gestureSensitivity.coerceIn(PERCENT_RANGE)
+        gestureSensitivity = gestureSensitivity.coerceIn(PERCENT_RANGE),
+        dictationLanguage = dictationLanguage.takeIf {
+            it in DICTATION_LANGUAGES
+        } ?: DICTATION_AUTO,
+        dictationSilenceMs = dictationSilenceMs.coerceIn(DICTATION_SILENCE_RANGE)
     )
 
     companion object {
@@ -60,5 +72,9 @@ data class KeyboardSettings(
         const val DEFAULT_CLIPBOARD_MAX_ITEMS = 50
         val CLIPBOARD_ITEMS_RANGE = 5..500
         val SKIN_TONE_RANGE = 0..5
+        const val DICTATION_AUTO = "auto"
+        val DICTATION_LANGUAGES = listOf(DICTATION_AUTO, "es", "en")
+        const val DEFAULT_DICTATION_SILENCE_MS = 1500
+        val DICTATION_SILENCE_RANGE = 500..5000
     }
 }

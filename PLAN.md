@@ -124,12 +124,12 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 7 — Models and flavors
 
-- [ ] 7.1 `docs/MODELS.md` + `models.json`: `base` and `small` (quantized), size, SHA-256 (compute and pin from the official source), URL.
-- [ ] 7.2 `full`: build-time download of `base` with checksum, cached; packaged uncompressed as asset.
-- [ ] 7.3 `lite`: WorkManager downloader (resumable, Wi-Fi-only option) + SHA-256; INTERNET only in `lite` manifest.
-- [ ] 7.4 Import from file (SAF) in both flavors with checksum check / unknown-file warning.
-- [ ] 7.5 Model manager and dictation settings screens.
-- [ ] 7.6 Tests: checksum, manifests of both flavors, downloader state machine.
+- [x] 7.1 `docs/MODELS.md` + `models.json`: `base` and `small` (quantized), size, SHA-256 (compute and pin from the official source), URL.
+- [x] 7.2 `full`: build-time download of `base` with checksum, cached; packaged uncompressed as asset.
+- [x] 7.3 `lite`: WorkManager downloader (resumable, Wi-Fi-only option) + SHA-256; INTERNET only in `lite` manifest.
+- [x] 7.4 Import from file (SAF) in both flavors with checksum check / unknown-file warning.
+- [x] 7.5 Model manager and dictation settings screens.
+- [x] 7.6 Tests: checksum, manifests of both flavors, downloader state machine.
 
 **DoD:** `full` dictates offline out of the box; `lite` downloads and verifies; release `v0.8.0`.
 
