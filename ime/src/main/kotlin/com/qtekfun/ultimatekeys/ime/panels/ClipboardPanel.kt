@@ -23,6 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.qtekfun.ultimatekeys.clipboard.ClipItem
@@ -63,7 +66,7 @@ internal fun ClipboardPanel(
             PanelText(
                 stringResource(R.string.panel_clipboard),
                 theme,
-                Modifier.weight(1f),
+                Modifier.weight(1f).semantics { heading() },
                 size = 16.sp
             )
             if (ui.items.any { !it.pinned }) {
@@ -129,20 +132,24 @@ private fun Notice(theme: PanelTheme, text: String, tinted: Boolean) {
 
 @Composable
 private fun ClipRow(theme: PanelTheme, item: ClipItem, actions: ClipboardActions) {
+    val paste = stringResource(R.string.panel_paste)
     Row(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .clip(theme.shape())
             .background(theme.surface)
-            .clickable { actions.onPaste(item) }
             .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Only the text pastes: the pin and delete buttons stay separate nodes for a screen reader.
         PanelText(
             item.text,
             theme,
-            Modifier.weight(1f).padding(vertical = 8.dp),
+            Modifier
+                .weight(1f)
+                .clickable(onClickLabel = paste, role = Role.Button) { actions.onPaste(item) }
+                .padding(vertical = 8.dp),
             size = 14.sp,
             maxLines = 2
         )

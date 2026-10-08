@@ -31,16 +31,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.CustomAccessibilityAction
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelHost
+import com.qtekfun.ultimatekeys.ime.panels.PanelKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
 import com.qtekfun.ultimatekeys.ime.voice.VoicePanel
 import com.qtekfun.ultimatekeys.style.MicPlacement
@@ -68,6 +64,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val description = stringResource(R.string.keyboard_description)
     val privateOn = stringResource(R.string.private_mode_on)
     val privateAction = stringResource(R.string.private_mode_toggle)
+    val screenReader = rememberAccessibilityActive()
+    val panelKind by controller.panels.kind.collectAsState()
 
     val layout =
         remember(state.page, settings.letterLayoutId, settings.numberRow, activeStyle.bottomRow) {
@@ -176,18 +174,14 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                         .fillMaxWidth()
                         .height(totalHeight)
                         .onSizeChanged { widthPx = it.width.toFloat() }
-                        .semantics {
-                            contentDescription = description
-                            if (privacy.isPrivate) stateDescription = privateOn
-                            if (controller.privacy.canToggle) {
-                                customActions = listOf(
-                                    CustomAccessibilityAction(privateAction) {
-                                        controller.togglePrivate()
-                                        true
-                                    }
-                                )
-                            }
-                        }
+                        // With a screen reader the virtual key nodes replace the canvas's own.
+                        .keyboardSemantics(
+                            hidden = screenReader || panelKind != PanelKind.NONE,
+                            description = description,
+                            privateState = privateOn.takeIf { privacy.isPrivate },
+                            toggle = privateAction.takeIf { controller.privacy.canToggle },
+                            onToggle = controller::togglePrivate
+                        )
                         .pointerInput(gestures) { trackPointers(gestures) }
                 ) {
                     renderer.draw(
@@ -202,6 +196,22 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                     )
                 }
             }
+        }
+        if (screenReader && !dictating && panelKind == PanelKind.NONE) {
+            KeyboardAccessibilityOverlay(
+                controller = controller,
+                geometry = geometry,
+                state = state,
+                strip = A11yStrip(
+                    suggestions = strip,
+                    toggle = showToggle,
+                    privateOn = privacy.isPrivate,
+                    canTogglePrivate = controller.privacy.canToggle,
+                    mic = showMic,
+                    tools = showTools
+                ),
+                modifier = Modifier.fillMaxWidth().height(totalHeight)
+            )
         }
         PanelHost(controller, panelTheme, keysHeightDp - settings.bottomMarginDp)
     }

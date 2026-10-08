@@ -139,10 +139,10 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 - [ ] 8.1 Meet the latency targets in `SPEC.md` §12; optimize and document in `docs/PERFORMANCE.md` (including APK sizes per flavor).
 - [ ] 8.2 Model warm-up on voice panel open, unload after idle; memory caps.
-- [ ] 8.3 Accessibility: TalkBack for keys (explore-by-touch) and all panels/settings; 48 dp targets in settings.
-- [ ] 8.4 Complete Spanish translation.
-- [ ] 8.5 In-app "Open-source licenses" screen generated from `docs/THIRD_PARTY.md` data.
-- [ ] 8.6 Zero lint warnings in our modules; coverage targets met.
+- [x] 8.3 Accessibility: TalkBack for keys (explore-by-touch) and all panels/settings; 48 dp targets in settings.
+- [x] 8.4 Complete Spanish translation.
+- [x] 8.5 In-app "Open-source licenses" screen generated from `docs/THIRD_PARTY.md` data.
+- [x] 8.6 Zero lint warnings in our modules; coverage targets met.
 - [ ] 8.7 **[HUMAN]** Real-device benchmarks, battery, 30-minute stability session (Find X8 Pro and a Pixel).
 
 **DoD:** release `v0.9.0`.

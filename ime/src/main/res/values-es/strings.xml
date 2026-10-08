@@ -71,4 +71,22 @@
     <string name="panel_pin">Fijar</string>
     <string name="panel_unpin">Desfijar</string>
     <string name="panel_delete">Eliminar</string>
+    <string name="key_shift_off">Desactivadas</string>
+    <string name="key_shift_once">Activadas, la próxima letra en mayúscula</string>
+    <string name="key_shift_locked">Bloqueo de mayúsculas activado</string>
+    <string name="key_choose_keyboard">Elegir teclado</string>
+    <string name="key_dictate">Dictar</string>
+    <string name="private_mode_name">Modo privado</string>
+    <string name="private_mode_state_on">Activado</string>
+    <string name="private_mode_state_off">Desactivado</string>
+    <string name="a11y_type_alternative">Escribir %1$s</string>
+    <string name="a11y_suggestion">Sugerencia: %1$s</string>
+    <string name="panel_insert">Insertar</string>
+    <string name="panel_paste">Pegar</string>
+    <string name="panel_tone_default">Predeterminado</string>
+    <string name="panel_tone_light">Claro</string>
+    <string name="panel_tone_medium_light">Medio claro</string>
+    <string name="panel_tone_medium">Medio</string>
+    <string name="panel_tone_medium_dark">Medio oscuro</string>
+    <string name="panel_tone_dark">Oscuro</string>
 </resources>

@@ -1,0 +1,168 @@
+{
+  "licenses": [
+    {"id": "GPL-3.0-or-later", "name": "GNU General Public License, version 3 or later", "asset": "licenses/GPL-3.0-or-later.txt"},
+    {"id": "Apache-2.0", "name": "Apache License 2.0", "asset": "licenses/Apache-2.0.txt"},
+    {"id": "MIT", "name": "MIT License", "asset": "licenses/MIT-whisper.cpp.txt"},
+    {"id": "OFL-1.1", "name": "SIL Open Font License 1.1", "asset": "fonts/OFL-inter.txt"},
+    {"id": "Unicode-3.0", "name": "Unicode License v3", "asset": "licenses/Unicode-3.0.txt"}
+  ],
+  "components": [
+    {
+      "name": "UltimateKeys",
+      "category": "app",
+      "use": "This keyboard",
+      "license": "GPL-3.0-or-later",
+      "copyright": "Copyright (c) 2026 UltimateKeys contributors",
+      "url": "https://github.com/qtekfun/UltimateKeys"
+    },
+    {
+      "name": "AOSP LatinIME native engine",
+      "category": "code",
+      "use": "Suggestions and autocorrect",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) 2008, The Android Open Source Project",
+      "url": "https://android.googlesource.com/platform/packages/inputmethods/LatinIME",
+      "thirdPartyRows": ["AOSP LatinIME native engine"]
+    },
+    {
+      "name": "whisper.cpp and ggml",
+      "category": "code",
+      "use": "Offline speech-to-text",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2023-2026 The ggml authors",
+      "url": "https://github.com/ggml-org/whisper.cpp",
+      "thirdPartyRows": ["whisper.cpp (with its bundled ggml)"]
+    },
+    {
+      "name": "AOSP LatinIME word lists (es, en)",
+      "category": "data",
+      "use": "Dictionaries for the suggestion engine",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) 2008, The Android Open Source Project",
+      "url": "https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/127336e9f29d69607eab55982324b210279ae8c5/dictionaries",
+      "thirdPartyRows": ["AOSP LatinIME word lists `es`, `en`"]
+    },
+    {
+      "name": "Unicode CLDR annotations and emoji list",
+      "category": "data",
+      "use": "Emoji search keywords, categories and skin-tone forms",
+      "license": "Unicode-3.0",
+      "copyright": "Copyright (c) 1991-2025 Unicode, Inc.",
+      "url": "https://www.unicode.org/license.txt",
+      "thirdPartyRows": ["Unicode CLDR annotations and emoji list"]
+    },
+    {
+      "name": "Material Symbols",
+      "category": "icons",
+      "use": "Key and panel icons",
+      "license": "Apache-2.0",
+      "copyright": "Copyright Google LLC",
+      "url": "https://github.com/google/material-design-icons",
+      "thirdPartyRows": ["Open fonts and Material Symbols"]
+    },
+    {
+      "name": "Inter",
+      "category": "fonts",
+      "use": "Keyboard font",
+      "license": "OFL-1.1",
+      "licenseAsset": "fonts/OFL-inter.txt",
+      "copyright": "Copyright 2020 The Inter Project Authors",
+      "url": "https://github.com/rsms/inter",
+      "thirdPartyRows": ["Inter (variable)"]
+    },
+    {
+      "name": "Roboto Flex",
+      "category": "fonts",
+      "use": "Keyboard font",
+      "license": "OFL-1.1",
+      "licenseAsset": "fonts/OFL-robotoflex.txt",
+      "copyright": "Copyright 2017 The Roboto Flex Project Authors",
+      "url": "https://github.com/TypeNetwork/Roboto-Flex",
+      "thirdPartyRows": ["Roboto Flex (variable)"]
+    },
+    {
+      "name": "Atkinson Hyperlegible",
+      "category": "fonts",
+      "use": "Keyboard font",
+      "license": "OFL-1.1",
+      "licenseAsset": "fonts/OFL-atkinsonhyperlegible.txt",
+      "copyright": "Copyright 2020 Braille Institute of America, Inc.",
+      "url": "https://brailleinstitute.org/freefont",
+      "thirdPartyRows": ["Atkinson Hyperlegible Regular", "Atkinson Hyperlegible Bold"]
+    },
+    {
+      "name": "Nunito",
+      "category": "fonts",
+      "use": "Keyboard font",
+      "license": "OFL-1.1",
+      "licenseAsset": "fonts/OFL-nunito.txt",
+      "copyright": "Copyright 2014 The Nunito Project Authors",
+      "url": "https://github.com/googlefonts/nunito",
+      "thirdPartyRows": ["Nunito (variable, rounded)"]
+    },
+    {
+      "name": "AndroidX",
+      "category": "libraries",
+      "use": "Core, activity, lifecycle, saved state and preferences storage",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) The Android Open Source Project",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "modules": [
+        "androidx.core:core-ktx",
+        "androidx.activity:activity-compose",
+        "androidx.lifecycle:lifecycle-runtime-compose",
+        "androidx.lifecycle:lifecycle-runtime",
+        "androidx.lifecycle:lifecycle-viewmodel",
+        "androidx.savedstate:savedstate",
+        "androidx.datastore:datastore-preferences"
+      ]
+    },
+    {
+      "name": "Jetpack Compose and Material 3",
+      "category": "libraries",
+      "use": "User interface of the keyboard, the panels and the settings",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) The Android Open Source Project",
+      "url": "https://developer.android.com/jetpack/compose",
+      "modules": [
+        "androidx.compose:compose-bom",
+        "androidx.compose.ui:ui",
+        "androidx.compose.ui:ui-graphics",
+        "androidx.compose.ui:ui-tooling-preview",
+        "androidx.compose.foundation:foundation",
+        "androidx.compose.material3:material3"
+      ]
+    },
+    {
+      "name": "Room",
+      "category": "libraries",
+      "use": "Clipboard history storage",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) The Android Open Source Project",
+      "url": "https://developer.android.com/training/data-storage/room",
+      "modules": ["androidx.room:room-runtime"]
+    },
+    {
+      "name": "Kotlin, kotlinx.coroutines and kotlinx.serialization",
+      "category": "libraries",
+      "use": "Language runtime, concurrency and JSON",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) JetBrains s.r.o. and Kotlin contributors",
+      "url": "https://kotlinlang.org",
+      "modules": [
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+        "org.jetbrains.kotlinx:kotlinx-serialization-json"
+      ]
+    },
+    {
+      "name": "Kotlin Symbol Processing and Room compiler",
+      "category": "build",
+      "use": "Generates code while building; not part of the app",
+      "license": "Apache-2.0",
+      "copyright": "Copyright (c) Google LLC and The Android Open Source Project",
+      "url": "https://github.com/google/ksp",
+      "modules": ["androidx.room:room-compiler"]
+    }
+  ]
+}

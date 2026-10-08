@@ -13,12 +13,13 @@ dependencies {
     api(libs.kotlinx.coroutines.core)
 }
 
-// SPEC.md section 12: the private-mode rules are covered completely.
+// Private mode must never leak: its rules are covered completely, lines and branches (SPEC section 12).
 kover {
     reports {
         verify {
-            rule("Private mode rules: full line coverage") {
-                minBound(100)
+            rule("Private mode rules are fully covered") {
+                minBound(100, kotlinx.kover.gradle.plugin.dsl.CoverageUnit.LINE)
+                minBound(100, kotlinx.kover.gradle.plugin.dsl.CoverageUnit.BRANCH)
             }
         }
     }

@@ -13,6 +13,13 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - Gesture typing: glide over the letters to type a word. A trail in the style's color follows the finger, the best word is typed with an automatic space, the other candidates sit in the suggestion bar (tap one to swap), and backspace removes the whole word. Works for Spanish and English together with no switching, offers your own dictionary words, and learns nothing in private mode. Settings: turn it on or off, show the trail, sensitivity. Styles gain a gesture trail color (style files move to schema version 2 and older files are upgraded automatically).
 - The home screen shows the app version and build number.
+- TalkBack and other screen readers can use the keyboard: every key, suggestion and bar button is announced and activated (explore by touch, double tap), shift says its state, enter says the editor action, long-press alternatives are in the actions menu, and the emoji, clipboard and dictation panels are fully labelled. Typing without a screen reader is unaffected.
+- Open-source licenses screen on the home screen: every component, font, icon set, data set and library with its license, link and full license text (GPL-3.0, Apache-2.0, MIT, SIL OFL 1.1, Unicode).
+
+### Changed
+
+- App screens for accessibility: 48 dp touch targets, labelled sliders and switches that read their value, section headers that say whether they are open, buttons that name the style they act on, and an error message (not only a red outline) for invalid colors.
+- Spanish translation audited; the build now fails when a string has no Spanish translation, or the placeholders differ.
 
 ## [0.7.0] - 2026-10-08
 
