@@ -175,6 +175,7 @@ internal fun rememberA11yLabels(): A11yLabels {
             delete = text(R.string.key_delete),
             globe = text(R.string.key_language),
             keyboardPicker = text(R.string.key_choose_keyboard),
+            openSettings = text(R.string.globe_menu_settings),
             symbols = text(R.string.key_symbols),
             letters = text(R.string.key_letters),
             moreSymbols = text(R.string.key_more_symbols),

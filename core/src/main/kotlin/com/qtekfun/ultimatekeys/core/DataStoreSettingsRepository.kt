@@ -51,6 +51,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     )
 
     private fun KeyboardSettings.withDictation(prefs: Preferences) = copy(
+        dictationEnabled = prefs[DICTATION_ENABLED] ?: dictationEnabled,
         dictationLanguage = prefs[DICTATION_LANGUAGE] ?: dictationLanguage,
         dictationSilenceMs = prefs[DICTATION_SILENCE] ?: dictationSilenceMs,
         dictationModelId = prefs[DICTATION_MODEL] ?: dictationModelId,
@@ -79,6 +80,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[GESTURE_TYPING] = s.gestureTyping
         this[GESTURE_TRAIL] = s.gestureTrail
         this[GESTURE_SENSITIVITY] = s.gestureSensitivity
+        this[DICTATION_ENABLED] = s.dictationEnabled
         this[DICTATION_LANGUAGE] = s.dictationLanguage
         this[DICTATION_SILENCE] = s.dictationSilenceMs
         this[DICTATION_MODEL] = s.dictationModelId
@@ -86,6 +88,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     }
 
     private companion object {
+        val DICTATION_ENABLED = booleanPreferencesKey("dictation_enabled")
         val DICTATION_LANGUAGE = stringPreferencesKey("dictation_language")
         val DICTATION_SILENCE = intPreferencesKey("dictation_silence_ms")
         val DICTATION_MODEL = stringPreferencesKey("dictation_model_id")

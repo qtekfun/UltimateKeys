@@ -3,6 +3,8 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_KEYBOARDS
+import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_SETTINGS
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 
 /** Carries out what an accessibility node stands for, with the same calls the touch path makes. */
@@ -19,7 +21,9 @@ object AccessibilityTargets {
                 controller.onAction(target.action)
             }
 
-            A11yTarget.KeyboardPicker -> controller.onGlobeLongPress()
+            A11yTarget.KeyboardPicker -> controller.onGlobeMenu(GLOBE_MENU_KEYBOARDS)
+
+            A11yTarget.OpenSettings -> controller.onGlobeMenu(GLOBE_MENU_SETTINGS)
 
             A11yTarget.TogglePrivate -> controller.togglePrivate()
 

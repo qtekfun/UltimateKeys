@@ -6,6 +6,7 @@ package com.qtekfun.ultimatekeys.ime.surface
 import com.qtekfun.ultimatekeys.gesture.GestureCapture
 import com.qtekfun.ultimatekeys.gesture.GestureKeyboard
 import com.qtekfun.ultimatekeys.gesture.GestureSensitivity
+import com.qtekfun.ultimatekeys.ime.GLOBE_MENU_KEYBOARDS
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.gesture.GestureSupport
 import com.qtekfun.ultimatekeys.ime.logic.Page
@@ -44,6 +45,9 @@ class SurfaceGestures(
             field = value
         }
     private var gestureKeyboard: GestureKeyboard? = null
+
+    /** Entries of the menu that opens on a long press of the language key; empty keeps the picker. */
+    var globeMenu: List<String> = emptyList()
 
     /** Whether the private-mode button sits at the left of the suggestion bar. */
     var stripToggleVisible = false
@@ -131,7 +135,14 @@ class SurfaceGestures(
 
             KeyAction.GLOBE -> scheduleLongPress(press) {
                 press.longPressHandled = true
-                controller.onGlobeLongPress()
+                if (globeMenu.isEmpty()) {
+                    controller.onGlobeMenu(GLOBE_MENU_KEYBOARDS)
+                } else {
+                    openMenu(
+                        press,
+                        globeMenu
+                    )
+                }
             }
 
             else -> Unit
@@ -165,10 +176,16 @@ class SurfaceGestures(
         selectionStepCount = 0
     }
 
-    private fun openChooser(press: Press, key: CharKey) {
+    private fun openChooser(press: Press, key: CharKey) = openMenu(press, key.alternatives)
+
+    /** Pops a row of [items] above the pressed key; sliding onto one and lifting picks it. */
+    private fun openMenu(press: Press, items: List<String>) {
         val geo = geometry ?: return
-        val items = key.alternatives
-        val cell = min(max(press.key.width, metrics.chooserMinCell), geo.width / items.size)
+        val wide = if (press.key.key is ActionKey) MENU_CELL_FACTOR else 1f
+        val cell = min(
+            max(press.key.width, metrics.chooserMinCell * wide),
+            geo.width / items.size
+        )
         val total = cell * items.size
         val left = (press.key.centerX - total / 2f).coerceIn(0f, max(0f, geo.width - total))
         val top = max(0f, press.key.top - metrics.chooserHeight - 2f)
@@ -348,6 +365,11 @@ class SurfaceGestures(
         val chooser = press.chooser
         val key = press.key.key
         return when {
+            chooser != null && key is ActionKey -> {
+                controller.onGlobeMenu(chooser.selected)
+                false
+            }
+
             chooser != null -> {
                 val choice = chooser.items.getOrNull(chooser.selected)
                 controller.onText(choice ?: (key as CharKey).output)
@@ -399,6 +421,7 @@ class SurfaceGestures(
         const val TOGGLE_SLOT = -1
         const val MIC_SLOT = -2
         const val MARGIN_MIC_SLOT = -5
+        const val MENU_CELL_FACTOR = 2.2f
         const val CLIPBOARD_SLOT = -3
         const val EMOJI_SLOT = -4
         const val STRIP_TOOLS = 2

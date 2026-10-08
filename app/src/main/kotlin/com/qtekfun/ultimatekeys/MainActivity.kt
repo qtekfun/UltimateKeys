@@ -198,6 +198,9 @@ private fun SettingsSection(
             settings.soundVolume,
             KeyboardSettings.PERCENT_RANGE
         ) { v -> update { it.copy(soundVolume = v) } }
+        SwitchSetting(R.string.setting_dictation_enabled, settings.dictationEnabled) { v ->
+            update { it.copy(dictationEnabled = v) }
+        }
         SwitchSetting(R.string.setting_suggestions, settings.showSuggestions) { v ->
             update { it.copy(showSuggestions = v) }
         }

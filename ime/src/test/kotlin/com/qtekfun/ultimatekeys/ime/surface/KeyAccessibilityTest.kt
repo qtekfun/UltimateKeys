@@ -44,6 +44,7 @@ class KeyAccessibilityTest {
         delete = "delete",
         globe = "language",
         keyboardPicker = "picker",
+        openSettings = "settings",
         symbols = "symbols",
         letters = "letters",
         moreSymbols = "more",
@@ -160,7 +161,13 @@ class KeyAccessibilityTest {
         assertEquals("emoji", node(nodes, "emoji").description)
         assertEquals("symbols", node(nodes, "symbols").description)
         val globe = node(nodes, "language")
-        assertEquals(listOf(A11yAction("picker", A11yTarget.KeyboardPicker)), globe.actions)
+        assertEquals(
+            listOf(
+                A11yAction("picker", A11yTarget.KeyboardPicker),
+                A11yAction("settings", A11yTarget.OpenSettings)
+            ),
+            globe.actions
+        )
     }
 
     @Test

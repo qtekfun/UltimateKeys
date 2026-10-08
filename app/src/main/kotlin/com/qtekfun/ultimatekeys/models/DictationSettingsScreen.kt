@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.Heading
 import com.qtekfun.ultimatekeys.LabeledSlider
+import com.qtekfun.ultimatekeys.LabeledSwitch
 import com.qtekfun.ultimatekeys.MinTouchTarget
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
@@ -50,6 +51,11 @@ internal fun DictationSettingsScreen(
         Text(
             stringResource(R.string.dictation_title),
             style = MaterialTheme.typography.headlineSmall
+        )
+        LabeledSwitch(
+            label = stringResource(R.string.setting_dictation_enabled),
+            checked = settings.dictationEnabled,
+            onChange = { v -> update { it.copy(dictationEnabled = v) } }
         )
         Heading(stringResource(R.string.dictation_language))
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
