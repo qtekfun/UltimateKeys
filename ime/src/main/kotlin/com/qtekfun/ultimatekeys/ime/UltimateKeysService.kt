@@ -35,6 +35,7 @@ import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
 import com.qtekfun.ultimatekeys.engine.SharedEngine
 import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
+import com.qtekfun.ultimatekeys.ime.gesture.GestureSupport
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
@@ -115,6 +116,26 @@ class UltimateKeysService :
         )
         clipboardWatcher =
             SystemClipboardWatcher(this, controller.clipboard, scope).also { it.start() }
+        loadGesturesInBackground()
+    }
+
+    /** Parses the word lists for gesture typing (a second or two); gestures start working when done. */
+    private fun loadGesturesInBackground() {
+        scope.launch(Dispatchers.Default) {
+            try {
+                val locator = installDictionaries()
+                val vocabulary = GestureSupport.vocabulary(
+                    locator,
+                    listOf(Locale.forLanguageTag("es"), Locale.forLanguageTag("en"))
+                )
+                controller.gesture.install(vocabulary)
+            } catch (
+                @Suppress("TooGenericExceptionCaught") e: Throwable
+            ) {
+                // Gesture typing is optional: typing must keep working without it.
+                Log.e("UltimateKeys", "Gesture typing unavailable", e)
+            }
+        }
     }
 
     /** Builds the dictionaries on first run (seconds) and then switches typing to the real engine. */

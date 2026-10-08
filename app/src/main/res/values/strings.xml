@@ -24,6 +24,9 @@
     <string name="setting_smart_punctuation">Smart punctuation spacing</string>
     <string name="setting_suggestions">Show suggestions</string>
     <string name="setting_autocorrect">Auto-correction</string>
+    <string name="setting_gesture_typing">Gesture typing (glide over the letters)</string>
+    <string name="setting_gesture_trail">Show the gesture trail</string>
+    <string name="setting_gesture_sensitivity">Gesture sensitivity</string>
     <string name="user_dictionary_open">My dictionary and learned words</string>
     <string name="user_dictionary_title">My dictionary</string>
     <string name="user_dictionary_add">New word</string>
@@ -161,4 +164,5 @@
     <string name="retention_day">1 day</string>
     <string name="retention_week">7 days</string>
     <string name="retention_forever">Forever</string>
+    <string name="col_gesture_trail">Gesture typing trail</string>
 </resources>

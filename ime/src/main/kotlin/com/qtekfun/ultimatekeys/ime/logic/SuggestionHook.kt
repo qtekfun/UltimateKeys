@@ -16,4 +16,10 @@ interface SuggestionHook {
 
     /** The user undid an autocorrection of [original]. */
     fun onAutoCorrectRejected(original: String)
+
+    /**
+     * [word] was typed by gesture; [alternatives] are the other candidates, best first. The word is
+     * not finished yet (the person may still swap or take it back): [onWordFinished] follows later.
+     */
+    fun onGestureCommitted(word: String, contextBefore: String, alternatives: List<String>) = Unit
 }

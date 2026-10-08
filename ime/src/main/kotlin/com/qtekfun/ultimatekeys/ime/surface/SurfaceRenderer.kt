@@ -10,6 +10,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -75,17 +76,43 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
         scope.drawRect(style.background)
         drawStrip(scope, geometry, strip, style, dimens)
-        val pressedKeys = presses.map { it.key }.toSet()
+        val pressedKeys = presses.filter { it.mode != PressMode.GESTURE }.map { it.key }.toSet()
         geometry.keys.forEach { placed ->
             drawKey(scope, placed, state, placed in pressedKeys, style, labels, dimens)
         }
         presses.forEach { press ->
+            drawTrail(scope, press.trail, style, dimens)
             val chooser = press.chooser
             if (chooser != null) {
                 drawChooser(scope, chooser, style, dimens)
             } else if (press.key.key is CharKey && press.mode == PressMode.NORMAL) {
                 drawPreview(scope, press.key, state, style, dimens)
             }
+        }
+    }
+
+    /** The line a gliding finger leaves: it thins and fades towards its oldest end. */
+    private fun drawTrail(
+        scope: DrawScope,
+        trail: FloatArray,
+        style: SurfaceStyle,
+        dimens: SurfaceDimens
+    ) {
+        val points = trail.size / 2
+        if (points < 2) return
+        val width = dimens.labelSize * TRAIL_WIDTH
+        for (i in 1 until points) {
+            val age = i.toFloat() / points
+            scope.drawLine(
+                color = style.gestureTrail.copy(
+                    alpha =
+                        style.gestureTrail.alpha * (TRAIL_MIN_ALPHA + (1f - TRAIL_MIN_ALPHA) * age)
+                ),
+                start = Offset(trail[2 * i - 2], trail[2 * i - 1]),
+                end = Offset(trail[2 * i], trail[2 * i + 1]),
+                strokeWidth = width * (TRAIL_MIN_WIDTH + (1f - TRAIL_MIN_WIDTH) * age),
+                cap = StrokeCap.Round
+            )
         }
     }
 
@@ -483,5 +510,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val PILL_HEIGHT = 0.68f
         const val PILL_ALPHA = 0.55f
         const val PREVIEW_TEXT = 1.3f
+        const val TRAIL_WIDTH = 0.5f
+        const val TRAIL_MIN_ALPHA = 0.15f
+        const val TRAIL_MIN_WIDTH = 0.3f
     }
 }

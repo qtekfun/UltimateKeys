@@ -24,6 +24,9 @@
     <string name="setting_smart_punctuation">Espaciado inteligente de puntuación</string>
     <string name="setting_suggestions">Mostrar sugerencias</string>
     <string name="setting_autocorrect">Autocorrección</string>
+    <string name="setting_gesture_typing">Escritura gestual (desliza sobre las letras)</string>
+    <string name="setting_gesture_trail">Mostrar la estela del gesto</string>
+    <string name="setting_gesture_sensitivity">Sensibilidad del gesto</string>
     <string name="user_dictionary_open">Mi diccionario y palabras aprendidas</string>
     <string name="user_dictionary_title">Mi diccionario</string>
     <string name="user_dictionary_add">Palabra nueva</string>
@@ -161,4 +164,5 @@
     <string name="retention_day">1 día</string>
     <string name="retention_week">7 días</string>
     <string name="retention_forever">Siempre</string>
+    <string name="col_gesture_trail">Estela de escritura gestual</string>
 </resources>

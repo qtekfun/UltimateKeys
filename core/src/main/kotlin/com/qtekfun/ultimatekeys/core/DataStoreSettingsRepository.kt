@@ -41,8 +41,14 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
             clipboardMaxItems = this[CLIPBOARD_MAX_ITEMS] ?: d.clipboardMaxItems,
             emojiSkinTone = this[EMOJI_SKIN_TONE] ?: d.emojiSkinTone,
             emojiRecents = this[EMOJI_RECENTS] ?: d.emojiRecents
-        ).sanitized()
+        ).withGesture(this).sanitized()
     }
+
+    private fun KeyboardSettings.withGesture(prefs: Preferences) = copy(
+        gestureTyping = prefs[GESTURE_TYPING] ?: gestureTyping,
+        gestureTrail = prefs[GESTURE_TRAIL] ?: gestureTrail,
+        gestureSensitivity = prefs[GESTURE_SENSITIVITY] ?: gestureSensitivity
+    )
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(s: KeyboardSettings) {
         this[HEIGHT] = s.heightPercent
@@ -63,10 +69,16 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[CLIPBOARD_MAX_ITEMS] = s.clipboardMaxItems
         this[EMOJI_SKIN_TONE] = s.emojiSkinTone
         this[EMOJI_RECENTS] = s.emojiRecents
+        this[GESTURE_TYPING] = s.gestureTyping
+        this[GESTURE_TRAIL] = s.gestureTrail
+        this[GESTURE_SENSITIVITY] = s.gestureSensitivity
     }
 
     private companion object {
         val HEIGHT = intPreferencesKey("height_percent")
+        val GESTURE_TYPING = booleanPreferencesKey("gesture_typing")
+        val GESTURE_TRAIL = booleanPreferencesKey("gesture_trail")
+        val GESTURE_SENSITIVITY = intPreferencesKey("gesture_sensitivity")
         val BOTTOM_MARGIN = intPreferencesKey("bottom_margin_dp")
         val NUMBER_ROW = booleanPreferencesKey("number_row")
         val LONG_PRESS = intPreferencesKey("long_press_delay_ms")

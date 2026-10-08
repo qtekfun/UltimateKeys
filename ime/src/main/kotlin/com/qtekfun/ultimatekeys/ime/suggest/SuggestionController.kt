@@ -16,7 +16,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** What the suggestion strip shows: left, centre (the best) and right slots; empty when unused. */
-data class SuggestionState(val slots: List<String> = List(SLOTS) { "" }) {
+data class SuggestionState(
+    val slots: List<String> = List(SLOTS) { "" },
+    /** True while the slots are the alternatives of a word just typed by gesture (a tap swaps the word). */
+    val gesture: Boolean = false
+) {
     companion object {
         const val SLOTS = 3
         const val BEST = 1
@@ -68,6 +72,20 @@ class SuggestionController(
         if (!learningAllowed() || word.isBlank()) return
         val context = ContextWords.from(contextBefore)
         scope.launch(dispatcher) { engine.learn(word, context, locale()) }
+    }
+
+    override fun onGestureCommitted(
+        word: String,
+        contextBefore: String,
+        alternatives: List<String>
+    ) {
+        job?.cancel()
+        cache = null
+        val others = alternatives.filterNot { it.equals(word, ignoreCase = true) }
+        mutableState.value = SuggestionState(
+            listOf(others.getOrNull(0).orEmpty(), word, others.getOrNull(1).orEmpty()),
+            gesture = true
+        )
     }
 
     override fun onAutoCorrectRejected(original: String) {

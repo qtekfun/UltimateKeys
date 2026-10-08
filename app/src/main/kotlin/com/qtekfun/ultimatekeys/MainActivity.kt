@@ -182,6 +182,19 @@ private fun SettingsSection(
         SwitchSetting(R.string.setting_autocorrect, settings.autoCorrect) { v ->
             update { it.copy(autoCorrect = v) }
         }
+        SwitchSetting(R.string.setting_gesture_typing, settings.gestureTyping) { v ->
+            update { it.copy(gestureTyping = v) }
+        }
+        if (settings.gestureTyping) {
+            SwitchSetting(R.string.setting_gesture_trail, settings.gestureTrail) { v ->
+                update { it.copy(gestureTrail = v) }
+            }
+            SliderSetting(
+                R.string.setting_gesture_sensitivity,
+                settings.gestureSensitivity,
+                KeyboardSettings.PERCENT_RANGE
+            ) { v -> update { it.copy(gestureSensitivity = v) } }
+        }
         SwitchSetting(R.string.setting_number_row, settings.numberRow) { v ->
             update { it.copy(numberRow = v) }
         }

@@ -15,6 +15,8 @@ import com.qtekfun.ultimatekeys.emoji.EmojiData
 import com.qtekfun.ultimatekeys.emoji.EmojiSearch
 import com.qtekfun.ultimatekeys.engine.NoopSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.SuggestionEngine
+import com.qtekfun.ultimatekeys.gesture.GestureKeyboard
+import com.qtekfun.ultimatekeys.ime.gesture.GestureTyping
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.logic.InputOptions
 import com.qtekfun.ultimatekeys.ime.logic.Page
@@ -22,6 +24,7 @@ import com.qtekfun.ultimatekeys.ime.panels.PanelKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelsController
 import com.qtekfun.ultimatekeys.ime.suggest.PrivacyGuardedEngine
 import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
+import com.qtekfun.ultimatekeys.ime.suggest.SuggestionState
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
 import com.qtekfun.ultimatekeys.ime.voice.DictationHost
 import com.qtekfun.ultimatekeys.layouts.BottomRow
@@ -34,6 +37,7 @@ import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
 import com.qtekfun.ultimatekeys.style.StyleRepository
+import com.qtekfun.ultimatekeys.voice.DictationState
 import com.qtekfun.ultimatekeys.voice.DictationResult
 import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,6 +49,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Connects the surface, the typing logic, the settings and the feedback. Main thread only. */
 class KeyboardController(
@@ -53,7 +58,9 @@ class KeyboardController(
     private val scope: CoroutineScope,
     private val feedback: Feedback?,
     private val engine: SuggestionEngine = NoopSuggestionEngine,
-    suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
+    private val suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(
+        1
+    ),
     private val logLatency: ((String) -> Unit)? = null,
     styles: StyleRepository = InMemoryStyleRepository(),
     /** Dictation; null hides the microphone key (no speech engine in this build). */
@@ -109,6 +116,9 @@ class KeyboardController(
         locale = { logic.locale },
         learningAllowed = { !privacy.isPrivate }
     )
+
+    /** Gesture typing; it works once the word lists are installed into it (see [GestureTyping.install]). */
+    val gesture = GestureTyping(engine)
 
     init {
         logic.suggestionHook = suggestions
@@ -210,12 +220,44 @@ class KeyboardController(
 
     /** A tap on slot [index] of the suggestion strip. */
     fun onSuggestionTapped(index: Int) {
-        val word = suggestions.state.value.slots.getOrNull(index).orEmpty()
-        if (word.isNotEmpty()) logic.commitWithAutoSpace(word)
+        val state = suggestions.state.value
+        val word = state.slots.getOrNull(index).orEmpty()
+        if (word.isEmpty()) return
+        if (state.gesture && logic.canReplaceGestureWord) {
+            // The strip offers alternatives to the word just glided: the centre one is already typed.
+            if (index != SuggestionState.BEST) {
+                logic.replaceGestureWord(word, state.slots.filter { it.isNotEmpty() && it != word })
+            }
+            return
+        }
+        logic.commitWithAutoSpace(word)
+    }
+
+    /**
+     * A finger glided over the letters along [path] (pixels of [keyboard], interleaved x and y). Decodes
+     * off the main thread and then types the best word, offering the others in the strip.
+     */
+    fun onGesture(path: FloatArray, keyboard: GestureKeyboard) {
+        if (!gesture.ready) return
+        val context = logic.contextText()
+        val locale = logic.locale
+        scope.launch {
+            val words = withContext(suggestionDispatcher) {
+                gesture.decode(path, keyboard, context, locale)
+            }
+            if (words.isNotEmpty()) {
+                logic.commitGestureWord(words.first(), words.drop(1).take(ALTERNATIVES))
+            }
+        }
     }
 
     /** The clipboard button in the suggestion bar. */
     fun openClipboard() = openPanel(PanelKind.CLIPBOARD)
+
+    /** True while the emoji or clipboard panel or a dictation replaces the keys: no gestures then. */
+    val panelOrDictationOpen: Boolean
+        get() = panels.kind.value != PanelKind.NONE ||
+            (dictation != null && dictation.state.value != DictationState.Idle)
 
     /** Panels are exclusive: opening one ends a running dictation. */
     private fun openPanel(kind: PanelKind) {
@@ -240,6 +282,7 @@ class KeyboardController(
 
     private companion object {
         const val LOG_EVERY = 20
+        const val ALTERNATIVES = 4
         const val P50 = 50.0
         const val P95 = 95.0
     }
