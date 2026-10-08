@@ -103,7 +103,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     }
     DisposableEffect(layout) { onDispose { gestures.cancelAll() } }
 
-    val renderer = remember { SurfaceRenderer() }
+    val renderer = remember(context) { SurfaceRenderer(FontCatalog(context.assets)) }
     // The system bar area below the keys carries the keyboard's own background, like a margin.
     Box(
         modifier = modifier

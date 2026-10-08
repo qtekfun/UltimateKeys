@@ -48,7 +48,7 @@ data class SurfaceDimens(
 )
 
 /** Draws the key surface with plain canvas calls: one pass, no per-key composables. */
-class SurfaceRenderer {
+class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     private var loadedFont: FontChoice? = null
     private var loadedWeight = 0
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -67,7 +67,7 @@ class SurfaceRenderer {
         strip: List<String> = emptyList()
     ) {
         if (style.font != loadedFont || style.fontWeight != loadedWeight) {
-            text.typeface = SurfaceStyle.typefaceFor(style.font, style.fontWeight)
+            text.typeface = fonts.typeface(style.font, style.fontWeight)
             loadedFont = style.font
             loadedWeight = style.fontWeight
         }

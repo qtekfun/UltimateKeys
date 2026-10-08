@@ -133,25 +133,10 @@ data class SurfaceStyle(
                 BackgroundKind.IMAGE, BackgroundKind.SOLID -> SolidColor(colors.first())
             }
         }
-
-        /** Font loading is centralised here: bundled fonts are added in one place. */
-        fun typefaceFor(font: FontChoice, weight: Int): Typeface =
-            Typeface.create(FontCatalog.base(font), weight, false)
     }
 }
 
 private fun ArgbColor.color() = Color(argb)
-
-/** Where each [FontChoice] comes from. `SYSTEM` is the device default. */
-internal object FontCatalog {
-    fun base(font: FontChoice): Typeface = when (font) {
-        FontChoice.SYSTEM,
-        FontChoice.INTER,
-        FontChoice.ROBOTO_FLEX,
-        FontChoice.ATKINSON_HYPERLEGIBLE,
-        FontChoice.NUNITO -> Typeface.DEFAULT
-    }
-}
 
 /** A linear gradient along [angleDegrees] (0 = left to right, 90 = top to bottom) over the whole area. */
 class AngleGradient(private val colors: List<Color>, private val angleDegrees: Int) :
