@@ -4,7 +4,9 @@
 package com.qtekfun.ultimatekeys.style
 
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.int
@@ -47,6 +49,20 @@ object StyleCodec {
     private val migrations: Map<Int, (JsonObject) -> JsonObject> = emptyMap()
 
     fun encode(style: Style): String = json.encodeToString(Style.serializer(), style.sanitized())
+
+    /** Writes a list of styles as one JSON array (used for persistence, not for sharing). */
+    fun encodeAll(styles: List<Style>): String =
+        json.encodeToString(ListSerializer(Style.serializer()), styles.map { it.sanitized() })
+
+    /** Reads a list written by [encodeAll]; entries that fail to load are dropped. */
+    fun decodeAll(text: String): List<Style> {
+        val array = try {
+            json.parseToJsonElement(text) as? JsonArray
+        } catch (_: SerializationException) {
+            null
+        } ?: return emptyList()
+        return array.mapNotNull { (decode(it.toString()) as? StyleLoadResult.Loaded)?.style }
+    }
 
     fun decode(text: String): StyleLoadResult {
         if (text.length > MAX_BYTES) return StyleLoadResult.Failed(StyleLoadError.TooLarge)

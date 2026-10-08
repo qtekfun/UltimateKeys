@@ -41,7 +41,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val strip by controller.suggestions.state.collectAsState()
     val settings by controller.settings.collectAsState()
     val density = LocalDensity.current
-    val style = if (isSystemInDarkTheme()) TempStyle.Dark else TempStyle.Light
+    val activeStyle by controller.style.collectAsState()
+    val systemDark = isSystemInDarkTheme()
+    val style = remember(activeStyle, systemDark) { SurfaceStyle.resolve(activeStyle, systemDark) }
     val labels = rememberLabels()
     val description = stringResource(R.string.keyboard_description)
 
@@ -54,17 +56,34 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val rowDp = SurfaceSpec.rowDp(settings.heightPercent)
     val dimens = with(density) {
         SurfaceDimens(
-            gapX = SurfaceSpec.GAP_X_DP.dp.toPx(),
-            gapY = SurfaceSpec.GAP_Y_DP.dp.toPx(),
-            corner = 8.dp.toPx(),
-            labelSize = (rowDp * LABEL_RATIO).dp.toPx(),
+            gapX = style.gapXDp.dp.toPx(),
+            gapY = style.gapYDp.dp.toPx(),
+            corner = style.cornerDp.dp.toPx(),
+            borderWidth = style.borderWidthDp.dp.toPx(),
+            elevation = style.elevationDp.dp.toPx(),
+            labelSize = (rowDp * LABEL_RATIO * style.labelSizePercent / PERCENT).dp.toPx(),
             hintSize = 10.dp.toPx(),
             previewHeight = (rowDp * PREVIEW_RATIO).dp.toPx()
         )
     }
-    val geometry = remember(layout, widthPx, settings.heightPercent, density) {
-        SurfaceSpec.geometry(layout, widthPx, density.density, settings.heightPercent)
-    }
+    val geometry =
+        remember(
+            layout,
+            widthPx,
+            settings.heightPercent,
+            settings.numberRow,
+            activeStyle,
+            density
+        ) {
+            SurfaceSpec.geometry(
+                layout,
+                widthPx,
+                density.density,
+                settings.heightPercent,
+                activeStyle,
+                settings.numberRow
+            )
+        }
 
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
@@ -94,7 +113,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                     SurfaceSpec.totalHeightDp(
                         layout.rows.size,
                         settings.heightPercent,
-                        settings.bottomMarginDp
+                        settings.bottomMarginDp,
+                        activeStyle,
+                        settings.numberRow
                     ).dp
                 )
                 .onSizeChanged { widthPx = it.width.toFloat() }
@@ -152,4 +173,5 @@ private fun rememberLabels(): SurfaceLabels {
 }
 
 private const val LABEL_RATIO = 0.4f
+private const val PERCENT = 100f
 private const val PREVIEW_RATIO = 1.0f

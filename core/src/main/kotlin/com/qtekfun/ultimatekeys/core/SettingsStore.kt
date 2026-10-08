@@ -8,6 +8,10 @@ import androidx.datastore.preferences.preferencesDataStore
 
 private val Context.keyboardSettingsStore by preferencesDataStore(name = "keyboard_settings")
 
+/** The user's active style and custom styles, in the same DataStore file as the settings. */
+fun Context.styleRepository(): com.qtekfun.ultimatekeys.style.StyleRepository =
+    DataStoreStyleRepository(applicationContext.keyboardSettingsStore)
+
 /** The settings repository backed by the app's single DataStore file. */
 fun Context.settingsRepository(): SettingsRepository =
     DataStoreSettingsRepository(applicationContext.keyboardSettingsStore)

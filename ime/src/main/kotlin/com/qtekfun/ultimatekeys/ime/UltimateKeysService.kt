@@ -24,6 +24,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.qtekfun.ultimatekeys.core.settingsRepository
+import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
 import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
@@ -72,6 +73,7 @@ class UltimateKeysService :
             scope = scope,
             feedback = Feedback(this),
             engine = engine,
+            styles = styleRepository(),
             showImePicker = {
                 getSystemService(InputMethodManager::class.java).showInputMethodPicker()
             },

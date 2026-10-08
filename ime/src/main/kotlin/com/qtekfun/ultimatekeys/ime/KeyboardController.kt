@@ -15,6 +15,10 @@ import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
+import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
+import com.qtekfun.ultimatekeys.style.Presets
+import com.qtekfun.ultimatekeys.style.Style
+import com.qtekfun.ultimatekeys.style.StyleRepository
 import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -35,10 +39,15 @@ class KeyboardController(
     private val engine: SuggestionEngine = NoopSuggestionEngine,
     suggestionDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(1),
     private val logLatency: ((String) -> Unit)? = null,
+    styles: StyleRepository = InMemoryStyleRepository(),
     private val showImePicker: () -> Unit
 ) {
     val settings: StateFlow<KeyboardSettings> =
         repository.settings.stateIn(scope, SharingStarted.Eagerly, KeyboardSettings())
+
+    /** The style the surface is drawn with; changes apply immediately. */
+    val style: StateFlow<Style> =
+        styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
     val latency = LatencyTracker()
     val suggestions = SuggestionController(
         engine = engine,

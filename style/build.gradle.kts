@@ -12,4 +12,5 @@ android {
 
 dependencies {
     api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.coroutines.core)
 }
