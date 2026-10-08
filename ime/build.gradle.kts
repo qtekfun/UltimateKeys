@@ -40,3 +40,20 @@ tasks.withType<Test>().configureEach {
         ).layout.buildDirectory.dir("generated/dictionaries/assets").get().asFile.path
     )
 }
+
+// The part of private mode that lives here (the engine wrapper that stops learning) is covered completely.
+kover {
+    reports {
+        filters {
+            includes {
+                classes("com.qtekfun.ultimatekeys.ime.suggest.PrivacyGuardedEngine*")
+            }
+        }
+        verify {
+            rule("Private mode engine guard is fully covered") {
+                minBound(100, kotlinx.kover.gradle.plugin.dsl.CoverageUnit.LINE)
+                minBound(100, kotlinx.kover.gradle.plugin.dsl.CoverageUnit.BRANCH)
+            }
+        }
+    }
+}
