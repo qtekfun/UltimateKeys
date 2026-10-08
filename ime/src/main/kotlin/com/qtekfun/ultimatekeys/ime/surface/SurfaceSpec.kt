@@ -28,6 +28,11 @@ object SurfaceSpec {
         percent / PERCENT
     }
 
+    /** True when dictation exists and the style puts its button in the bottom margin. */
+    fun micInMargin(voice: Boolean, style: Style): Boolean = voice &&
+        style.bottomRow.micPlacement ==
+        com.qtekfun.ultimatekeys.style.MicPlacement.BOTTOM_MARGIN
+
     /** The margin under the keys, made tall enough for the microphone when it sits there. */
     fun marginDp(bottomMarginDp: Int, micInMargin: Boolean): Float = if (micInMargin) {
         maxOf(

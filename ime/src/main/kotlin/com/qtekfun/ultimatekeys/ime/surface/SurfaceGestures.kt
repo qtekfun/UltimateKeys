@@ -276,24 +276,26 @@ class SurfaceGestures(
         }
     }
 
+    private fun finishStripPress(slot: Int, x: Float) {
+        val same = if (slot == MARGIN_MIC_SLOT) {
+            x < 0f || marginMic?.containsX(x) == true
+        } else {
+            x < 0f || slotAt(x) == slot
+        }
+        if (!same) return
+        when (slot) {
+            MARGIN_MIC_SLOT, MIC_SLOT -> controller.onAction(KeyAction.MIC)
+            TOGGLE_SLOT -> controller.togglePrivate()
+            CLIPBOARD_SLOT -> controller.openClipboard()
+            EMOJI_SLOT -> controller.onAction(KeyAction.EMOJI)
+            else -> controller.onSuggestionTapped(slot)
+        }
+    }
+
     fun up(id: Long, x: Float = -1f) {
         val slot = stripPresses.remove(id)
         if (slot != null) {
-            val same = if (slot == MARGIN_MIC_SLOT) {
-                x < 0f || marginMic?.containsX(x) == true
-            } else {
-                x < 0f || slotAt(x) == slot
-            }
-            if (same) {
-                when (slot) {
-                    MARGIN_MIC_SLOT -> controller.onAction(KeyAction.MIC)
-                    TOGGLE_SLOT -> controller.togglePrivate()
-                    MIC_SLOT -> controller.onAction(KeyAction.MIC)
-                    CLIPBOARD_SLOT -> controller.openClipboard()
-                    EMOJI_SLOT -> controller.onAction(KeyAction.EMOJI)
-                    else -> controller.onSuggestionTapped(slot)
-                }
-            }
+            finishStripPress(slot, x)
             return
         }
         val press = presses.remove(id) ?: return

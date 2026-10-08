@@ -113,8 +113,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
     val dictating = dictation != null && dictationState != DictationState.Idle
     val showTools = activeStyle.suggestionBar.toolIcons == ToolIcons.SHOWN
-    val micInMargin = controller.features.voice &&
-        activeStyle.bottomRow.micPlacement == MicPlacement.BOTTOM_MARGIN
+    val micInMargin = SurfaceSpec.micInMargin(controller.features.voice, activeStyle)
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
@@ -146,15 +145,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         settings.numberRow,
         micInMargin
     )
-    val marginMic = if (micInMargin) {
-        MarginMic.of(
-            widthPx,
-            geometry.top + geometry.height,
-            keysHeightDp * density.density
-        )
-    } else {
-        null
-    }
+    val marginMic = MarginMic.forSurface(
+        micInMargin,
+        widthPx,
+        geometry.top + geometry.height,
+        keysHeightDp * density.density
+    )
     gestures.marginMic = marginMic
     // The system bar area below the keys carries the keyboard's own background, like a margin.
     Box(

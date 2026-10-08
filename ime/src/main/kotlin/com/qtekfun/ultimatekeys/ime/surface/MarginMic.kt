@@ -22,6 +22,14 @@ data class MarginMic(val left: Float, val top: Float, val right: Float, val bott
         private const val ICON_RATIO = 0.5f
         private const val WIDTH_RATIO = 1.6f
 
+        /** [of] when [enabled], otherwise null. */
+        fun forSurface(
+            enabled: Boolean,
+            width: Float,
+            keysBottom: Float,
+            totalHeight: Float
+        ): MarginMic? = if (enabled) of(width, keysBottom, totalHeight) else null
+
         /** The zone below the keys, or null when there is no margin to put it in. */
         fun of(width: Float, keysBottom: Float, totalHeight: Float): MarginMic? {
             val height = totalHeight - keysBottom

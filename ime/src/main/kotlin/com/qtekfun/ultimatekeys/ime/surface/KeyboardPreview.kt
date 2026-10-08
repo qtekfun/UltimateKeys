@@ -73,8 +73,7 @@ fun KeyboardPreview(
             content.numberRow
         )
     }
-    val micInMargin = content.features.voice &&
-        style.bottomRow.micPlacement == MicPlacement.BOTTOM_MARGIN
+    val micInMargin = SurfaceSpec.micInMargin(content.features.voice, style)
     val height = SurfaceSpec.totalHeightDp(
         layout.rows.size,
         content.heightPercent,
@@ -103,15 +102,12 @@ fun KeyboardPreview(
                         style.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR,
                     showTools = content.showToggle &&
                         style.suggestionBar.toolIcons == ToolIcons.SHOWN,
-                    marginMic = if (micInMargin) {
-                        MarginMic.of(
-                            widthPx,
-                            geometry.top + geometry.height,
-                            height * density.density
-                        )
-                    } else {
-                        null
-                    }
+                    marginMic = MarginMic.forSurface(
+                        micInMargin,
+                        widthPx,
+                        geometry.top + geometry.height,
+                        height * density.density
+                    )
                 )
             )
         }
