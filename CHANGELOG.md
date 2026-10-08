@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-08
+
 ## [0.5.0] - 2026-10-08
 
 ## [0.4.0] - 2026-10-08
@@ -55,7 +57,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v0.2.0...v0.3.0
