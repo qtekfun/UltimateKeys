@@ -97,6 +97,18 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Before the `1.0.0` tag: read the store texts in `fastlane/metadata/android/*/` and the README against the build you are about to release (flavors, models, the licenses screen), and look at the screenshots there.
 - [ ] After the `1.0.0` tag: build the `lite` APK on another machine and compare it with the published one (`docs/DISTRIBUTION.md`), then open the fdroiddata merge request.
 
+## Many languages (ADR 0022)
+
+- [ ] Typing feel per script on the Find X8 Pro and a smaller phone: French AZERTY, German QWERTZ, Turkish Q (12 keys on the top row), Russian (12 keys), Greek and Polish. Check that the narrow keys of the 11 and 12 key rows are comfortable and that the "wider edge keys" setting helps.
+- [ ] Long-press accents on a real device: each language's special letters appear first in the popup (for example é è ê à ç œ in French, ä ö ü ß in German, ă â î ș ț in Romanian, ё in Russian, ά έ ή in Greek) and the popup fits the screen on 6-key-wide edge letters.
+- [ ] Turkish: with shift on, i types İ and ı types I; the suggestion bar capitalizes Turkish words the same way.
+- [ ] Turn on six languages (for example Spanish, English, French, German, Russian and Greek) on a real phone: the first build of the dictionaries (a few seconds each) never freezes typing, the Languages screen shows "Preparing the dictionary" and then clears it, suggestions appear in each language, and the key-to-suggestion latency stays under 30 ms (read `UKLatency`); note memory in `docs/PERFORMANCE.md`.
+- [ ] Mixed typing quality with three or more languages: write a sentence that switches between them; check that the suggestions follow the language of the previous words and that auto-correction does not "fix" a valid word of another enabled language.
+- [ ] The language key: a tap moves through the enabled languages in the order of the Languages screen, the space bar shows the right name and fits (long names such as Portugues (BR)), the menu on long press shows three entries with words that fit, and Languages opens the right screen of the app.
+- [ ] Gesture typing in Cyrillic, Greek, French and German; words with letters that have a key of their own (ö, ø, ł, ß) and words typed on a layout without that key (a German word on the Spanish layout).
+- [ ] TalkBack on the language key: it says the active language and offers the Languages and Settings actions.
+- [ ] Disable a language that was in use: the keyboard moves to another enabled one, memory and disk space of the old one are given back (check the app storage in Android settings), and enabling it again works.
+
 ## Phase 8, performance
 
 - [ ] On the Find X8 Pro, run a debug build and read `UKLatency` in logcat: `first-show` (target under 300 ms), `key-to-commit` p95 (under 16 ms), gesture `lift-to-candidates` (under 50 ms); add the numbers to the table in `docs/PERFORMANCE.md`.

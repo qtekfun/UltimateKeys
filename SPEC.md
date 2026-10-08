@@ -61,7 +61,7 @@ Rules:
 ## 4. IME core
 
 - `InputMethodService` implementation with robust `InputConnection` handling: composing text, batch edits, cursor tracking (`onUpdateSelection`), restarts, password fields, apps with broken editors.
-- Layouts defined as data (JSON or Kotlin DSL) in `:layouts`: Spanish QWERTY (with `ñ`), English QWERTY, symbols (2 pages), numeric, phone, number row variant. Easy to add more layouts later.
+- Layouts defined as data (JSON or Kotlin DSL) in `:layouts`: Spanish QWERTY (with `ñ`), English QWERTY, one or more layouts for each other supported language (ADR 0022), symbols (2 pages), numeric, phone, number row variant. The supported languages are listed as data in `:languages`; right-to-left languages are out of scope.
 - Shift: single tap, double tap caps lock, auto-capitalization following `EditorInfo` caps mode.
 - Long-press: accented and alternative characters per layout (e.g. `a → á à ä â ã å ā`), popup chooser with slide-to-select.
 - Delete key with accelerating repeat and swipe-left-to-delete-word.
@@ -76,7 +76,7 @@ Rules:
 ## 5. Suggestions and autocorrect
 
 - `:engine` module wraps the native engine behind a Kotlin `SuggestionEngine` interface: `suggest(context, composing, locale)`, `predictNext(context)`, `learn(word, context)`, `isValidWord()`, `addToUserDictionary()`, `clearLearned()`.
-- **Spanish + English mixed typing without manual switching**: query both locale dictionaries and merge candidates with a language-confidence weight derived from recent context (last N words). Spanish primary by default.
+- **Mixed typing in two or more languages without manual switching**: query the dictionary of every enabled language (at most six, Spanish and English by default) and merge candidates with a language-confidence weight derived from recent context (last N words). The language of the active layout is the primary one (ADR 0022).
 - Suggestion strip shows up to 3 (or scrolling N, depending on style) candidates; autocorrect on space/punctuation with undo by backspace immediately after correction.
 - Next-word prediction after space.
 - User dictionary (add/remove words, import/export) and learned history, both disabled while private mode is on.

@@ -6,9 +6,10 @@ UltimateKeys is a modern keyboard that works entirely offline. There are no anal
 • Material You colors, and a warning when text would be hard to read.
 • Export, import and share your styles as .ukstyle files.
 
-<b>Type fast, in two languages</b>
-• Spanish and English layouts (with ñ), symbols, numbers and an optional number row.
-• Suggestions, auto-correction and next-word prediction that mix Spanish and English with no switching.
+<b>Type fast, in many languages</b>
+• 22 languages, each with its own layout and dictionary: Spanish, English (US and UK), French, German, Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Danish, Norwegian, Swedish, Finnish, Turkish, Romanian, Croatian, Slovenian, Serbian (Cyrillic), Lithuanian, Latvian, Russian and Greek. Hebrew and other right-to-left languages are not supported yet.
+• Turn on up to six at once: suggestions, auto-correction and next-word prediction mix all of them with no switching, and the language key moves from one to the next. Spanish and English are on by default.
+• Symbols, numbers and an optional number row.
 • Gesture typing: glide over the letters and the word appears.
 • Accents and alternatives on long press, caps lock, cursor control on the space bar, drag on delete to select and remove.
 • Your own dictionary, with import and export.
@@ -24,9 +25,9 @@ UltimateKeys is a modern keyboard that works entirely offline. There are no anal
 • Emoji by category, recent emoji, skin tones and search by name in English and Spanish, all offline.
 
 <b>Dictation without a connection</b>
-• Tap the microphone and speak: the text is recognized on your phone with Whisper (whisper.cpp), in Spanish or English.
+• Tap the microphone and speak: the text is recognized on your phone with Whisper (whisper.cpp), in Spanish or English (dictation does not cover the other languages yet).
 • Audio stays in memory and is never written to disk or sent anywhere.
 • Pick the model that suits your phone: a small one that is quick, or a larger one that is more accurate.
 
 <b>Free software</b>
-UltimateKeys is licensed under the GPL-3.0-or-later. It builds on the Android Open Source Project suggestion engine and word lists (Apache-2.0) and on whisper.cpp (MIT). Credits and licenses are listed in the app and in the source repository.
+UltimateKeys is licensed under the GPL-3.0-or-later. It builds on the Android Open Source Project suggestion engine and the word lists of its 22 languages (Apache-2.0) and on whisper.cpp (MIT). Credits and licenses are listed in the app and in the source repository.

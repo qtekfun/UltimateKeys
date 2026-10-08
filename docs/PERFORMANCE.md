@@ -61,3 +61,34 @@ real hardware (the Find X8 Pro or a Pixel) are listed in `docs/HUMAN_VERIFICATIO
 |---|---|---|
 | `lite` | 16 000 299 bytes (15.3 MiB) | No model. |
 | `full` | 75 524 484 bytes (72.0 MiB) | `lite` plus the `base` model, stored uncompressed. |
+
+## Many languages (ADR 0022)
+
+### Release APK sizes with 24 dictionaries (this branch, unsigned release builds, R8 on)
+
+| Flavor | Size | Change against v0.9.1 above |
+|---|---|---|
+| `lite` | 41 401 372 bytes (39.5 MiB) | +25 401 073 bytes (+24.2 MiB) |
+| `full` | 100 925 557 bytes (96.3 MiB) | +25 401 073 bytes (+24.2 MiB) |
+
+The whole increase is the 22 added word lists (they are gzip data, so they do not compress further). The rule set by the owner was to bundle every
+language in both flavors when all lists together add less than 25 MiB, and to make the rest importable or downloadable otherwise: 24.2 MiB is under the
+limit, so everything is bundled and there is no import or download path. The margin is small (0.8 MiB): a larger list or a new language will need the
+other route (the installer and `BinaryDictionaries` already work per language, so the download of one list is the only missing piece).
+
+### On the device, per enabled language
+
+- Installed word list: about 1 MiB (the bundled file, copied on first use of the language; none for languages that are off).
+- Built binary dictionary: a few MiB (English measured at 4.6 MiB for 160,000 words; the lists are capped at the 250,000 most frequent words, so
+  at most about 7 MiB). Built once, in the background, in a few seconds per language; removed when the language is switched off.
+- Gesture vocabulary: about 40 bytes a word, at most 120,000 words per language (about 5 MiB each); all enabled languages together stay near 30 MB at
+  the limit of six.
+- Native suggestion engine: three dictionaries per language are memory-mapped (main, history, user); a language that is switched off is closed.
+
+### Latency with six languages
+
+- Gestures (JVM, `ManyLanguagesGestureTest`): six languages (French, Spanish, English, German, Russian, Greek, 698,000 words) decode in p50 0.9 ms and
+  p95 4.1 ms, the same as two languages (p95 4.2 ms), because the keys of the first and last point prune the candidates.
+- Suggestions: each enabled language adds three native queries to every keystroke, so six languages cost about three times what two do. The engine is
+  serialized on one background thread. The real-device number with six languages is a human check (`docs/HUMAN_VERIFICATION.md`); the CI emulator
+  test measures the Spanish and English case.
