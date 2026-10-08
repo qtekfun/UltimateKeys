@@ -112,5 +112,45 @@ internal object KeyIcons {
         )
     }
 
+    /** A hat over a pair of glasses; filled when private mode is on. */
+    @Suppress("LongParameterList")
+    fun incognito(
+        scope: DrawScope,
+        cx: Float,
+        cy: Float,
+        unit: Float,
+        ink: Color,
+        filled: Boolean
+    ) {
+        val stroke = Stroke(width = unit * STROKE)
+        val hat = Path().apply {
+            moveTo(cx - unit * 0.32f, cy - unit * 0.1f)
+            lineTo(cx - unit * 0.2f, cy - unit * 0.55f)
+            lineTo(cx + unit * 0.2f, cy - unit * 0.55f)
+            lineTo(cx + unit * 0.32f, cy - unit * 0.1f)
+            close()
+        }
+        if (filled) scope.drawPath(hat, ink) else scope.drawPath(hat, ink, style = stroke)
+        scope.drawLine(
+            ink,
+            Offset(cx - unit * 0.55f, cy - unit * 0.1f),
+            Offset(cx + unit * 0.55f, cy - unit * 0.1f),
+            unit * STROKE
+        )
+        val r = unit * 0.15f
+        listOf(-1f, 1f).forEach { side ->
+            val center = Offset(cx + side * unit * 0.22f, cy + unit * 0.3f)
+            if (filled) {
+                scope.drawCircle(
+                    ink,
+                    r,
+                    center
+                )
+            } else {
+                scope.drawCircle(ink, r, center, style = stroke)
+            }
+        }
+    }
+
     private const val STROKE = 0.1f
 }

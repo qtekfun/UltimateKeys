@@ -10,12 +10,15 @@ import com.qtekfun.ultimatekeys.engine.SuggestionEngine
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
 import com.qtekfun.ultimatekeys.ime.logic.InputOptions
 import com.qtekfun.ultimatekeys.ime.logic.Page
+import com.qtekfun.ultimatekeys.ime.suggest.PrivacyGuardedEngine
 import com.qtekfun.ultimatekeys.ime.suggest.SuggestionController
 import com.qtekfun.ultimatekeys.ime.surface.LatencyTracker
 import com.qtekfun.ultimatekeys.layouts.BottomRow
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
+import com.qtekfun.ultimatekeys.privacy.ManualDuration
+import com.qtekfun.ultimatekeys.privacy.PrivacyState
 import com.qtekfun.ultimatekeys.style.InMemoryStyleRepository
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
@@ -46,6 +49,9 @@ class KeyboardController(
     val settings: StateFlow<KeyboardSettings> =
         repository.settings.stateIn(scope, SharingStarted.Eagerly, KeyboardSettings())
 
+    /** Whether typing is private right now; nothing is learned while it is. */
+    val privacy = PrivacyState()
+
     /** The style the surface is drawn with; changes apply immediately. */
     val style: StateFlow<Style> =
         styles.active.stateIn(scope, SharingStarted.Eagerly, Presets.default)
@@ -54,10 +60,11 @@ class KeyboardController(
     val features = BottomRowFeatures()
     val latency = LatencyTracker()
     val suggestions = SuggestionController(
-        engine = engine,
+        engine = PrivacyGuardedEngine(engine) { privacy.isPrivate },
         scope = scope,
         dispatcher = suggestionDispatcher,
-        locale = { logic.locale }
+        locale = { logic.locale },
+        learningAllowed = { !privacy.isPrivate }
     )
 
     init {
@@ -66,6 +73,11 @@ class KeyboardController(
     }
 
     private fun apply(s: KeyboardSettings) {
+        privacy.manualDuration = if (s.privateModeEndsOnClose) {
+            ManualDuration.UNTIL_KEYBOARD_CLOSES
+        } else {
+            ManualDuration.UNTIL_TURNED_OFF
+        }
         logic.options = InputOptions(
             autoCapitalize = s.autoCapitalize,
             doubleSpacePeriod = s.doubleSpacePeriod,
@@ -146,6 +158,9 @@ class KeyboardController(
         val word = suggestions.state.value.slots.getOrNull(index).orEmpty()
         if (word.isNotEmpty()) logic.commitWithAutoSpace(word)
     }
+
+    /** The private-mode button in the suggestion bar. */
+    fun togglePrivate() = privacy.toggleManual()
 
     fun onGlobeLongPress() = showImePicker()
 

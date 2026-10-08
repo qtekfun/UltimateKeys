@@ -28,12 +28,16 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.style.ToolIcons
 
 /** The keyboard: a strip reserved for suggestions (Phase 2) above a single-canvas key grid. */
 @Composable
@@ -41,6 +45,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val state by controller.logic.state.collectAsState()
     val strip by controller.suggestions.state.collectAsState()
     val settings by controller.settings.collectAsState()
+    val privacy by controller.privacy.state.collectAsState()
     val density = LocalDensity.current
     val activeStyle by controller.style.collectAsState()
     val systemDark = isSystemInDarkTheme()
@@ -51,6 +56,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     }
     val labels = rememberLabels()
     val description = stringResource(R.string.keyboard_description)
+    val privateOn = stringResource(R.string.private_mode_on)
+    val privateAction = stringResource(R.string.private_mode_toggle)
 
     val layout =
         remember(state.page, settings.letterLayoutId, settings.numberRow, activeStyle.bottomRow) {
@@ -91,9 +98,11 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             )
         }
 
+    val showToggle = privacy.isPrivate || activeStyle.suggestionBar.toolIcons != ToolIcons.HIDDEN
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
+    gestures.stripToggleVisible = showToggle
     gestures.metrics = with(density) {
         GestureMetrics(
             slop = 12.dp.toPx(),
@@ -125,10 +134,30 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                     ).dp
                 )
                 .onSizeChanged { widthPx = it.width.toFloat() }
-                .semantics { contentDescription = description }
+                .semantics {
+                    contentDescription = description
+                    if (privacy.isPrivate) stateDescription = privateOn
+                    if (controller.privacy.canToggle) {
+                        customActions = listOf(
+                            CustomAccessibilityAction(privateAction) {
+                                controller.togglePrivate()
+                                true
+                            }
+                        )
+                    }
+                }
                 .pointerInput(gestures) { trackPointers(gestures) }
         ) {
-            renderer.draw(this, geometry, state, presses, style, labels, dimens, strip.slots)
+            renderer.draw(
+                this,
+                geometry,
+                state,
+                presses,
+                style,
+                labels,
+                dimens,
+                StripState(strip.slots, privacy.isPrivate, showToggle)
+            )
         }
     }
 }

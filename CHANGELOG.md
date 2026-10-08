@@ -11,6 +11,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- Private mode: turns on by itself in incognito tabs and password fields, or by hand with the button at the left of the suggestion bar. While it is on nothing is learned (no history, no new words), the bar is tinted by the style and shows an icon. Setting: whether a manual switch-on ends when the keyboard closes.
+
+### Added
+
 - Keyboard styles: seven original built-in styles (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), each with light and dark colors, bundled open fonts and Material You colors. A style editor with a live preview, contrast warnings, duplicate and reset, plus import, export and sharing of `.ukstyle` files.
 - Bottom-row arrangements and a suggestion-bar layout chosen by the style.
 

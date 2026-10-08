@@ -4,7 +4,6 @@
 package com.qtekfun.ultimatekeys.ime.surface
 
 import com.qtekfun.ultimatekeys.ime.KeyboardController
-import com.qtekfun.ultimatekeys.ime.suggest.SuggestionState
 import com.qtekfun.ultimatekeys.layouts.ActionKey
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
@@ -35,6 +34,9 @@ class SurfaceGestures(
     private val publish: (List<PressView>) -> Unit
 ) {
     var geometry: KeyGeometry? = null
+
+    /** Whether the private-mode button sits at the left of the suggestion bar. */
+    var stripToggleVisible = false
     var metrics = GestureMetrics(slop = 1f, dragStep = 1f, chooserMinCell = 1f, chooserHeight = 1f)
 
     private class Press(var key: PlacedKey, val downX: Float) {
@@ -59,7 +61,8 @@ class SurfaceGestures(
     fun down(id: Long, x: Float, y: Float) {
         val geo = geometry ?: return
         if (y < geo.top) {
-            stripPresses[id] = slotAt(x, geo.width)
+            val strip = StripLayout(geo.width, geo.top, stripToggleVisible)
+            stripPresses[id] = if (strip.isToggle(x)) TOGGLE_SLOT else strip.slotAt(x)
             return
         }
         val placed = geo.keyAt(x, y) ?: return
@@ -203,14 +206,24 @@ class SurfaceGestures(
         }
     }
 
-    private fun slotAt(x: Float, width: Float): Int =
-        (x / width * SuggestionState.SLOTS).toInt().coerceIn(0, SuggestionState.SLOTS - 1)
+    private fun slotAt(x: Float): Int {
+        val geo = geometry ?: return 0
+        val strip = StripLayout(geo.width, geo.top, stripToggleVisible)
+        return if (strip.isToggle(x)) TOGGLE_SLOT else strip.slotAt(x)
+    }
 
     fun up(id: Long, x: Float = -1f) {
         val slot = stripPresses.remove(id)
         if (slot != null) {
-            val width = geometry?.width ?: 0f
-            if (x < 0f || slotAt(x, width) == slot) controller.onSuggestionTapped(slot)
+            if (x < 0f || slotAt(x) == slot) {
+                if (slot ==
+                    TOGGLE_SLOT
+                ) {
+                    controller.togglePrivate()
+                } else {
+                    controller.onSuggestionTapped(slot)
+                }
+            }
             return
         }
         val press = presses.remove(id) ?: return
@@ -274,5 +287,6 @@ class SurfaceGestures(
 
     private companion object {
         const val CHAR_STEPS = 5
+        const val TOGGLE_SLOT = -1
     }
 }

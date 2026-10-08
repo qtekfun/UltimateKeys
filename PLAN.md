@@ -83,12 +83,12 @@ Versioning (see `docs/CI_CD.md`): each phase ends with a release made by pushing
 
 ## Phase 4 — Private mode
 
-- [ ] 4.1 `:privacy`: `PrivacyState` as `StateFlow` and a pure `shouldBePrivate(editorInfo, manualToggle, settings)`.
-- [ ] 4.2 Auto activation for `IME_FLAG_NO_PERSONALIZED_LEARNING`, password, visible-password, web-password and number-password types.
-- [ ] 4.3 Manual toggle with "lasts until turned off / keyboard closes" setting.
-- [ ] 4.4 Suppress all learning (engine history, user dictionary auto-add, dictation results) while private.
-- [ ] 4.5 Indicator icon + style-defined tint; accessible content description.
-- [ ] 4.6 Tests: 100% coverage of rules; integration tests proving no learning writes while private.
+- [x] 4.1 `:privacy`: `PrivacyState` as `StateFlow` and a pure `shouldBePrivate(editorInfo, manualToggle, settings)`.
+- [x] 4.2 Auto activation for `IME_FLAG_NO_PERSONALIZED_LEARNING`, password, visible-password, web-password and number-password types.
+- [x] 4.3 Manual toggle with "lasts until turned off / keyboard closes" setting.
+- [x] 4.4 Suppress all learning (engine history, user dictionary auto-add, dictation results) while private.
+- [x] 4.5 Indicator icon + style-defined tint; accessible content description.
+- [x] 4.6 Tests: 100% coverage of rules; integration tests proving no learning writes while private.
 
 **DoD:** release `v0.5.0`.
 

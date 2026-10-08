@@ -71,3 +71,23 @@ class SurfaceStyleTest {
         assertTrue(with < without, "number row is shorter than a letter row by default")
     }
 }
+
+class StripLayoutTest {
+    @Test
+    fun `without the button the three slots share the whole width`() {
+        val layout = StripLayout(width = 300f, height = 40f, showToggle = false)
+        assertEquals(0f, layout.toggleWidth)
+        assertFalse(layout.isToggle(0f))
+        assertEquals(listOf(0, 1, 2), listOf(10f, 150f, 290f).map(layout::slotAt))
+    }
+
+    @Test
+    fun `the button takes a square at the left and the slots share the rest`() {
+        val layout = StripLayout(width = 340f, height = 40f, showToggle = true)
+        assertEquals(40f, layout.toggleWidth)
+        assertTrue(layout.isToggle(39f))
+        assertFalse(layout.isToggle(40f))
+        assertEquals(100f, layout.cellWidth)
+        assertEquals(listOf(0, 1, 2), listOf(41f, 141f, 339f).map(layout::slotAt))
+    }
+}

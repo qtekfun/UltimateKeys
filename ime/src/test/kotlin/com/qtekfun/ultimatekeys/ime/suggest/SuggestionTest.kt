@@ -20,6 +20,7 @@ class FakeEngine(
     var next: (List<String>) -> List<Suggestion> = { emptyList() }
 ) : SuggestionEngine by NoopSuggestionEngine {
     val learned = mutableListOf<Pair<String, List<String>>>()
+    val userWords = mutableListOf<String>()
 
     override fun suggest(context: List<String>, composing: String, locale: Locale) =
         suggestions(context, composing)
@@ -28,6 +29,10 @@ class FakeEngine(
 
     override fun learn(word: String, context: List<String>, locale: Locale) {
         learned += word to context
+    }
+
+    override fun addToUserDictionary(word: String, locale: Locale) {
+        userWords += word
     }
 }
 

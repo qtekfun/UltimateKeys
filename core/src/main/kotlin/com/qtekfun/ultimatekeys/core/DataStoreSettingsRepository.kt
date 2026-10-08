@@ -33,7 +33,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
             smartPunctuation = this[SMART_PUNCT] ?: d.smartPunctuation,
             showSuggestions = this[SHOW_SUGGESTIONS] ?: d.showSuggestions,
             autoCorrect = this[AUTO_CORRECT] ?: d.autoCorrect,
-            letterLayoutId = this[LAYOUT] ?: d.letterLayoutId
+            letterLayoutId = this[LAYOUT] ?: d.letterLayoutId,
+            privateModeEndsOnClose = this[PRIVATE_ENDS_ON_CLOSE] ?: d.privateModeEndsOnClose
         ).sanitized()
     }
 
@@ -50,6 +51,7 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         this[SHOW_SUGGESTIONS] = s.showSuggestions
         this[AUTO_CORRECT] = s.autoCorrect
         this[LAYOUT] = s.letterLayoutId
+        this[PRIVATE_ENDS_ON_CLOSE] = s.privateModeEndsOnClose
     }
 
     private companion object {
@@ -65,5 +67,6 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val SHOW_SUGGESTIONS = booleanPreferencesKey("show_suggestions")
         val AUTO_CORRECT = booleanPreferencesKey("auto_correct")
         val LAYOUT = stringPreferencesKey("letter_layout_id")
+        val PRIVATE_ENDS_ON_CLOSE = booleanPreferencesKey("private_mode_ends_on_close")
     }
 }

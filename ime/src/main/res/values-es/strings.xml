@@ -22,4 +22,6 @@
     <string name="key_letters">Letras</string>
     <string name="key_more_symbols">Más símbolos</string>
     <string name="keyboard_description">Teclado</string>
+    <string name="private_mode_on">Modo privado activado</string>
+    <string name="private_mode_toggle">Activar o desactivar el modo privado</string>
 </resources>
