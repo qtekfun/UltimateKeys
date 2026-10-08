@@ -6,6 +6,7 @@ package com.qtekfun.ultimatekeys
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.qtekfun.ultimatekeys.dictionaries.BinaryDictionaries
+import com.qtekfun.ultimatekeys.dictionaries.WordListParser
 import com.qtekfun.ultimatekeys.dictionaries.installDictionaries
 import com.qtekfun.ultimatekeys.engine.AospSuggestionEngine
 import com.qtekfun.ultimatekeys.engine.DictionaryBuilder
@@ -80,10 +81,72 @@ class EngineJniTest {
         assertFalse(engine.isValidWord("hello", ru))
     }
 
+    // The most frequent words of a language (letters only, at least six of them): what people type most.
+    private fun commonWords(locale: Locale, count: Int = COMMON_SAMPLE): List<String> {
+        val file = checkNotNull(context.installDictionaries(languages.toSet()).fileFor(locale))
+        val list = file.inputStream().use { WordListParser.parseGzip(it) }
+        return list.words.asSequence().filter { !it.notAWord && !it.possiblyOffensive }
+            .map { it.word }
+            .filter { w ->
+                w.length >= MIN_WORD && w.all { it.isLetter() } &&
+                    w == w.lowercase(locale)
+            }
+            .take(count).toList()
+    }
+
+    private fun hitRate(locale: Locale, words: List<String>, typed: (String) -> String): Double {
+        val hits = words.count { word ->
+            engine.suggest(emptyList(), typed(word), locale).any { it.word.equals(word, true) }
+        }
+        println("UKEngine ${locale.toLanguageTag()} hit rate $hits/${words.size}")
+        return hits.toDouble() / words.size
+    }
+
+    private fun assertCompletes(locale: Locale) {
+        val rate = hitRate(locale, commonWords(locale)) { it.dropLast(1) }
+        assertTrue("${locale.toLanguageTag()} completion hit rate $rate", rate >= COMPLETION_RATE)
+    }
+
+    // Prefix completion of common words, one test per script so a doubtful one cannot hide the others.
     @Test
-    fun suggestsInOtherScriptsAndWithoutAccents() {
-        assertTrue(engine.suggest(emptyList(), "приве", ru).any { it.word == "привет" })
+    fun completesCommonCyrillicWords() = assertCompletes(ru)
+
+    @Test
+    fun completesCommonGreekWords() = assertCompletes(el)
+
+    @Test
+    fun completesCommonTurkishWords() = assertCompletes(tr)
+
+    @Test
+    fun completesCommonFrenchWords() = assertCompletes(fr)
+
+    @Test
+    fun completesCommonRomanianWords() = assertCompletes(ro)
+
+    @Test
+    fun frenchWithoutAccentsFindsTheAccentedWord() {
+        val accented = commonWords(fr, ACCENT_POOL).filter { w -> w.any { it in "éèêàçùô" } }
+            .take(COMMON_SAMPLE)
+        val rate = hitRate(fr, accented) { w ->
+            java.text.Normalizer.normalize(w, java.text.Normalizer.Form.NFD)
+                .filter { it.code < ASCII }
+        }
+        assertTrue("accent-less French hit rate $rate", rate >= ACCENT_RATE)
+    }
+
+    @Test
+    fun frenchEcoleBecomesEcole() {
         assertTrue(engine.suggest(emptyList(), "ecole", fr).any { it.word == "école" })
+    }
+
+    // A doubtful assertion on purpose kept apart: correcting a swapped pair of letters without coordinates.
+    @Test
+    fun swappedLettersInACyrillicWordAreCorrected() {
+        val rate = hitRate(ru, commonWords(ru)) { w ->
+            val i = w.length / 2
+            w.substring(0, i) + w[i + 1] + w[i] + w.substring(i + 2)
+        }
+        assertTrue("Cyrillic swapped letters hit rate $rate", rate >= TYPO_RATE)
     }
 
     @Test
@@ -116,6 +179,13 @@ class EngineJniTest {
 
     private companion object {
         const val WARMUP = 20
+        const val COMMON_SAMPLE = 200
+        const val ACCENT_POOL = 3000
+        const val MIN_WORD = 6
+        const val ASCII = 128
+        const val COMPLETION_RATE = 0.8
+        const val ACCENT_RATE = 0.7
+        const val TYPO_RATE = 0.5
         const val SAMPLES = 200
         const val P95_FRACTION = 0.95
         const val NANOS_PER_MILLI = 1_000_000.0

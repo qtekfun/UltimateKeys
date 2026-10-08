@@ -3,6 +3,7 @@
 
 package com.qtekfun.ultimatekeys.dictionaries
 
+import com.qtekfun.ultimatekeys.engine.WordFrequency
 import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.LayoutRepository
@@ -92,6 +93,33 @@ class PinnedDictionariesTest {
                 "${language.tag}: ${untypable.size} of ${common.size} common words need keys " +
                     "the layout lacks: $missing, e.g. ${untypable.take(5).map { it.word }}"
             )
+        }
+    }
+
+    @Test
+    fun `the word cap keeps the most frequent words of the real lists`() {
+        val locator = installed()
+        listOf("ru", "ro", "es").forEach { tag ->
+            val language = LanguageCatalog.find(tag)!!
+            val full = WordListParser.parseGzip(locator.fileFor(language.locale)!!.inputStream())
+                .words.filter { !it.notAWord && !it.possiblyOffensive }
+            val built = mutableListOf<WordFrequency>()
+            BinaryDictionaries(locator, File(tmp, "binary-$tag")) { dir, _, words ->
+                dir.mkdirs()
+                built += words
+                true
+            }.prepare(listOf(tag))
+            val cap = BinaryDictionaries.MAX_WORDS
+            assertEquals(minOf(cap, full.size), built.size, tag)
+            // The cap is a prefix of the list, which is sorted by frequency: nothing common is dropped.
+            assertEquals(
+                full.take(COMMON_WORDS).map {
+                    it.word
+                },
+                built.take(COMMON_WORDS).map { it.word },
+                tag
+            )
+            assertTrue(built.last().frequency >= full.getOrNull(cap)?.frequency ?: 0, tag)
         }
     }
 
