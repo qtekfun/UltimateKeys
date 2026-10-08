@@ -30,6 +30,7 @@ include(
     ":layouts",
     ":style",
     ":screenshots",
+    ":ui",
     ":engine",
     ":dictionaries",
     ":privacy",

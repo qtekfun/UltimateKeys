@@ -12,6 +12,16 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ### Added
 
 - Two new styles: Dracula (the open Dracula palette) and OLED (pure black behind the keys). Both are always dark.
+- The letter layout (Spanish or English QWERTY) can be chosen in Settings, Typing.
+
+### Changed
+
+- The app screens have a new look: grouped settings on rounded cards over a tinted page (following the system light and dark theme and the Material You colors), a large title that collapses into the top bar, and sliders, switches and choices with their value shown at the end of the row.
+- The home screen is now a short list (Setup, Typing, Suggestions, Gestures, Feedback, Appearance, Dictation, Clipboard and emoji, Privacy, About) that opens one screen per area. The style editor opens one screen per group of controls, with the live keyboard preview always visible under the top bar. The style gallery has an Options menu per style.
+
+### Fixed
+
+- The settings title no longer sits under the status bar: every app screen now draws edge to edge and keeps its content clear of the status bar, the navigation bar and the on-screen keyboard.
 
 ## [0.8.1] - 2026-10-08
 

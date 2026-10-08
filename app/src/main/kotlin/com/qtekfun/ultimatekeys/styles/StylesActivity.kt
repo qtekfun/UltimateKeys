@@ -11,28 +11,13 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,18 +26,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import com.qtekfun.ultimatekeys.Heading
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardPreview
 import com.qtekfun.ultimatekeys.ime.surface.PreviewContent
+import com.qtekfun.ultimatekeys.ime.surface.SurfaceStyle
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
 import com.qtekfun.ultimatekeys.style.StyleCodec
@@ -60,6 +46,18 @@ import com.qtekfun.ultimatekeys.style.StyleLoadError
 import com.qtekfun.ultimatekeys.style.StyleLoadResult
 import com.qtekfun.ultimatekeys.style.StyleRepository
 import com.qtekfun.ultimatekeys.style.asNewCustom
+import com.qtekfun.ultimatekeys.ui.UkBarButton
+import com.qtekfun.ultimatekeys.ui.UkChevron
+import com.qtekfun.ultimatekeys.ui.UkContentRow
+import com.qtekfun.ultimatekeys.ui.UkGlyph
+import com.qtekfun.ultimatekeys.ui.UkIcon
+import com.qtekfun.ultimatekeys.ui.UkRadius
+import com.qtekfun.ultimatekeys.ui.UkRow
+import com.qtekfun.ultimatekeys.ui.UkScreen
+import com.qtekfun.ultimatekeys.ui.UkSize
+import com.qtekfun.ultimatekeys.ui.UkTheme
+import com.qtekfun.ultimatekeys.ui.group
+import com.qtekfun.ultimatekeys.ui.setUkContent
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -68,22 +66,13 @@ class StylesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val repository = styleRepository()
-        setContent {
-            val scheme = if (isSystemInDarkTheme()) {
-                dynamicDarkColorScheme(this)
-            } else {
-                dynamicLightColorScheme(this)
-            }
-            MaterialTheme(colorScheme = scheme) {
-                Surface(Modifier.fillMaxSize()) { StylesScreen(repository, onClose = ::finish) }
-            }
-        }
+        setUkContent { StylesScreen(repository, onClose = ::finish) }
     }
 }
 
 @Composable
 private fun StylesScreen(repository: StyleRepository, onClose: () -> Unit) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val activeId by repository.activeId.collectAsState(initial = Presets.default.id)
     val custom by repository.custom.collectAsState(initial = emptyList())
@@ -133,56 +122,62 @@ private fun StylesScreen(repository: StyleRepository, onClose: () -> Unit) {
                     editing = null
                 }
             },
-            onBack = { editing = null },
-            modifier = Modifier.statusBarsPadding()
+            onBack = { editing = null }
         )
         return
     }
 
-    Column(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp)) {
-        FlowRow(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            OutlinedButton(onClick = onClose) { Text(stringResource(R.string.style_back)) }
-            Button(onClick = { importLauncher.launch(arrayOf("*/*")) }) {
-                Text(stringResource(R.string.style_import))
-            }
+    val back = stringResource(R.string.nav_back)
+    val builtInLabel = stringResource(R.string.style_builtin)
+    UkScreen(
+        title = stringResource(R.string.styles_title),
+        onBack = onClose,
+        backText = back,
+        backDescription = back,
+        actions = {
+            UkBarButton(
+                stringResource(R.string.style_import),
+                onClick = { importLauncher.launch(arrayOf("*/*")) },
+                bold = false
+            )
         }
-        Heading(
-            stringResource(R.string.styles_title),
-            MaterialTheme.typography.headlineSmall,
-            Modifier.padding(vertical = 12.dp)
-        )
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(Presets.all + custom, key = { it.id }) { style ->
-                StyleCard(
-                    style = style,
-                    builtIn = Presets.isPreset(style.id),
-                    active = style.id == activeId,
-                    dark = dark,
-                    actions = CardActions(
-                        onUse = { scope.launch { repository.select(style.id) } },
-                        onEdit = { editing = style },
-                        onDuplicate = {
-                            val copyName = "${style.name} $copySuffix"
-                            editing = asNewCustom(style, custom, copyName)
-                        },
-                        onExport = {
-                            pendingExport = style
-                            exportLauncher.launch("${style.id}.${StyleCodec.FILE_EXTENSION}")
-                        },
-                        onShare = { shareStyle(context, style) },
-                        onDelete = { scope.launch { repository.delete(style.id) } }
+    ) {
+        (Presets.all + custom).forEach { style ->
+            val builtIn = Presets.isPreset(style.id)
+            group(key = style.id) {
+                row { StylePreview(style, dark) }
+                row {
+                    StyleSelectRow(
+                        style = style,
+                        active = style.id == activeId,
+                        builtInLabel = if (builtIn) builtInLabel else null,
+                        onUse = { scope.launch { repository.select(style.id) } }
                     )
-                )
+                }
+                row {
+                    StyleMenuRow(
+                        style = style,
+                        builtIn = builtIn,
+                        actions = CardActions(
+                            onEdit = { editing = style },
+                            onDuplicate = {
+                                editing = asNewCustom(style, custom, "${style.name} $copySuffix")
+                            },
+                            onExport = {
+                                pendingExport = style
+                                exportLauncher.launch("${style.id}.${StyleCodec.FILE_EXTENSION}")
+                            },
+                            onShare = { shareStyle(context, style) },
+                            onDelete = { scope.launch { repository.delete(style.id) } }
+                        )
+                    )
+                }
             }
         }
     }
 }
 
 private class CardActions(
-    val onUse: () -> Unit,
     val onEdit: () -> Unit,
     val onDuplicate: () -> Unit,
     val onExport: () -> Unit,
@@ -190,91 +185,83 @@ private class CardActions(
     val onDelete: () -> Unit
 )
 
-@OptIn(ExperimentalLayoutApi::class)
+/** The keyboard drawn in the style, at a thumbnail size; the picture is described, not read key by key. */
 @Composable
-private fun StyleCard(
-    style: Style,
-    builtIn: Boolean,
-    active: Boolean,
-    dark: Boolean,
-    actions: CardActions
-) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val status = when {
-                active -> stringResource(R.string.style_active)
-                builtIn -> stringResource(R.string.style_builtin)
-                else -> ""
-            }
-            Text(
-                if (status.isEmpty()) style.name else "${style.name}  $status",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() }
+private fun StylePreview(style: Style, systemDark: Boolean) {
+    val previewLabel = stringResource(R.string.style_preview, style.name)
+    UkContentRow(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
+        Box(Modifier.clip(RoundedCornerShape(UkRadius.badge))) {
+            KeyboardPreview(
+                style = style,
+                dark = SurfaceStyle.isDark(style, systemDark),
+                content = PreviewContent(heightPercent = THUMB_HEIGHT_PERCENT)
             )
-            if (style.description.isNotBlank()) Text(style.description)
-            val previewLabel = stringResource(R.string.style_preview, style.name)
-            Box(Modifier.clearAndSetSemantics { contentDescription = previewLabel }) {
-                KeyboardPreview(
-                    style = style,
-                    dark = com.qtekfun.ultimatekeys.ime.surface.SurfaceStyle.isDark(style, dark),
-                    content = PreviewContent(heightPercent = THUMB_HEIGHT_PERCENT)
-                )
+        }
+    }
+}
+
+/** The style's name; tapping it makes it the one in use (a radio button of the whole list). */
+@Composable
+private fun StyleSelectRow(
+    style: Style,
+    active: Boolean,
+    builtInLabel: String?,
+    onUse: () -> Unit
+) {
+    val inUse = stringResource(R.string.style_active)
+    val subtitle = listOfNotNull(builtInLabel, style.description.takeIf { it.isNotBlank() })
+        .joinToString(" · ").ifBlank { null }
+    UkRow(
+        title = style.name,
+        subtitle = subtitle,
+        onClick = onUse,
+        role = Role.RadioButton,
+        state = if (active) inUse else null,
+        trailing = {
+            if (active) {
+                UkIcon(UkGlyph.Check, UkTheme.colors.tint, size = UkSize.badgeGlyph)
+                Text(inUse, style = UkTheme.typography.footnote, color = UkTheme.colors.tint)
             }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = actions.onUse,
-                    enabled = !active,
-                    modifier = Modifier.described(actionLabel(R.string.style_select, style.name))
-                ) {
-                    Text(stringResource(R.string.style_select))
-                }
-                if (!builtIn) {
-                    OutlinedButton(
-                        onClick = actions.onEdit,
-                        modifier = Modifier.described(actionLabel(R.string.style_edit, style.name))
-                    ) {
-                        Text(stringResource(R.string.style_edit))
-                    }
-                }
-                OutlinedButton(
-                    onClick = actions.onDuplicate,
-                    modifier = Modifier.described(actionLabel(R.string.style_duplicate, style.name))
-                ) {
-                    Text(stringResource(R.string.style_duplicate))
-                }
-                OutlinedButton(
-                    onClick = actions.onExport,
-                    modifier = Modifier.described(actionLabel(R.string.style_export, style.name))
-                ) {
-                    Text(stringResource(R.string.style_export))
-                }
-                OutlinedButton(
-                    onClick = actions.onShare,
-                    modifier = Modifier.described(actionLabel(R.string.style_share, style.name))
-                ) {
-                    Text(stringResource(R.string.style_share))
-                }
-                if (!builtIn) {
-                    OutlinedButton(
-                        onClick = actions.onDelete,
-                        modifier = Modifier.described(
-                            actionLabel(R.string.style_delete, style.name)
-                        )
-                    ) {
-                        Text(stringResource(R.string.style_delete))
-                    }
-                }
+        }
+    )
+}
+
+/** "Options": a menu of what can be done with the style; every item names the style for TalkBack. */
+@Composable
+private fun StyleMenuRow(style: Style, builtIn: Boolean, actions: CardActions) {
+    var open by remember { mutableStateOf(false) }
+    val items = buildList {
+        if (!builtIn) add(MenuItem(R.string.style_edit, actions.onEdit))
+        add(MenuItem(R.string.style_duplicate, actions.onDuplicate))
+        add(MenuItem(R.string.style_export, actions.onExport))
+        add(MenuItem(R.string.style_share, actions.onShare))
+        if (!builtIn) add(MenuItem(R.string.style_delete, actions.onDelete))
+    }
+    Box {
+        UkRow(
+            title = stringResource(R.string.style_options),
+            onClick = { open = true },
+            role = Role.DropdownList,
+            trailing = { UkChevron(pointingDown = true) }
+        )
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            items.forEach { item ->
+                val label = stringResource(item.label)
+                val described = stringResource(R.string.a11y_action_on_style, label, style.name)
+                DropdownMenuItem(
+                    text = { Text(label) },
+                    onClick = {
+                        open = false
+                        item.run()
+                    },
+                    modifier = Modifier.semantics { contentDescription = described }
+                )
             }
         }
     }
 }
 
-/** What a button says to a screen reader: its action and the style it acts on ("Edit, Classic"). */
-@Composable
-private fun actionLabel(action: Int, styleName: String): String =
-    stringResource(R.string.a11y_action_on_style, stringResource(action), styleName)
-
-private fun Modifier.described(text: String): Modifier = semantics { contentDescription = text }
+private class MenuItem(val label: Int, val run: () -> Unit)
 
 /** Reads at most [limit] bytes, so a huge file cannot fill the memory. */
 private fun java.io.InputStream.readUpTo(limit: Int): ByteArray {

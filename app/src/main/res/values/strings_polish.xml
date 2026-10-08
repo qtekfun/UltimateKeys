@@ -4,8 +4,6 @@
   SPDX-License-Identifier: GPL-3.0-or-later
 -->
 <resources>
-    <string name="a11y_expanded">Expanded</string>
-    <string name="a11y_collapsed">Collapsed</string>
     <string name="a11y_action_on_style">%1$s, %2$s</string>
     <string name="color_invalid">Not a valid color. Use #RRGGBB or #AARRGGBB.</string>
     <string name="style_preview">Preview of the style %1$s</string>

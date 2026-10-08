@@ -20,6 +20,21 @@ android {
     androidResources {
         noCompress += "ggml"
     }
+    // The screens are rendered by Robolectric in the unit tests (layout, insets and screenshots).
+    testOptions.unitTests.isIncludeAndroidResources = true
+}
+
+// Golden images of the settings screens live in the repository, so a change of look is a
+// reviewable diff (same scheme as :screenshots).
+//   ./gradlew :app:testFullDebugUnitTest                              verifies against the goldens
+//   ./gradlew :app:testFullDebugUnitTest -Proborazzi.test.record=true  rewrites them
+val recordGoldens = providers.gradleProperty(
+    "roborazzi.test.record"
+).map(String::toBoolean).orElse(false)
+tasks.withType<Test>().configureEach {
+    systemProperty("roborazzi.test.record", recordGoldens.get())
+    systemProperty("roborazzi.test.verify", !recordGoldens.get())
+    systemProperty("snapshot.dir", layout.projectDirectory.dir("src/test/snapshots").asFile.path)
 }
 
 dependencies {
@@ -27,6 +42,7 @@ dependencies {
     implementation(projects.ime)
     implementation(projects.layouts)
     implementation(projects.style)
+    implementation(projects.ui)
     implementation(projects.engine)
     implementation(projects.dictionaries)
     implementation(projects.privacy)
@@ -43,6 +59,16 @@ dependencies {
     "liteImplementation"(libs.androidx.work.runtime)
     // Reads assets/licenses/components.json (already used by :layouts, no new artifact).
     implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // The screen tests are JUnit 4 (Robolectric); the other tests of the app use Jupiter.
+    testRuntimeOnly(libs.junit.vintage.engine)
 
     androidTestImplementation(projects.dictionaries)
     androidTestImplementation(projects.engine)

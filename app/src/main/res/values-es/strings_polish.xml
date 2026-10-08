@@ -4,8 +4,6 @@
   SPDX-License-Identifier: GPL-3.0-or-later
 -->
 <resources>
-    <string name="a11y_expanded">Desplegado</string>
-    <string name="a11y_collapsed">Plegado</string>
     <string name="a11y_action_on_style">%1$s, %2$s</string>
     <string name="color_invalid">No es un color válido. Usa #RRGGBB o #AARRGGBB.</string>
     <string name="style_preview">Vista previa del estilo %1$s</string>

@@ -3,29 +3,20 @@
 
 package com.qtekfun.ultimatekeys.models
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.qtekfun.ultimatekeys.Heading
-import com.qtekfun.ultimatekeys.LabeledSlider
-import com.qtekfun.ultimatekeys.LabeledSwitch
-import com.qtekfun.ultimatekeys.MinTouchTarget
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
-import kotlin.math.roundToInt
+import com.qtekfun.ultimatekeys.settings.ValueFormat
+import com.qtekfun.ultimatekeys.settings.choice
+import com.qtekfun.ultimatekeys.settings.intSlider
+import com.qtekfun.ultimatekeys.settings.toggle
+import com.qtekfun.ultimatekeys.ui.ScreenInsets
+import com.qtekfun.ultimatekeys.ui.UkNavRow
+import com.qtekfun.ultimatekeys.ui.UkOption
+import com.qtekfun.ultimatekeys.ui.UkScreen
+import com.qtekfun.ultimatekeys.ui.group
+import com.qtekfun.ultimatekeys.ui.section
 
 private val LANGUAGES = listOf(
     "auto" to R.string.dictation_language_auto,
@@ -39,58 +30,39 @@ private const val SILENCE_STEP_MS = 100
 internal fun DictationSettingsScreen(
     settings: KeyboardSettings,
     update: ((KeyboardSettings) -> KeyboardSettings) -> Unit,
-    onBack: () -> Unit
+    onModels: () -> Unit,
+    onBack: () -> Unit,
+    insets: ScreenInsets = ScreenInsets.current()
 ) {
-    Column(
-        Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    val languages = LANGUAGES.map { (code, label) -> UkOption(code, stringResource(label)) }
+    UkScreen(
+        title = stringResource(R.string.dictation_title),
+        insets = insets,
+        onBack = onBack,
+        backText = stringResource(R.string.nav_back),
+        backDescription = stringResource(R.string.nav_back)
     ) {
-        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinTouchTarget)) {
-            Text(stringResource(R.string.models_back))
-        }
-        Text(
-            stringResource(R.string.dictation_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        LabeledSwitch(
-            label = stringResource(R.string.setting_dictation_enabled),
-            checked = settings.dictationEnabled,
-            onChange = { v -> update { it.copy(dictationEnabled = v) } }
-        )
-        Heading(stringResource(R.string.dictation_language))
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            LANGUAGES.forEach { (code, label) ->
-                FilterChip(
-                    selected = settings.dictationLanguage == code,
-                    onClick = { update { it.copy(dictationLanguage = code) } },
-                    label = { Text(stringResource(label)) },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = MinTouchTarget)
-                )
+        group {
+            toggle(R.string.setting_dictation_enabled, settings.dictationEnabled) { v ->
+                update { it.copy(dictationEnabled = v) }
             }
         }
-        Text(
-            stringResource(R.string.dictation_language_note),
-            style = MaterialTheme.typography.bodySmall
-        )
-        val ms = settings.dictationSilenceMs
-        val seconds = "${ms / MS_PER_SECOND}.${ms % MS_PER_SECOND / TENTH_MS}"
-        val silenceRange = KeyboardSettings.DICTATION_SILENCE_RANGE
-        LabeledSlider(
-            label = stringResource(R.string.dictation_silence_label),
-            valueText = stringResource(R.string.dictation_silence_value, seconds),
-            value = ms.toFloat(),
-            range = silenceRange.first.toFloat()..silenceRange.last.toFloat(),
-            onChange = { v ->
-                val stepped = (v / SILENCE_STEP_MS).roundToInt() * SILENCE_STEP_MS
-                update { it.copy(dictationSilenceMs = stepped) }
+        section(footer = R.string.dictation_language_note) {
+            choice(R.string.dictation_language, languages, settings.dictationLanguage) { v ->
+                update { it.copy(dictationLanguage = v) }
             }
-        )
-        Text(
-            stringResource(R.string.dictation_silence_note),
-            style = MaterialTheme.typography.bodySmall
-        )
+        }
+        section(footer = R.string.dictation_silence_note) {
+            intSlider(
+                R.string.dictation_silence_label,
+                settings.dictationSilenceMs,
+                KeyboardSettings.DICTATION_SILENCE_RANGE,
+                { ValueFormat.seconds(it) },
+                step = SILENCE_STEP_MS
+            ) { v -> update { it.copy(dictationSilenceMs = v) } }
+        }
+        group {
+            row { UkNavRow(stringResource(R.string.models_open), onClick = onModels) }
+        }
     }
 }
-
-private const val MS_PER_SECOND = 1000
-private const val TENTH_MS = 100
