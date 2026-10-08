@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Two new styles: Dracula (the open Dracula palette) and OLED (pure black behind the keys). Both are always dark.
+
 ## [0.8.1] - 2026-10-08
 
 ### Added
