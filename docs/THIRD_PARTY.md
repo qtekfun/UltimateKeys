@@ -127,3 +127,7 @@ The `:gesture` module (Phase 10) is original code. These papers were read for th
 - G. M. Chaikin, "An algorithm for high-speed curve generation", Computer Graphics and Image Processing 3(4), 1974.
 
 The word frequencies used by gesture typing are the ones of the pinned word lists listed above; no new data source was added.
+
+## Colour palettes
+
+The built-in style "Dracula" uses the colours of the Dracula palette (https://draculatheme.com), MIT licence, Copyright (c) 2016 Zeno Rocha and the Dracula Theme contributors. Only the colour values are used; the keyboard design is our own.

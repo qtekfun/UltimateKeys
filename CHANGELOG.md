@@ -11,6 +11,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- Two new styles: Dracula (the open Dracula palette) and OLED (pure black behind the keys). Both are always dark.
 - Long-press the language key to open a small menu: Settings or the keyboard picker.
 - A setting to turn the dictation microphone off (home screen settings and dictation settings); it then disappears from the keyboard.
 
