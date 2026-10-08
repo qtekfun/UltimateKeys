@@ -64,15 +64,28 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             group = "verification"
             description = "Fails if any full-flavor merged manifest declares network permissions."
         }
+        val verifyLite = tasks.register("verifyLiteHasInternet") {
+            group = "verification"
+            description = "Fails if a lite-flavor merged manifest lacks the INTERNET permission the downloader needs."
+        }
         extensions.getByType(ApplicationAndroidComponentsExtension::class.java).onVariants { variant ->
+            val name = variant.name.replaceFirstChar { it.uppercase() }
             if (variant.productFlavors.any { it.second == "full" }) {
-                val name = variant.name.replaceFirstChar { it.uppercase() }
                 val task = tasks.register("verify${name}HasNoInternet", VerifyNoInternetTask::class.java) {
                     manifests.from(variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
                 }
                 verifyAll.configure { dependsOn(task) }
             }
+            if (variant.productFlavors.any { it.second == "lite" }) {
+                val task = tasks.register("verify${name}HasInternet", VerifyHasInternetTask::class.java) {
+                    manifests.from(variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+                }
+                verifyLite.configure { dependsOn(task) }
+            }
         }
-        tasks.matching { it.name == "check" }.configureEach { dependsOn(verifyAll) }
+        tasks.matching { it.name == "check" }.configureEach {
+            dependsOn(verifyAll)
+            dependsOn(verifyLite)
+        }
     }
 }
