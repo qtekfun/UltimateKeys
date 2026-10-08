@@ -1,7 +1,7 @@
 UltimateKeys es un teclado moderno que funciona totalmente sin conexión. No hay analíticas, ni anuncios, ni nube, y puedes dejarlo exactamente como quieras.
 
 <b>Hazlo tuyo</b>
-• Siete estilos originales incluidos (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper), cada uno con variante clara y oscura.
+• Nueve estilos incluidos (Ultimate, Soft, Flat, Outline, Classic, Midnight, Paper, Dracula, OLED). La mayoría tiene variante clara y oscura; Midnight, Dracula y OLED son siempre oscuros.
 • Un editor de estilos con vista previa en directo: forma de las teclas, separación, bordes, sombras, fuentes, colores, degradados, globos, barra de sugerencias, fila inferior y paneles son ajustes.
 • Colores Material You y un aviso cuando un texto sería difícil de leer.
 • Exporta, importa y comparte tus estilos como archivos .ukstyle.
