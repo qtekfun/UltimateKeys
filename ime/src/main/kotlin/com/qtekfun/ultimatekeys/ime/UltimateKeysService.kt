@@ -9,6 +9,7 @@ import android.inputmethodservice.InputMethodService
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.ComposeView
@@ -39,6 +40,7 @@ import com.qtekfun.ultimatekeys.engine.mixed.MixedSuggestionEngine
 import com.qtekfun.ultimatekeys.ime.gesture.GestureSupport
 import com.qtekfun.ultimatekeys.ime.logic.EditorContext
 import com.qtekfun.ultimatekeys.ime.logic.InputLogic
+import com.qtekfun.ultimatekeys.ime.surface.FirstShowTimer
 import com.qtekfun.ultimatekeys.ime.surface.KeyboardSurface
 import com.qtekfun.ultimatekeys.ime.voice.AndroidDictationActions
 import com.qtekfun.ultimatekeys.ime.voice.DictationHost
@@ -70,6 +72,9 @@ class UltimateKeysService :
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val engine = SharedEngine.instance
     private lateinit var controller: KeyboardController
+
+    /** Debug builds only: logs how long the first show took. */
+    private var firstShow: FirstShowTimer? = null
     private lateinit var transcriber: WhisperTranscriber
     private var clipboardWatcher: SystemClipboardWatcher? = null
 
@@ -84,6 +89,10 @@ class UltimateKeysService :
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
         loadEngineInBackground()
         val debuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+        if (debuggable) {
+            firstShow = FirstShowTimer(System::nanoTime) { Log.d("UKLatency", it) }
+            firstShow?.markCreated()
+        }
         transcriber = WhisperTranscriber(
             log = if (debuggable) { msg -> Log.d("UKVoice", msg) } else null
         )
@@ -191,6 +200,16 @@ class UltimateKeysService :
         return ComposeView(this).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent { KeyboardSurface(controller) }
+            firstShow?.let { timer ->
+                viewTreeObserver.addOnDrawListener(
+                    object : ViewTreeObserver.OnDrawListener {
+                        override fun onDraw() {
+                            timer.markDrawn()
+                            post { viewTreeObserver.removeOnDrawListener(this) }
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -242,6 +261,12 @@ class UltimateKeysService :
             candidatesEnd
         )
         controller.logic.onSelectionChanged(newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+    }
+
+    /** Short of memory: the speech model is the biggest thing we hold, let it go while idle. */
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= TRIM_MEMORY_BACKGROUND) controller.dictation?.trimMemory()
     }
 
     override fun onDestroy() {

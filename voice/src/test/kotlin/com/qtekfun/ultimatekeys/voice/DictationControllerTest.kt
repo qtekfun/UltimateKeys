@@ -28,6 +28,7 @@ class DictationControllerTest {
     private var config = DictationConfig(vad = VadConfig(silenceTimeoutMs = 600))
     private var source: () -> AudioSource = { speechThenSilence() }
     private var sources = 0
+    private var idleUnloadMs = NEVER_UNLOAD
 
     @AfterEach
     fun tearDown() {
@@ -50,7 +51,8 @@ class DictationControllerTest {
         permission = { granted },
         config = { config },
         onResult = { results += it },
-        recordDispatcher = UnconfinedTestDispatcher(testScheduler)
+        recordDispatcher = UnconfinedTestDispatcher(testScheduler),
+        idleUnloadMs = idleUnloadMs
     )
 
     @Test
@@ -287,5 +289,98 @@ class DictationControllerTest {
         advanceUntilIdle()
         assertEquals(DictationState.Idle, controller.state.value)
         assertEquals(1, results.size)
+    }
+
+    @Test
+    fun `warming up loads the model once and listening reuses it`() = runTest {
+        val controller = controller()
+        controller.warmUp()
+        advanceUntilIdle()
+        assertEquals(listOf(model.path), transcriber.loads)
+        controller.start()
+        advanceUntilIdle()
+        assertEquals(1, transcriber.loads.size)
+        assertEquals(1, results.size)
+    }
+
+    @Test
+    fun `warming up without a model does nothing`() = runTest {
+        currentModel = null
+        val controller = controller()
+        controller.warmUp()
+        advanceUntilIdle()
+        assertTrue(transcriber.loads.isEmpty())
+    }
+
+    @Test
+    fun `a failing warm-up is silent and the dictation reports it`() = runTest {
+        transcriber.failLoad = true
+        val controller = controller()
+        controller.warmUp()
+        advanceUntilIdle()
+        assertEquals(DictationState.Idle, controller.state.value)
+        controller.start()
+        advanceUntilIdle()
+        assertEquals(
+            DictationState.Failed(DictationError.MODEL_LOAD_FAILED),
+            controller.state.value
+        )
+    }
+
+    @Test
+    fun `the model is freed after the idle time and loaded again when needed`() = runTest {
+        idleUnloadMs = 60_000L
+        val controller = controller()
+        controller.start()
+        testScheduler.advanceTimeBy(59_000L)
+        testScheduler.runCurrent()
+        assertEquals(0, transcriber.unloads)
+        testScheduler.advanceTimeBy(70_000L)
+        testScheduler.runCurrent()
+        assertEquals(1, transcriber.unloads)
+        assertEquals(null, transcriber.loadedModel)
+        controller.start()
+        advanceUntilIdle()
+        assertEquals(2, transcriber.loads.size)
+    }
+
+    @Test
+    fun `starting again cancels the pending unload`() = runTest {
+        idleUnloadMs = 60_000L
+        val controller = controller()
+        controller.start()
+        testScheduler.advanceTimeBy(40_000L)
+        testScheduler.runCurrent()
+        controller.start()
+        testScheduler.advanceTimeBy(40_000L)
+        testScheduler.runCurrent()
+        assertEquals(0, transcriber.unloads)
+    }
+
+    @Test
+    fun `low memory frees the model when idle but never during a dictation`() = runTest {
+        source = { ScriptedSource(emptyList(), after = SPEECH_FRAME) }
+        val controller = controller()
+        controller.start()
+        controller.trimMemory()
+        testScheduler.runCurrent()
+        assertEquals(0, transcriber.unloads)
+        controller.stop()
+        advanceUntilIdle()
+        controller.trimMemory()
+        testScheduler.runCurrent()
+        assertEquals(1, transcriber.unloads)
+    }
+
+    @Test
+    fun `releasing the controller cancels a dictation and frees the model`() = runTest {
+        source = { ScriptedSource(emptyList(), after = SPEECH_FRAME) }
+        val controller = controller()
+        controller.start()
+        controller.release()
+        testScheduler.runCurrent()
+        assertEquals(DictationState.Idle, controller.state.value)
+        assertEquals(1, transcriber.unloads)
+        assertTrue(results.isEmpty())
     }
 }

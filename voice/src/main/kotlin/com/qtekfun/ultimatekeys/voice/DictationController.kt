@@ -12,11 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /** The person's dictation choices, read each time a dictation starts. */
@@ -78,13 +81,18 @@ class DictationController(
     private val permission: MicrophonePermission,
     private val config: () -> DictationConfig,
     private val onResult: (DictationResult) -> Unit,
-    private val recordDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val recordDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    /** How long the model stays in memory after the last dictation; [NEVER_UNLOAD] keeps it. */
+    private val idleUnloadMs: Long = DEFAULT_IDLE_UNLOAD_MS
 ) {
     private val mutableState = MutableStateFlow<DictationState>(DictationState.Idle)
     val state: StateFlow<DictationState> = mutableState.asStateFlow()
 
     private val recorder = AudioRecorder(vadConfig = { config().vad })
     private var job: Job? = null
+    private var warmJob: Job? = null
+    private var idleJob: Job? = null
+    private val loadLock = Mutex()
 
     @Volatile
     private var stopRequested = false
@@ -97,8 +105,48 @@ class DictationController(
         val model = models.currentModel()
         if (model == null || !model.isFile) return fail(DictationError.NO_MODEL)
         stopRequested = false
+        idleJob?.cancel()
         mutableState.value = DictationState.Listening()
         job = scope.launch { session(model) }
+    }
+
+    /**
+     * Loads the model ahead of the first dictation (while the permission prompt is up, for
+     * example), so listening starts without waiting. Does nothing while a dictation runs or when
+     * there is no model.
+     */
+    fun warmUp() {
+        val current = mutableState.value
+        if (current is DictationState.Listening || current is DictationState.Transcribing) return
+        val model = models.currentModel()?.takeIf { it.isFile } ?: return
+        idleJob?.cancel()
+        warmJob?.cancel()
+        warmJob = scope.launch {
+            try {
+                ensureLoaded(model)
+            } catch (_: ModelLoadException) {
+                // The real attempt, when the person starts talking, reports the problem.
+            }
+            scheduleUnload()
+        }
+    }
+
+    /** The system is short of memory: free the model unless a dictation is using it. */
+    fun trimMemory() {
+        val current = mutableState.value
+        if (current is DictationState.Listening || current is DictationState.Transcribing) return
+        warmJob?.cancel()
+        idleJob?.cancel()
+        scope.launch { unloadNow() }
+    }
+
+    /** The keyboard is going away: stop everything and free the model. */
+    fun release() {
+        job?.cancel()
+        warmJob?.cancel()
+        idleJob?.cancel()
+        mutableState.value = DictationState.Idle
+        scope.launch { unloadNow() }
     }
 
     /** Ends the recording now and transcribes what was said. */
@@ -112,6 +160,7 @@ class DictationController(
         job = null
         stopRequested = false
         mutableState.value = DictationState.Idle
+        scheduleUnload()
     }
 
     /** Leaves an error state. */
@@ -121,7 +170,23 @@ class DictationController(
 
     private fun fail(error: DictationError) {
         mutableState.value = DictationState.Failed(error)
+        scheduleUnload()
     }
+
+    /** Frees the model after [idleUnloadMs] without a dictation. */
+    private fun scheduleUnload() {
+        if (idleUnloadMs == NEVER_UNLOAD) return
+        idleJob?.cancel()
+        idleJob = scope.launch {
+            delay(idleUnloadMs)
+            val current = mutableState.value
+            if (current !is DictationState.Listening && current !is DictationState.Transcribing) {
+                unloadNow()
+            }
+        }
+    }
+
+    private suspend fun unloadNow() = loadLock.withLock { transcriber.unload() }
 
     private suspend fun session(model: File) {
         try {
@@ -170,9 +235,10 @@ class DictationController(
         // Deliver the text first: whoever sees the state go idle can rely on the result being in.
         onResult(DictationResult(text, result?.language.orEmpty()))
         mutableState.value = DictationState.Idle
+        scheduleUnload()
     }
 
-    private suspend fun ensureLoaded(model: File) {
+    private suspend fun ensureLoaded(model: File) = loadLock.withLock {
         if (transcriber.loadedModel != model.path) transcriber.load(model.path)
     }
 
@@ -182,3 +248,9 @@ class DictationController(
         }
     }
 }
+
+/** Keep the model in memory for ever. */
+const val NEVER_UNLOAD = Long.MAX_VALUE
+
+/** The model is freed after this long without a dictation (about two minutes). */
+const val DEFAULT_IDLE_UNLOAD_MS = 120_000L
