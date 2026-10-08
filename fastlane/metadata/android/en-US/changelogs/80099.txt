@@ -1,0 +1,1 @@
+Speech models: the full build ships the Base model and dictates offline from the first start; the lite build downloads Base or Small (resumable, Wi-Fi only option), and models can be imported from a file. The microphone now sits in the margin under the keys. Screen reader support, an open-source licenses screen and the app version on the home screen.
