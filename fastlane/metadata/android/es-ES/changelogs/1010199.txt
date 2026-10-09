@@ -1,0 +1,1 @@
+Versión de mantenimiento: el mismo teclado que la 1.1.0, con la compilación al día y actualizaciones semanales de dependencias.

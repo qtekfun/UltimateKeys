@@ -1,0 +1,1 @@
+Maintenance release: same keyboard as 1.1.0, with a refreshed build and weekly dependency updates.
