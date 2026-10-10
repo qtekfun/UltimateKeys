@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-10
+
 ### Fixed
 
 - With suggestions on, editing a word that was already typed and pressing space no longer deletes part of it or inserts odd text.
@@ -181,7 +183,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.1...v1.0.2

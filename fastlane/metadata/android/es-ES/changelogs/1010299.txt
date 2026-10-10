@@ -1,0 +1,1 @@
+Corrige la edición de una palabra ya escrita: con las sugerencias activadas, al pulsar espacio ya no se borra parte de ella ni se inserta texto extraño.
