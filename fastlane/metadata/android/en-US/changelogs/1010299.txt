@@ -1,0 +1,1 @@
+Fixes editing a word that was already typed: with suggestions on, pressing space no longer deletes part of it or inserts odd text.
