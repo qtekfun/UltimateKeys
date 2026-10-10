@@ -280,6 +280,39 @@ class InputLogicTest {
     }
 
     @Test
+    fun `typing at the end of an existing word composes the whole word`() {
+        val e = FakeEditorConnection("hol")
+        val (l, _) = logic(editor = e, options = InputOptions(composeWords = true))
+        l.type("a")
+        assertEquals("hola", e.composingText)
+        assertEquals("hola", l.composingText)
+        l.onSpace()
+        assertEquals("hola ", e.text.toString())
+    }
+
+    @Test
+    fun `typing in the middle of a word inserts plainly without composing`() {
+        val e = FakeEditorConnection("hoa")
+        val (l, _) = logic(editor = e, options = InputOptions(composeWords = true))
+        l.moveCursor(-1)
+        l.type("l")
+        assertEquals("hola", e.text.toString())
+        assertEquals("", e.composingText)
+        l.onSpace()
+        assertEquals("hol a", e.text.toString())
+    }
+
+    @Test
+    fun `leaving the word settles the composing text so the next letter does not replace it`() {
+        val e = FakeEditorConnection()
+        val (l, _) = logic(editor = e, options = InputOptions(composeWords = true))
+        l.type("hola")
+        l.onSelectionChanged(0, 0, 0, 4)
+        assertEquals("", e.composingText)
+        assertEquals("hola", e.text.toString())
+    }
+
+    @Test
     fun `composing is off for passwords and numeric fields`() {
         val password = EditorContext.from(
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD,

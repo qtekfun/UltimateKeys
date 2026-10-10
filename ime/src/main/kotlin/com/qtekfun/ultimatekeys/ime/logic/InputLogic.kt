@@ -101,8 +101,10 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         cursor = newStart
         val stillInWord = composingStart >= 0 && newStart == composingEnd && newEnd == composingEnd
         if (composing.isNotEmpty() && !stillInWord) {
-            // The cursor moved away from the word being composed (tap in the text, app edit).
+            // The cursor moved away from the word being composed (tap in the text, app edit). The
+            // editor still holds it as composing text: settle it, or the next letter replaces it.
             composing.clear()
+            editor?.finishComposingText()
             suggestionHook?.onComposingChanged("", "")
         }
         refreshAutoShift()
@@ -495,9 +497,28 @@ class InputLogic(private val clock: () -> Long = System::currentTimeMillis) {
         val isWordChar =
             text.length == 1 && (text[0].isLetter() || (text[0] == '\'' && composing.isNotEmpty()))
         if (!isWordChar) return false
+        if (composing.isEmpty() && !startComposing(ed)) return false
         composing.append(text)
         ed.setComposingText(composing)
         suggestionHook?.onComposingChanged(composing.toString(), contextBefore(ed))
+        return true
+    }
+
+    /**
+     * Prepares to compose a new word with the letter being typed. When the cursor is at the
+     * end of an existing word, that word is taken back as composing text so that it is corrected and
+     * suggested as a whole, not as the lone letter. Returns false when the letter must be inserted
+     * as plain text: a selection to replace, or the cursor in the middle of a word.
+     */
+    private fun startComposing(ed: EditorConnection): Boolean {
+        if (ed.selectedText().isNotEmpty()) return false
+        if (ed.textAfterCursor(1).firstOrNull()?.isLetter() == true) return false
+        val before = ed.textBeforeCursor(WORD_LOOKBEHIND).toString()
+        val fragment = before.takeLastWhile { it.isLetter() }
+        if (fragment.isNotEmpty()) {
+            ed.deleteSurroundingText(fragment.length, 0)
+            composing.append(fragment)
+        }
         return true
     }
 

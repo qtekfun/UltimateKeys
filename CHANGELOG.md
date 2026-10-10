@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- With suggestions on, editing a word that was already typed and pressing space no longer deletes part of it or inserts odd text.
+
 ## [1.1.1] - 2026-10-09
 
 No change in how the keyboard works; this release only refreshes the build and the project housekeeping.
