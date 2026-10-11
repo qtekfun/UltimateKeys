@@ -45,7 +45,9 @@ class KeyGeometry(
     /** Free space between the screen edge and the keys; touches there still reach the edge keys. */
     sideInset: Float = 0f,
     /** Extra width (0.2 = 20%) of a letter at either end of a row, to make it easier to hit. */
-    edgeBoost: Float = 0f
+    edgeBoost: Float = 0f,
+    /** Empty space in the middle of every row that has enough keys, for a split keyboard (0 = one block). */
+    splitGap: Float = 0f
 ) {
     val keys: List<PlacedKey>
     val height: Float = layout.rows.indices.sumOf {
@@ -57,17 +59,28 @@ class KeyGeometry(
         var rowTop = top
         layout.rows.forEachIndexed { rowIndex, row ->
             val thisRowHeight = rowHeight * rowScales.getOrElse(rowIndex) { 1f }
-            val weights = row.keys.mapIndexed { i, key ->
-                val atEnd = i == 0 || i == row.keys.lastIndex
-                key.width * if (atEnd && key is CharKey) 1f + edgeBoost else 1f
+            val items = rowItems(row.keys, edgeBoost)
+            val splitAt = if (splitGap > 0f &&
+                row.keys.size >= MIN_SPLIT_KEYS
+            ) {
+                splitIndex(items)
+            } else {
+                -1
             }
-            val totalWeight = weights.sumOf { it.toDouble() }.toFloat()
-            val available = width - 2f * sideInset - gapX * row.keys.size
+            val totalWeight = items.sumOf { it.weight.toDouble() }.toFloat()
+            val rowGap = if (splitAt >= 0) splitGap else 0f
+            val available = width - 2f * sideInset - gapX * items.size - rowGap
             var x = sideInset + gapX / 2f
-            row.keys.forEachIndexed { i, key ->
-                val w = available * weights[i] / totalWeight
-                placed +=
-                    PlacedKey(key, x, rowTop + gapY / 2f, x + w, rowTop + thisRowHeight - gapY / 2f)
+            items.forEachIndexed { i, item ->
+                if (i == splitAt) x += rowGap
+                val w = available * item.weight / totalWeight
+                placed += PlacedKey(
+                    item.key,
+                    x,
+                    rowTop + gapY / 2f,
+                    x + w,
+                    rowTop + thisRowHeight - gapY / 2f
+                )
                 x += w + gapX
             }
             rowTop += thisRowHeight
@@ -92,6 +105,44 @@ class KeyGeometry(
         return best
     }
 
+    private class Item(val key: LayoutKey, val weight: Float)
+
+    private fun rowItems(keys: List<LayoutKey>, edgeBoost: Float): MutableList<Item> =
+        keys.mapIndexedTo(ArrayList()) { i, key ->
+            val atEnd = i == 0 || i == keys.lastIndex
+            Item(key, key.width * if (atEnd && key is CharKey) 1f + edgeBoost else 1f)
+        }
+
+    /**
+     * The index of the first item of the right half: the keys left of the middle go left and the ones right
+     * of it go right. A long key that crosses the middle (the space bar) is cut in two, one piece per half,
+     * so neither thumb is left without it.
+     */
+    private fun splitIndex(items: MutableList<Item>): Int {
+        val half = items.sumOf { it.weight.toDouble() }.toFloat() / 2f
+        var passed = 0f
+        for (i in items.indices) {
+            val w = items[i].weight
+            val crosses = passed < half - EPSILON && passed + w > half + EPSILON
+            if (crosses && w >= LONG_KEY_WEIGHT) {
+                val key = items[i].key
+                items[i] = Item(key, w / 2f)
+                items.add(i + 1, Item(key, w / 2f))
+                return i + 1
+            }
+            if (passed + w / 2f >= half) return i
+            passed += w
+        }
+        return items.size
+    }
+
     private fun closerCenter(a: PlacedKey, b: PlacedKey, x: Float) =
         kotlin.math.abs(a.centerX - x) < kotlin.math.abs(b.centerX - x)
+
+    private companion object {
+        /** Rows with fewer keys than this (a lone space bar, a phone pad row) are never split. */
+        const val MIN_SPLIT_KEYS = 4
+        const val LONG_KEY_WEIGHT = 2f
+        const val EPSILON = 0.001f
+    }
 }

@@ -113,3 +113,9 @@ Things that need a physical device or human judgment. Tick when done.
 
 - [ ] On the Find X8 Pro, run a debug build and read `UKLatency` in logcat: `first-show` (target under 300 ms), `key-to-commit` p95 (under 16 ms), gesture `lift-to-candidates` (under 50 ms); add the numbers to the table in `docs/PERFORMANCE.md`.
 - [ ] Dictate once, wait two minutes and check the app's memory drops (the speech model is freed), then dictate again and check the model comes back without an error.
+
+## Sideways and split keyboard
+
+- [ ] Hold the phone sideways (Realme and Find X8 Pro) in an app with a text field: the keyboard takes less than 60% of the screen height and the editor stays visible; the height slider "Keyboard height, held sideways" changes it and the portrait height is unaffected.
+- [ ] Turn "Split the keys" on (always, then sideways only): the two halves sit near the edges with a free space in the middle, every row is reachable with both thumbs, the space bar shows on both halves, and a tap in the free space types the nearest key. Try gaps of 10%, 20% and 40%, and gesture typing across the gap.
+- [ ] Number and phone pads (a number field) are never split.

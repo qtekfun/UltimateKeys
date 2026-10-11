@@ -12,6 +12,22 @@ import org.junit.jupiter.api.Test
 
 class SettingsTest {
     @Test
+    fun `sideways height and split settings are clamped`() {
+        val s = KeyboardSettings(
+            landscapeHeightPercent = 5,
+            splitMode = "diagonal",
+            splitGapPercent = 99
+        ).sanitized()
+        assertEquals(40, s.landscapeHeightPercent)
+        assertEquals(KeyboardSettings.SPLIT_OFF, s.splitMode)
+        assertEquals(60, s.splitGapPercent)
+        assertEquals(
+            KeyboardSettings.SPLIT_LANDSCAPE,
+            KeyboardSettings(splitMode = KeyboardSettings.SPLIT_LANDSCAPE).sanitized().splitMode
+        )
+    }
+
+    @Test
     fun `sanitized clamps every range`() {
         val s = KeyboardSettings(
             heightPercent = 500,

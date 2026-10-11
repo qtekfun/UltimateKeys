@@ -3,6 +3,8 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import com.qtekfun.ultimatekeys.core.KeyboardSettings
+import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
@@ -11,6 +13,12 @@ import com.qtekfun.ultimatekeys.style.Style
 object SurfaceSpec {
     const val BASE_ROW_DP = 54f
     const val BOTTOM_PADDING_DP = 6f
+
+    /** Keys are never squeezed below this height percent, whatever the room. */
+    const val MIN_PERCENT = 40
+
+    /** Sideways, the keyboard may take at most this share of the screen height. */
+    const val MAX_LANDSCAPE_SHARE = 0.6f
 
     /** The bottom margin is at least this tall when the microphone lives in it. */
     const val MIC_MARGIN_DP = 40f
@@ -54,6 +62,51 @@ object SurfaceSpec {
         rowDp(heightPercent) * rowScales(style, rows, numberRow).sum() +
         BOTTOM_PADDING_DP + marginDp(bottomMarginDp, micInMargin)
 
+    /** What the surface needs to know about the screen it is on. */
+    data class Screen(val landscape: Boolean, val heightDp: Int)
+
+    /**
+     * The key height percent to really use: the one the user chose for this orientation, lowered when the
+     * keyboard would be taller than its share of a sideways screen (where it would cover everything).
+     */
+    fun effectiveHeightPercent(
+        rows: Int,
+        style: Style,
+        settings: KeyboardSettings,
+        micInMargin: Boolean,
+        screen: Screen
+    ): Int {
+        if (!screen.landscape) return settings.heightPercent
+        val requested = settings.landscapeHeightPercent
+        val maxTotalDp = screen.heightDp * MAX_LANDSCAPE_SHARE
+        val margin = settings.bottomMarginDp
+        val total = totalHeightDp(rows, requested, margin, style, settings.numberRow, micInMargin)
+        if (total <= maxTotalDp) return requested
+        val fixed = style.suggestionBar.heightDp + BOTTOM_PADDING_DP + marginDp(margin, micInMargin)
+        val scales = rowScales(style, rows, settings.numberRow).sum()
+        val rowDp = (maxTotalDp - fixed) / scales
+        return (rowDp * PERCENT / BASE_ROW_DP).toInt().coerceIn(MIN_PERCENT, requested)
+    }
+
+    /** Whether the keys of [page] are split in two halves now. Number and phone pads never are. */
+    fun isSplit(settings: KeyboardSettings, landscape: Boolean, page: Page): Boolean {
+        if (page == Page.NUMERIC || page == Page.PHONE) return false
+        return when (settings.splitMode) {
+            KeyboardSettings.SPLIT_ALWAYS -> true
+            KeyboardSettings.SPLIT_LANDSCAPE -> landscape
+            else -> false
+        }
+    }
+
+    /** The free space between the two halves in pixels; 0 when the keys of [page] are not split now. */
+    fun splitGapPx(
+        settings: KeyboardSettings,
+        landscape: Boolean,
+        page: Page,
+        widthPx: Float
+    ): Float =
+        if (isSplit(settings, landscape, page)) widthPx * settings.splitGapPercent / PERCENT else 0f
+
     fun geometry(
         layout: KeyboardLayout,
         widthPx: Float,
@@ -62,7 +115,8 @@ object SurfaceSpec {
         style: Style = Presets.default,
         numberRow: Boolean = false,
         sideMarginDp: Int = 0,
-        edgeBoostPercent: Int = 0
+        edgeBoostPercent: Int = 0,
+        splitGapPx: Float = 0f
     ) = KeyGeometry(
         layout,
         width = widthPx,
@@ -72,6 +126,7 @@ object SurfaceSpec {
         top = style.suggestionBar.heightDp * density,
         rowScales = rowScales(style, layout.rows.size, numberRow),
         sideInset = sideMarginDp * density,
-        edgeBoost = edgeBoostPercent / PERCENT
+        edgeBoost = edgeBoostPercent / PERCENT,
+        splitGap = splitGapPx
     )
 }

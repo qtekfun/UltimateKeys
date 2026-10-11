@@ -3,6 +3,7 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import android.content.res.Configuration
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -29,6 +30,7 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -89,7 +91,23 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
-    val rowDp = SurfaceSpec.rowDp(settings.heightPercent)
+    val configuration = LocalConfiguration.current
+
+    // The keyboard window is not the app window, so its own container size says nothing about the screen.
+    @Suppress("ConfigurationScreenWidthHeight")
+    val screenHeightDp = configuration.screenHeightDp
+    val landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val micInMargin = SurfaceSpec.micInMargin(controller.features.voice, activeStyle)
+    // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
+    val heightPercent = SurfaceSpec.effectiveHeightPercent(
+        rows = layout.rows.size,
+        style = activeStyle,
+        settings = settings,
+        micInMargin = micInMargin,
+        screen = SurfaceSpec.Screen(landscape, screenHeightDp)
+    )
+    val splitGapPx = SurfaceSpec.splitGapPx(settings, landscape, state.page, widthPx)
+    val rowDp = SurfaceSpec.rowDp(heightPercent)
     val dimens = with(density) {
         SurfaceDimens(
             gapX = style.gapXDp.dp.toPx(),
@@ -106,22 +124,24 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         remember(
             layout,
             widthPx,
-            settings.heightPercent,
+            heightPercent,
             settings.numberRow,
             activeStyle,
             density,
             settings.sideMarginDp,
-            settings.edgeKeyBoostPercent
+            settings.edgeKeyBoostPercent,
+            splitGapPx
         ) {
             SurfaceSpec.geometry(
                 layout,
                 widthPx,
                 density.density,
-                settings.heightPercent,
+                heightPercent,
                 activeStyle,
                 settings.numberRow,
                 settings.sideMarginDp,
-                settings.edgeKeyBoostPercent
+                settings.edgeKeyBoostPercent,
+                splitGapPx
             )
         }
 
@@ -132,7 +152,6 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
     val dictating = dictation != null && dictationState != DictationState.Idle
     val showTools = activeStyle.suggestionBar.toolIcons == ToolIcons.SHOWN
-    val micInMargin = SurfaceSpec.micInMargin(controller.features.voice, activeStyle)
     val scope = rememberCoroutineScope()
     val gestures = remember(controller) { SurfaceGestures(controller, scope) { presses = it } }
     gestures.geometry = geometry
@@ -159,7 +178,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     }
     val keysHeightDp = SurfaceSpec.totalHeightDp(
         layout.rows.size,
-        settings.heightPercent,
+        heightPercent,
         settings.bottomMarginDp,
         activeStyle,
         settings.numberRow,

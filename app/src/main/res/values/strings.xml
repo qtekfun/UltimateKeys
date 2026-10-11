@@ -12,6 +12,14 @@
     <string name="step_selected">2. Selected</string>
     <string name="try_it_here">Try it here</string>
     <string name="setting_height">Keyboard height</string>
+    <string name="setting_height_landscape">Keyboard height, held sideways</string>
+    <string name="group_split">Split keyboard</string>
+    <string name="setting_split">Split the keys</string>
+    <string name="opt_split_off">Off</string>
+    <string name="opt_split_landscape">Sideways only</string>
+    <string name="opt_split_always">Always</string>
+    <string name="setting_split_gap">Space between the halves</string>
+    <string name="split_note">Two halves with a free space in the middle, each one under a thumb. A small gap keeps the keys big; a wide one makes each half compact. Numbers and phone pads are never split.</string>
     <string name="group_edges">Edges</string>
     <string name="setting_side_margin">Side margin</string>
     <string name="setting_edge_boost">Wider edge keys</string>

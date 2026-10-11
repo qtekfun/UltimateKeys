@@ -24,6 +24,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         val d = KeyboardSettings()
         return KeyboardSettings(
             heightPercent = this[HEIGHT] ?: d.heightPercent,
+            landscapeHeightPercent = this[LANDSCAPE_HEIGHT] ?: d.landscapeHeightPercent,
+            splitMode = this[SPLIT_MODE] ?: d.splitMode,
+            splitGapPercent = this[SPLIT_GAP] ?: d.splitGapPercent,
             bottomMarginDp = this[BOTTOM_MARGIN] ?: d.bottomMarginDp,
             sideMarginDp = this[SIDE_MARGIN] ?: d.sideMarginDp,
             edgeKeyBoostPercent = this[EDGE_BOOST] ?: d.edgeKeyBoostPercent,
@@ -68,6 +71,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(s: KeyboardSettings) {
         this[HEIGHT] = s.heightPercent
+        this[LANDSCAPE_HEIGHT] = s.landscapeHeightPercent
+        this[SPLIT_MODE] = s.splitMode
+        this[SPLIT_GAP] = s.splitGapPercent
         this[BOTTOM_MARGIN] = s.bottomMarginDp
         this[SIDE_MARGIN] = s.sideMarginDp
         this[EDGE_BOOST] = s.edgeKeyBoostPercent
@@ -102,6 +108,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     }
 
     private companion object {
+        val LANDSCAPE_HEIGHT = intPreferencesKey("landscape_height_percent")
+        val SPLIT_MODE = stringPreferencesKey("split_mode")
+        val SPLIT_GAP = intPreferencesKey("split_gap_percent")
         val DICTATION_ENABLED = booleanPreferencesKey("dictation_enabled")
         val DICTATION_LANGUAGE = stringPreferencesKey("dictation_language")
         val DICTATION_MIC_SIDE = stringPreferencesKey("dictation_mic_side")

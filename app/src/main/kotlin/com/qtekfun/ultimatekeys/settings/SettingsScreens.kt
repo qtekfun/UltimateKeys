@@ -177,11 +177,36 @@ internal fun TypingScreen(
                 ValueFormat::percent
             ) { v -> update { it.copy(heightPercent = v) } }
             intSlider(
+                R.string.setting_height_landscape,
+                settings.landscapeHeightPercent,
+                KeyboardSettings.LANDSCAPE_HEIGHT_RANGE,
+                ValueFormat::percent
+            ) { v -> update { it.copy(landscapeHeightPercent = v) } }
+            intSlider(
                 R.string.setting_bottom_margin,
                 settings.bottomMarginDp,
                 KeyboardSettings.BOTTOM_MARGIN_RANGE,
                 ValueFormat::dp
             ) { v -> update { it.copy(bottomMarginDp = v) } }
+        }
+        section(header = R.string.group_split, footer = R.string.split_note) {
+            choiceOf(
+                R.string.setting_split,
+                settings.splitMode,
+                { v -> update { it.copy(splitMode = v) } }
+            ) {
+                listOf(
+                    opt(KeyboardSettings.SPLIT_OFF, R.string.opt_split_off),
+                    opt(KeyboardSettings.SPLIT_LANDSCAPE, R.string.opt_split_landscape),
+                    opt(KeyboardSettings.SPLIT_ALWAYS, R.string.opt_split_always)
+                )
+            }
+            intSlider(
+                R.string.setting_split_gap,
+                settings.splitGapPercent,
+                KeyboardSettings.SPLIT_GAP_RANGE,
+                ValueFormat::percent
+            ) { v -> update { it.copy(splitGapPercent = v) } }
         }
         section(header = R.string.group_edges, footer = R.string.edges_note) {
             intSlider(
