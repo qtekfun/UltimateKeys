@@ -10,6 +10,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -212,6 +213,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             .fillMaxWidth()
             .background(style.background)
             .navigationBarsPadding()
+            .displayCutoutPadding()
     ) {
         val totalHeight = keysHeightDp.dp
         val fadeMs = if (activeStyle.motion.transition == PanelTransition.NONE) {

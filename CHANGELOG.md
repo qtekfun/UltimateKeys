@@ -9,8 +9,13 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- Sideways, the keys now use the whole width by default (like the system keyboard of the Pixel), with a 42 dp strip and rows about 40 dp tall. The sideways height and width settings go back to these new defaults.
+
 ### Fixed
 
+- Sideways, the keyboard background now reaches under the camera cutout, so the gap at the left (white over a light app) is gone; the keys stay clear of the cutout.
 - With the split keyboard on, the two halves now go to the edges of the screen when held sideways, instead of being pulled in by the width setting.
 
 ## [1.3.1] - 2026-10-11

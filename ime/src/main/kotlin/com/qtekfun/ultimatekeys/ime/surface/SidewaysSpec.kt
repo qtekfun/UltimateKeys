@@ -17,10 +17,10 @@ object SidewaysSpec {
     private const val PERCENT = 100f
 
     /** Sideways, the keyboard may take at most this share of the screen height. */
-    const val MAX_LANDSCAPE_SHARE = 0.6f
+    const val MAX_LANDSCAPE_SHARE = 0.65f
 
     /** Sideways the suggestion strip is at most this tall: every dp counts on a screen this short. */
-    const val LANDSCAPE_BAR_DP = 36
+    const val LANDSCAPE_BAR_DP = 42
 
     /**
      * The style as it is used on this screen. Held sideways the room is short, so the strip is compact, the

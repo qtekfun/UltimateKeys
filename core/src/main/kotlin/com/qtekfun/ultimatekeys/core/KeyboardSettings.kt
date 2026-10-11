@@ -136,8 +136,8 @@ data class KeyboardSettings(
         const val DEFAULT_LONG_PRESS_MS = 350
         const val DEFAULT_HAPTIC = 50
         const val DEFAULT_GESTURE_SENSITIVITY = 50
-        const val DEFAULT_LANDSCAPE_HEIGHT_PERCENT = 70
-        const val DEFAULT_LANDSCAPE_WIDTH_PERCENT = 80
+        const val DEFAULT_LANDSCAPE_HEIGHT_PERCENT = 75
+        const val DEFAULT_LANDSCAPE_WIDTH_PERCENT = 100
         const val DEFAULT_SPLIT_GAP_PERCENT = 20
         const val SPLIT_OFF = "off"
         const val SPLIT_LANDSCAPE = "landscape"
