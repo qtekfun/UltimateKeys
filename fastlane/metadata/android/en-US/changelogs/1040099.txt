@@ -1,0 +1,1 @@
+Spanish keys on long press (¿ ¡ ª º and quotes) and a sideways layout like the system keyboard: keys use the full width and the split halves go to the screen edges.
