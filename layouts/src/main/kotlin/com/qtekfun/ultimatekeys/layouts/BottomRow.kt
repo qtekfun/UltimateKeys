@@ -29,6 +29,27 @@ object BottomRow {
         return layout.copy(rows = rows)
     }
 
+    /**
+     * The second symbols page offers the angle brackets on both sides of the space bar, where the other pages
+     * have the comma and the period.
+     */
+    fun withAngleBrackets(layout: KeyboardLayout): KeyboardLayout {
+        val last = layout.rows.lastIndex
+        val keys = layout.rows[last].keys.map {
+            when {
+                it is CharKey && it.label == "," -> CharKey("<", width = it.width)
+                it is CharKey && it.label == "." -> CharKey(">", width = it.width)
+                else -> it
+            }
+        }
+        return layout.copy(
+            rows = layout.rows.toMutableList().also { rows ->
+                rows[last] =
+                    KeyRow(keys)
+            }
+        )
+    }
+
     private fun widthOf(slot: BottomSlot) = when (slot) {
         BottomSlot.SWITCH, BottomSlot.ENTER -> EDGE_WIDTH
         else -> SIDE_WIDTH

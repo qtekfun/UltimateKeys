@@ -169,7 +169,9 @@ class KeyboardController(
 
             Page.SYMBOLS_1 -> BottomRow.apply(LayoutRepository.load("symbols_1"), slots)
 
-            Page.SYMBOLS_2 -> BottomRow.apply(LayoutRepository.load("symbols_2"), slots)
+            Page.SYMBOLS_2 -> BottomRow.withAngleBrackets(
+                BottomRow.apply(LayoutRepository.load("symbols_2"), slots)
+            )
 
             Page.NUMERIC -> LayoutRepository.load("numeric")
 
