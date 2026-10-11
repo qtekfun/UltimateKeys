@@ -1,0 +1,1 @@
+Redesigned keyboard when held sideways: compact strip, taller keys and a narrower block of keys. The microphone has its own sideways setting (hidden by default) and the split keyboard can be used upright only.

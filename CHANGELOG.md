@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-11
+
 ### Changed
 
 - Held sideways the keyboard is redesigned to be usable: a compact suggestion strip, the microphone inside it instead of a margin under the keys, no bottom margin, taller keys (70% by default) and a narrower block of keys (80% of the width by default, adjustable) instead of very wide, flat keys.
@@ -209,7 +211,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...v1.2.0
