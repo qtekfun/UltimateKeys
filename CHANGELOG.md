@@ -10,6 +10,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ## [1.2.0] - 2026-10-11
+
 ### Added
 
 - The default bottom row now has an emoji key next to the comma and the space bar (a new "full" arrangement in the style editor; the older ones are still available).
