@@ -11,7 +11,14 @@ data class KeyboardSettings(
     val heightPercent: Int = DEFAULT_HEIGHT_PERCENT,
     /** The same as [heightPercent] while the device is held sideways, where the screen has little height. */
     val landscapeHeightPercent: Int = DEFAULT_LANDSCAPE_HEIGHT_PERCENT,
-    /** When the keys are split in two halves: [SPLIT_OFF], [SPLIT_LANDSCAPE] or [SPLIT_ALWAYS]. */
+    /** Width of the keys held sideways, in percent of the screen width, centered; the rest is left empty. */
+    val landscapeWidthPercent: Int = DEFAULT_LANDSCAPE_WIDTH_PERCENT,
+    /** The microphone while the phone is held sideways: [LANDSCAPE_MIC_HIDDEN] or [LANDSCAPE_MIC_STRIP]. */
+    val landscapeMic: String = LANDSCAPE_MIC_HIDDEN,
+    /**
+     * When the keys are split in two halves: [SPLIT_OFF], [SPLIT_LANDSCAPE], [SPLIT_PORTRAIT] or
+     * [SPLIT_ALWAYS].
+     */
     val splitMode: String = SPLIT_OFF,
     /** Width of the empty space between the halves, in percent of the keyboard width. */
     val splitGapPercent: Int = DEFAULT_SPLIT_GAP_PERCENT,
@@ -87,6 +94,8 @@ data class KeyboardSettings(
     fun sanitized(): KeyboardSettings = sanitizedLanguages().copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
         landscapeHeightPercent = landscapeHeightPercent.coerceIn(LANDSCAPE_HEIGHT_RANGE),
+        landscapeWidthPercent = landscapeWidthPercent.coerceIn(LANDSCAPE_WIDTH_RANGE),
+        landscapeMic = landscapeMic.takeIf { it in LANDSCAPE_MICS } ?: LANDSCAPE_MIC_HIDDEN,
         splitMode = splitMode.takeIf { it in SPLIT_MODES } ?: SPLIT_OFF,
         splitGapPercent = splitGapPercent.coerceIn(SPLIT_GAP_RANGE),
         bottomMarginDp = bottomMarginDp.coerceIn(BOTTOM_MARGIN_RANGE),
@@ -127,14 +136,20 @@ data class KeyboardSettings(
         const val DEFAULT_LONG_PRESS_MS = 350
         const val DEFAULT_HAPTIC = 50
         const val DEFAULT_GESTURE_SENSITIVITY = 50
-        const val DEFAULT_LANDSCAPE_HEIGHT_PERCENT = 60
+        const val DEFAULT_LANDSCAPE_HEIGHT_PERCENT = 70
+        const val DEFAULT_LANDSCAPE_WIDTH_PERCENT = 80
         const val DEFAULT_SPLIT_GAP_PERCENT = 20
         const val SPLIT_OFF = "off"
         const val SPLIT_LANDSCAPE = "landscape"
+        const val SPLIT_PORTRAIT = "portrait"
         const val SPLIT_ALWAYS = "always"
-        val SPLIT_MODES = listOf(SPLIT_OFF, SPLIT_LANDSCAPE, SPLIT_ALWAYS)
+        val SPLIT_MODES = listOf(SPLIT_OFF, SPLIT_LANDSCAPE, SPLIT_PORTRAIT, SPLIT_ALWAYS)
+        const val LANDSCAPE_MIC_HIDDEN = "hidden"
+        const val LANDSCAPE_MIC_STRIP = "strip"
+        val LANDSCAPE_MICS = listOf(LANDSCAPE_MIC_HIDDEN, LANDSCAPE_MIC_STRIP)
         val HEIGHT_RANGE = 70..130
         val LANDSCAPE_HEIGHT_RANGE = 40..130
+        val LANDSCAPE_WIDTH_RANGE = 50..100
         val SPLIT_GAP_RANGE = 10..60
         val BOTTOM_MARGIN_RANGE = 0..48
         val SIDE_MARGIN_RANGE = 0..32

@@ -13,10 +13,12 @@
     <string name="try_it_here">Pruébalo aquí</string>
     <string name="setting_height">Altura del teclado</string>
     <string name="setting_height_landscape">Altura del teclado en horizontal</string>
+    <string name="setting_width_landscape">Ancho del teclado en horizontal</string>
     <string name="group_split">Teclado dividido</string>
     <string name="setting_split">Dividir las teclas</string>
     <string name="opt_split_off">No</string>
     <string name="opt_split_landscape">Solo en horizontal</string>
+    <string name="opt_split_portrait">Solo en vertical</string>
     <string name="opt_split_always">Siempre</string>
     <string name="setting_split_gap">Espacio entre las mitades</string>
     <string name="split_note">Dos mitades con un hueco libre en medio, cada una bajo un pulgar. Un hueco pequeño mantiene las teclas grandes; uno ancho hace cada mitad más compacta. Los teclados numérico y de teléfono nunca se dividen.</string>
@@ -227,6 +229,10 @@
     <string name="dictation_mic_left">Izquierda</string>
     <string name="dictation_mic_center">Centro</string>
     <string name="dictation_mic_right">Derecha</string>
+    <string name="dictation_mic_landscape">Micrófono en horizontal</string>
+    <string name="dictation_mic_landscape_hidden">Oculto</string>
+    <string name="dictation_mic_landscape_strip">En la barra de sugerencias</string>
+    <string name="dictation_mic_landscape_note">En horizontal la pantalla es poco alta, así que el micrófono está oculto por defecto. No cambia dónde está en vertical (eso se elige en el estilo).</string>
     <string name="dictation_mic_side_note">Dónde está el micrófono bajo las teclas. Muévelo si se solapa con el botón que Android muestra para cambiar de teclado.</string>
     <string name="dictation_language_note">El dictado solo entiende español e inglés por ahora, aunque el teclado escriba en más idiomas. Cambiar de idioma a mitad de frase no es fiable con los modelos pequeños; el modelo Small lo hace mejor.</string>
     <string name="dictation_silence_label">Parar tras silencio</string>

@@ -9,6 +9,12 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- Held sideways the keyboard is redesigned to be usable: a compact suggestion strip, the microphone inside it instead of a margin under the keys, no bottom margin, taller keys (70% by default) and a narrower block of keys (80% of the width by default, adjustable) instead of very wide, flat keys.
+- The microphone has its own setting held sideways (Settings, Dictation): hidden by default, or in the suggestion strip. Upright it keeps the style's placement.
+- The split keyboard can also be used "upright only" (off, sideways only, upright only, always).
+
 ## [1.3.0] - 2026-10-11
 
 ### Added

@@ -8,6 +8,7 @@ import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.layouts.CharKey
 import com.qtekfun.ultimatekeys.layouts.KeyAction
 import com.qtekfun.ultimatekeys.layouts.LayoutParser
+import com.qtekfun.ultimatekeys.style.MicPlacement
 import com.qtekfun.ultimatekeys.style.Presets
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -61,28 +62,86 @@ class SplitAndLandscapeTest {
     fun `portrait uses the normal height and sideways its own, lowered when too tall`() {
         val style = Presets.default
         val s = KeyboardSettings(heightPercent = 110, landscapeHeightPercent = 100)
-        fun percent(screen: SurfaceSpec.Screen, settings: KeyboardSettings = s) =
-            SurfaceSpec.effectiveHeightPercent(4, style, settings, false, screen)
-        assertEquals(110, percent(SurfaceSpec.Screen(landscape = false, heightDp = 100)))
-        assertEquals(100, percent(SurfaceSpec.Screen(landscape = true, heightDp = 900)))
-        val capped = percent(SurfaceSpec.Screen(landscape = true, heightDp = 300))
+        fun percent(screen: SidewaysSpec.Screen, settings: KeyboardSettings = s) =
+            SidewaysSpec.effectiveHeightPercent(4, style, settings, false, screen)
+        assertEquals(110, percent(SidewaysSpec.Screen(landscape = false, heightDp = 100)))
+        assertEquals(100, percent(SidewaysSpec.Screen(landscape = true, heightDp = 900)))
+        val capped = percent(SidewaysSpec.Screen(landscape = true, heightDp = 300))
         assertTrue(capped < 100)
         val total = SurfaceSpec.totalHeightDp(4, capped, s.bottomMarginDp, style, false, false)
-        assertTrue(total <= 300 * SurfaceSpec.MAX_LANDSCAPE_SHARE + 0.5f, "total $total")
+        assertTrue(total <= 300 * SidewaysSpec.MAX_LANDSCAPE_SHARE + 0.5f, "total $total")
         assertEquals(
             SurfaceSpec.MIN_PERCENT,
-            percent(SurfaceSpec.Screen(landscape = true, heightDp = 40))
+            percent(SidewaysSpec.Screen(landscape = true, heightDp = 40))
         )
     }
 
     @Test
     fun `the split follows the mode and spares the number and phone pads`() {
         fun split(mode: String, landscape: Boolean, page: Page = Page.LETTERS) =
-            SurfaceSpec.isSplit(KeyboardSettings(splitMode = mode), landscape, page)
+            SidewaysSpec.isSplit(KeyboardSettings(splitMode = mode), landscape, page)
         assertFalse(split(KeyboardSettings.SPLIT_OFF, landscape = true))
         assertTrue(split(KeyboardSettings.SPLIT_LANDSCAPE, landscape = true))
+        assertTrue(split(KeyboardSettings.SPLIT_PORTRAIT, landscape = false))
+        assertFalse(split(KeyboardSettings.SPLIT_PORTRAIT, landscape = true))
         assertFalse(split(KeyboardSettings.SPLIT_LANDSCAPE, landscape = false))
         assertTrue(split(KeyboardSettings.SPLIT_ALWAYS, landscape = false, page = Page.SYMBOLS_1))
         assertFalse(split(KeyboardSettings.SPLIT_ALWAYS, landscape = true, page = Page.PHONE))
+    }
+
+    @Test
+    fun `sideways the strip is compact, the mic joins it and there is no bottom margin`() {
+        val base = Presets.default.let {
+            it.copy(bottomRow = it.bottomRow.copy(micPlacement = MicPlacement.BOTTOM_MARGIN))
+        }
+        assertEquals(base, SidewaysSpec.styleFor(base, landscape = false))
+        val side = SidewaysSpec.styleFor(base, landscape = true)
+        assertTrue(side.suggestionBar.heightDp <= SidewaysSpec.LANDSCAPE_BAR_DP)
+        assertEquals(MicPlacement.SUGGESTION_BAR, side.bottomRow.micPlacement)
+        val inRow = base.copy(
+            bottomRow = base.bottomRow.copy(micPlacement = MicPlacement.BOTTOM_ROW)
+        )
+        assertEquals(
+            MicPlacement.SUGGESTION_BAR,
+            SidewaysSpec.styleFor(inRow, landscape = true).bottomRow.micPlacement
+        )
+        val settings = KeyboardSettings(bottomMarginDp = 30)
+        assertEquals(0, SidewaysSpec.sizing(settings, landscape = true).bottomMarginDp)
+        assertEquals(30, SidewaysSpec.sizing(settings, landscape = false).bottomMarginDp)
+    }
+
+    @Test
+    fun `sideways the keys take their share of the width, centered`() {
+        assertEquals(0f, SidewaysSpec.extraSidePx(2000f, landscape = false, percent = 80), 0.01f)
+        assertEquals(200f, SidewaysSpec.extraSidePx(2000f, landscape = true, percent = 80), 0.01f)
+        assertEquals(0f, SidewaysSpec.extraSidePx(2000f, landscape = true, percent = 100), 0.01f)
+    }
+
+    @Test
+    fun `with the new sideways layout the rows are far taller than before`() {
+        val old = Presets.default.let {
+            it.copy(bottomRow = it.bottomRow.copy(micPlacement = MicPlacement.BOTTOM_MARGIN))
+        }
+        val screen = SidewaysSpec.Screen(landscape = true, heightDp = 400)
+        fun rowDp(style: com.qtekfun.ultimatekeys.style.Style, settings: KeyboardSettings) =
+            SurfaceSpec.rowDp(
+                SidewaysSpec.effectiveHeightPercent(
+                    5,
+                    style,
+                    settings,
+                    SurfaceSpec.micInMargin(true, style),
+                    screen
+                )
+            )
+        val before = rowDp(old, KeyboardSettings(numberRow = true, landscapeHeightPercent = 100))
+        val side = SidewaysSpec.styleFor(old, landscape = true)
+        val after = rowDp(
+            side,
+            SidewaysSpec.sizing(
+                KeyboardSettings(numberRow = true, landscapeHeightPercent = 100),
+                landscape = true
+            )
+        )
+        assertTrue(after > before * 1.2f, "before $before after $after")
     }
 }

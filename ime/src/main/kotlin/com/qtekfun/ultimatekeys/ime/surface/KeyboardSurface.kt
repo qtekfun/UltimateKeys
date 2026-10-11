@@ -57,8 +57,17 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val settings by controller.settings.collectAsState()
     val privacy by controller.privacy.state.collectAsState()
     val density = LocalDensity.current
-    val activeStyle by controller.style.collectAsState()
+    val chosenStyle by controller.style.collectAsState()
     val systemDark = isSystemInDarkTheme()
+    val configuration = LocalConfiguration.current
+
+    // The keyboard window is not the app window, so its own container size says nothing about the screen.
+    @Suppress("ConfigurationScreenWidthHeight")
+    val screenHeightDp = configuration.screenHeightDp
+    val landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val activeStyle =
+        remember(chosenStyle, landscape) { SidewaysSpec.styleFor(chosenStyle, landscape) }
+    val sizing = SidewaysSpec.sizing(settings, landscape)
     val context = LocalContext.current
     val tones = remember(context) { ToneSource.fromContext(context) }
     val style = remember(activeStyle, systemDark, tones) {
@@ -78,35 +87,32 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val screenReader = rememberAccessibilityActive()
     val panelKind by controller.panels.kind.collectAsState()
 
+    // Held sideways the microphone has its own setting (hidden by default).
+    val keyFeatures = SidewaysSpec.featuresFor(controller.features, settings, landscape)
     val layout =
         remember(
             state.page,
             settings.letterLayoutId,
             settings.numberRow,
             activeStyle.bottomRow,
-            controller.features
+            keyFeatures
         ) {
-            controller.layoutFor(state.page, settings, activeStyle)
+            controller.layoutFor(state.page, settings, activeStyle, keyFeatures)
         }
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
-    val configuration = LocalConfiguration.current
-
-    // The keyboard window is not the app window, so its own container size says nothing about the screen.
-    @Suppress("ConfigurationScreenWidthHeight")
-    val screenHeightDp = configuration.screenHeightDp
-    val landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val micInMargin = SurfaceSpec.micInMargin(controller.features.voice, activeStyle)
+    val micInMargin = SurfaceSpec.micInMargin(keyFeatures.voice, activeStyle)
     // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
-    val heightPercent = SurfaceSpec.effectiveHeightPercent(
+    val heightPercent = SidewaysSpec.effectiveHeightPercent(
         rows = layout.rows.size,
         style = activeStyle,
-        settings = settings,
+        settings = sizing,
         micInMargin = micInMargin,
-        screen = SurfaceSpec.Screen(landscape, screenHeightDp)
+        screen = SidewaysSpec.Screen(landscape, screenHeightDp)
     )
-    val splitGapPx = SurfaceSpec.splitGapPx(settings, landscape, state.page, widthPx)
+    val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
+    val extraSidePx = SidewaysSpec.extraSidePx(widthPx, landscape, settings.landscapeWidthPercent)
     val rowDp = SurfaceSpec.rowDp(heightPercent)
     val dimens = with(density) {
         SurfaceDimens(
@@ -130,7 +136,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             density,
             settings.sideMarginDp,
             settings.edgeKeyBoostPercent,
-            splitGapPx
+            splitGapPx,
+            extraSidePx
         ) {
             SurfaceSpec.geometry(
                 layout,
@@ -141,12 +148,13 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                 settings.numberRow,
                 settings.sideMarginDp,
                 settings.edgeKeyBoostPercent,
-                splitGapPx
+                splitGapPx,
+                extraSidePx
             )
         }
 
     val showToggle = privacy.isPrivate || activeStyle.suggestionBar.toolIcons != ToolIcons.HIDDEN
-    val showMic = controller.features.voice &&
+    val showMic = keyFeatures.voice &&
         activeStyle.bottomRow.micPlacement == MicPlacement.SUGGESTION_BAR
     val dictation = controller.dictation
     val dictationState by (dictation?.state ?: IdleDictation).collectAsState()
@@ -179,7 +187,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val keysHeightDp = SurfaceSpec.totalHeightDp(
         layout.rows.size,
         heightPercent,
-        settings.bottomMarginDp,
+        sizing.bottomMarginDp,
         activeStyle,
         settings.numberRow,
         micInMargin
@@ -273,7 +281,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                 modifier = Modifier.fillMaxWidth().height(totalHeight)
             )
         }
-        PanelHost(controller, panelTheme, keysHeightDp - settings.bottomMarginDp)
+        PanelHost(controller, panelTheme, keysHeightDp - sizing.bottomMarginDp)
     }
 }
 

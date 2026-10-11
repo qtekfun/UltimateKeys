@@ -25,6 +25,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
         return KeyboardSettings(
             heightPercent = this[HEIGHT] ?: d.heightPercent,
             landscapeHeightPercent = this[LANDSCAPE_HEIGHT] ?: d.landscapeHeightPercent,
+            landscapeWidthPercent = this[LANDSCAPE_WIDTH] ?: d.landscapeWidthPercent,
+            landscapeMic = this[LANDSCAPE_MIC] ?: d.landscapeMic,
             splitMode = this[SPLIT_MODE] ?: d.splitMode,
             splitGapPercent = this[SPLIT_GAP] ?: d.splitGapPercent,
             bottomMarginDp = this[BOTTOM_MARGIN] ?: d.bottomMarginDp,
@@ -72,6 +74,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     private fun androidx.datastore.preferences.core.MutablePreferences.write(s: KeyboardSettings) {
         this[HEIGHT] = s.heightPercent
         this[LANDSCAPE_HEIGHT] = s.landscapeHeightPercent
+        this[LANDSCAPE_WIDTH] = s.landscapeWidthPercent
+        this[LANDSCAPE_MIC] = s.landscapeMic
         this[SPLIT_MODE] = s.splitMode
         this[SPLIT_GAP] = s.splitGapPercent
         this[BOTTOM_MARGIN] = s.bottomMarginDp
@@ -109,6 +113,8 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
 
     private companion object {
         val LANDSCAPE_HEIGHT = intPreferencesKey("landscape_height_percent")
+        val LANDSCAPE_WIDTH = intPreferencesKey("landscape_width_percent")
+        val LANDSCAPE_MIC = stringPreferencesKey("landscape_mic")
         val SPLIT_MODE = stringPreferencesKey("split_mode")
         val SPLIT_GAP = intPreferencesKey("split_gap_percent")
         val DICTATION_ENABLED = booleanPreferencesKey("dictation_enabled")

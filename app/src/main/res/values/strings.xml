@@ -13,10 +13,12 @@
     <string name="try_it_here">Try it here</string>
     <string name="setting_height">Keyboard height</string>
     <string name="setting_height_landscape">Keyboard height, held sideways</string>
+    <string name="setting_width_landscape">Keyboard width, held sideways</string>
     <string name="group_split">Split keyboard</string>
     <string name="setting_split">Split the keys</string>
     <string name="opt_split_off">Off</string>
     <string name="opt_split_landscape">Sideways only</string>
+    <string name="opt_split_portrait">Upright only</string>
     <string name="opt_split_always">Always</string>
     <string name="setting_split_gap">Space between the halves</string>
     <string name="split_note">Two halves with a free space in the middle, each one under a thumb. A small gap keeps the keys big; a wide one makes each half compact. Numbers and phone pads are never split.</string>
@@ -227,6 +229,10 @@
     <string name="dictation_mic_left">Left</string>
     <string name="dictation_mic_center">Center</string>
     <string name="dictation_mic_right">Right</string>
+    <string name="dictation_mic_landscape">Microphone held sideways</string>
+    <string name="dictation_mic_landscape_hidden">Hidden</string>
+    <string name="dictation_mic_landscape_strip">In the suggestion strip</string>
+    <string name="dictation_mic_landscape_note">Held sideways the screen is short, so the microphone is hidden by default. This does not change where it sits upright (that is in the style).</string>
     <string name="dictation_mic_side_note">Where the microphone sits under the keys. Move it if it overlaps the button Android shows to switch keyboards.</string>
     <string name="dictation_language_note">Dictation understands Spanish and English only for now, whichever languages the keyboard writes in. Switching language in the middle of a sentence is unreliable with small models; the Small model copes better.</string>
     <string name="dictation_silence_label">Stop after silence</string>

@@ -183,6 +183,12 @@ internal fun TypingScreen(
                 ValueFormat::percent
             ) { v -> update { it.copy(landscapeHeightPercent = v) } }
             intSlider(
+                R.string.setting_width_landscape,
+                settings.landscapeWidthPercent,
+                KeyboardSettings.LANDSCAPE_WIDTH_RANGE,
+                ValueFormat::percent
+            ) { v -> update { it.copy(landscapeWidthPercent = v) } }
+            intSlider(
                 R.string.setting_bottom_margin,
                 settings.bottomMarginDp,
                 KeyboardSettings.BOTTOM_MARGIN_RANGE,
@@ -198,6 +204,7 @@ internal fun TypingScreen(
                 listOf(
                     opt(KeyboardSettings.SPLIT_OFF, R.string.opt_split_off),
                     opt(KeyboardSettings.SPLIT_LANDSCAPE, R.string.opt_split_landscape),
+                    opt(KeyboardSettings.SPLIT_PORTRAIT, R.string.opt_split_portrait),
                     opt(KeyboardSettings.SPLIT_ALWAYS, R.string.opt_split_always)
                 )
             }
