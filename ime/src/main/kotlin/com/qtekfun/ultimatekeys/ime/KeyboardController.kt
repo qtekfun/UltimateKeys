@@ -158,9 +158,10 @@ class KeyboardController(
     fun layoutFor(
         page: Page,
         settings: KeyboardSettings,
-        style: Style = this.style.value
+        style: Style = this.style.value,
+        keys: BottomRowFeatures = features
     ): KeyboardLayout {
-        val slots = BottomRowPlan.slots(style.bottomRow, features)
+        val slots = BottomRowPlan.slots(style.bottomRow, keys)
         return when (page) {
             Page.LETTERS -> BottomRow.apply(
                 LayoutRepository.pages(settings.letterLayoutId, settings.numberRow).letters,

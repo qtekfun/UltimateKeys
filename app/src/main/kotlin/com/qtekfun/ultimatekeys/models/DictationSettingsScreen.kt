@@ -39,6 +39,16 @@ internal fun DictationSettingsScreen(
         UkOption(KeyboardSettings.MIC_CENTER, stringResource(R.string.dictation_mic_center)),
         UkOption(KeyboardSettings.MIC_RIGHT, stringResource(R.string.dictation_mic_right))
     )
+    val landscapeMic = listOf(
+        UkOption(
+            KeyboardSettings.LANDSCAPE_MIC_HIDDEN,
+            stringResource(R.string.dictation_mic_landscape_hidden)
+        ),
+        UkOption(
+            KeyboardSettings.LANDSCAPE_MIC_STRIP,
+            stringResource(R.string.dictation_mic_landscape_strip)
+        )
+    )
     val languages = LANGUAGES.map { (code, label) -> UkOption(code, stringResource(label)) }
     UkScreen(
         title = stringResource(R.string.dictation_title),
@@ -56,6 +66,13 @@ internal fun DictationSettingsScreen(
             choice(R.string.dictation_mic_side, sides, settings.dictationMicSide) { v ->
                 update { it.copy(dictationMicSide = v) }
             }
+        }
+        section(footer = R.string.dictation_mic_landscape_note) {
+            choice(
+                R.string.dictation_mic_landscape,
+                landscapeMic,
+                settings.landscapeMic
+            ) { v -> update { it.copy(landscapeMic = v) } }
         }
         section(footer = R.string.dictation_language_note) {
             choice(R.string.dictation_language, languages, settings.dictationLanguage) { v ->

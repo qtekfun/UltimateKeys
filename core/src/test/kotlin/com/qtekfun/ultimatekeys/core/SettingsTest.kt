@@ -15,11 +15,19 @@ class SettingsTest {
     fun `sideways height and split settings are clamped`() {
         val s = KeyboardSettings(
             landscapeHeightPercent = 5,
+            landscapeWidthPercent = 10,
             splitMode = "diagonal",
+            landscapeMic = "loud",
             splitGapPercent = 99
         ).sanitized()
         assertEquals(40, s.landscapeHeightPercent)
+        assertEquals(50, s.landscapeWidthPercent)
         assertEquals(KeyboardSettings.SPLIT_OFF, s.splitMode)
+        assertEquals(KeyboardSettings.LANDSCAPE_MIC_HIDDEN, s.landscapeMic)
+        assertEquals(
+            KeyboardSettings.SPLIT_PORTRAIT,
+            KeyboardSettings(splitMode = KeyboardSettings.SPLIT_PORTRAIT).sanitized().splitMode
+        )
         assertEquals(60, s.splitGapPercent)
         assertEquals(
             KeyboardSettings.SPLIT_LANDSCAPE,
