@@ -9,6 +9,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-11
 ### Added
 
 - The default bottom row now has an emoji key next to the comma and the space bar (a new "full" arrangement in the style editor; the older ones are still available).
@@ -188,7 +189,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.0.2...v1.1.0

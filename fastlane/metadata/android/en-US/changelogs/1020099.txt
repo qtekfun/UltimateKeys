@@ -1,0 +1,1 @@
+Adds an emoji key to the default bottom row and completes the symbols pages: < and > on both sides of the space bar of the second page, more currencies on long press.
