@@ -174,7 +174,7 @@ class SettingsScreenTest {
         compose.setContent {
             UkTheme(TestSchemes.light) {
                 TypingScreen(
-                    KeyboardSettings(heightPercent = 100),
+                    KeyboardSettings(heightPercent = 110),
                     {},
                     {},
                     {},
@@ -185,8 +185,8 @@ class SettingsScreenTest {
         val row = compose.onNode(hasText("Keyboard height"))
         row.assertExists()
         compose.onNode(
-            SemanticsMatcher("state description 100%") {
-                it.config.getOrNull(SemanticsProperties.StateDescription) == "100%"
+            SemanticsMatcher("state description 110%") {
+                it.config.getOrNull(SemanticsProperties.StateDescription) == "110%"
             }
         ).assertExists()
     }

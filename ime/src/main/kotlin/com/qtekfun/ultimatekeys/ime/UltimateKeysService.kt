@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.ComposeView
@@ -165,6 +166,14 @@ class UltimateKeysService :
 
     override fun onCreateInputView(): View {
         val owner = this
+        // Sideways, the camera cutout sits at a short edge: let the window (and so the keyboard background)
+        // reach under it instead of leaving a gap that shows the app behind. The keys keep clear of it.
+        window.window?.let { w ->
+            w.attributes = w.attributes.apply {
+                layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
         window.window?.decorView?.apply {
             setViewTreeLifecycleOwner(owner)
             setViewTreeViewModelStoreOwner(owner)

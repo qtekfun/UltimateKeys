@@ -115,6 +115,12 @@ class SplitAndLandscapeTest {
         assertEquals(0f, SidewaysSpec.extraSidePx(2000f, landscape = false, percent = 80), 0.01f)
         assertEquals(200f, SidewaysSpec.extraSidePx(2000f, landscape = true, percent = 80), 0.01f)
         assertEquals(0f, SidewaysSpec.extraSidePx(2000f, landscape = true, percent = 100), 0.01f)
+        // A split keyboard goes to the edges whatever the width setting says.
+        assertEquals(
+            0f,
+            SidewaysSpec.extraSidePx(2000f, landscape = true, percent = 80, splitGapPx = 300f),
+            0.01f
+        )
     }
 
     @Test

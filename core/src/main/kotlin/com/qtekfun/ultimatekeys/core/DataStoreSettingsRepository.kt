@@ -112,8 +112,9 @@ class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : S
     }
 
     private companion object {
-        val LANDSCAPE_HEIGHT = intPreferencesKey("landscape_height_percent")
-        val LANDSCAPE_WIDTH = intPreferencesKey("landscape_width_percent")
+        // New names: the 1.3.x values (70 and 80) were stored defaults, not choices, and the defaults changed.
+        val LANDSCAPE_HEIGHT = intPreferencesKey("landscape_height_percent_v2")
+        val LANDSCAPE_WIDTH = intPreferencesKey("landscape_width_percent_v2")
         val LANDSCAPE_MIC = stringPreferencesKey("landscape_mic")
         val SPLIT_MODE = stringPreferencesKey("split_mode")
         val SPLIT_GAP = intPreferencesKey("split_gap_percent")
