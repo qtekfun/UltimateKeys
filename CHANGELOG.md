@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- The default bottom row has two keys on each side of the space bar, so the space bar is centered and wider; the emoji key sits next to enter. The previous row stays available in the style editor.
+
 ## [1.2.0] - 2026-10-11
 
 ### Added

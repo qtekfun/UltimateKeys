@@ -15,48 +15,53 @@ data class BottomRowFeatures(val emoji: Boolean = false, val voice: Boolean = fa
 object BottomRowPlan {
     fun slots(style: BottomRowStyle, features: BottomRowFeatures): List<BottomSlot> {
         val micInRow = features.voice && style.micPlacement == MicPlacement.BOTTOM_ROW
+        // The period gives way to the microphone when the style puts it in the row.
+        val end = if (micInRow) BottomSlot.MIC else BottomSlot.PERIOD
+        val emoji = if (features.emoji) BottomSlot.EMOJI else BottomSlot.GLOBE
+        val sw = BottomSlot.SWITCH
+        val enter = BottomSlot.ENTER
+        val space = BottomSlot.SPACE
+        val globe = BottomSlot.GLOBE
+        val comma = BottomSlot.COMMA
         return when (style.arrangement) {
-            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_EMOJI_SPACE_PERIOD_ENTER -> buildList {
-                add(BottomSlot.SWITCH)
-                add(BottomSlot.GLOBE)
-                add(BottomSlot.COMMA)
-                if (features.emoji) add(BottomSlot.EMOJI)
-                add(BottomSlot.SPACE)
-                add(if (micInRow) BottomSlot.MIC else BottomSlot.PERIOD)
-                add(BottomSlot.ENTER)
-            }
+            // Two keys on each side of the space bar, so it sits in the middle under the thumbs.
+            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_EMOJI_ENTER ->
+                listOfNotNull(
+                    sw,
+                    globe,
+                    comma,
+                    space,
+                    end,
+                    BottomSlot.EMOJI.takeIf {
+                        features.emoji
+                    },
+                    enter
+                )
 
-            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER -> listOf(
-                BottomSlot.SWITCH,
-                BottomSlot.GLOBE,
-                BottomSlot.COMMA,
-                BottomSlot.SPACE,
-                if (micInRow) BottomSlot.MIC else BottomSlot.PERIOD,
-                BottomSlot.ENTER
-            )
+            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_EMOJI_SPACE_PERIOD_ENTER ->
+                listOfNotNull(
+                    sw,
+                    globe,
+                    comma,
+                    BottomSlot.EMOJI.takeIf {
+                        features.emoji
+                    },
+                    space,
+                    end,
+                    enter
+                )
 
-            BottomRowArrangement.SYMBOLS_EMOJI_SPACE_PERIOD_ENTER -> listOf(
-                BottomSlot.SWITCH,
-                if (features.emoji) BottomSlot.EMOJI else BottomSlot.GLOBE,
-                BottomSlot.SPACE,
-                BottomSlot.PERIOD,
-                BottomSlot.ENTER
-            )
+            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER ->
+                listOf(sw, globe, comma, space, end, enter)
 
-            BottomRowArrangement.SYMBOLS_COMMA_SPACE_MIC_ENTER -> listOf(
-                BottomSlot.SWITCH,
-                BottomSlot.COMMA,
-                BottomSlot.SPACE,
-                if (micInRow) BottomSlot.MIC else BottomSlot.PERIOD,
-                BottomSlot.ENTER
-            )
+            BottomRowArrangement.SYMBOLS_EMOJI_SPACE_PERIOD_ENTER ->
+                listOf(sw, emoji, space, BottomSlot.PERIOD, enter)
 
-            BottomRowArrangement.SYMBOLS_GLOBE_SPACE_ENTER -> listOf(
-                BottomSlot.SWITCH,
-                BottomSlot.GLOBE,
-                BottomSlot.SPACE,
-                BottomSlot.ENTER
-            )
+            BottomRowArrangement.SYMBOLS_COMMA_SPACE_MIC_ENTER ->
+                listOf(sw, comma, space, end, enter)
+
+            BottomRowArrangement.SYMBOLS_GLOBE_SPACE_ENTER ->
+                listOf(sw, globe, space, enter)
         }
     }
 }

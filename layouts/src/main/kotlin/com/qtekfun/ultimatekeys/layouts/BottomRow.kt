@@ -9,7 +9,7 @@ enum class BottomSlot { SWITCH, GLOBE, COMMA, PERIOD, SPACE, EMOJI, MIC, ENTER }
 /** Rearranges the bottom row of a layout (the row with the space bar) into the given slots. */
 object BottomRow {
     private const val EDGE_WIDTH = 1.4f
-    private const val SIDE_WIDTH = 1f
+    private const val SIDE_WIDTH = 0.9f
     private const val MIN_SPACE_WIDTH = 2f
 
     /** Returns [layout] with its bottom row rebuilt from [slots]; layouts without a space bar are unchanged. */
