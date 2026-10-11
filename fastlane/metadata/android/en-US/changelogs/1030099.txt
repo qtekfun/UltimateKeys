@@ -1,0 +1,1 @@
+The keyboard no longer covers the screen when held sideways: it has its own height and never takes more than 60% of the screen. New split keyboard option (Settings, Typing) with an adjustable gap.
