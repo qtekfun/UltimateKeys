@@ -1,0 +1,1 @@
+Teclado rediseñado en horizontal: barra compacta, teclas más altas y un bloque de teclas más estrecho. El micrófono tiene su propio ajuste en horizontal (oculto por defecto) y el teclado dividido puede usarse solo en vertical.
