@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-11
+
 ### Added
 
 - A height of its own for the keyboard when the phone is held sideways (60% by default), and the keyboard never takes more than 60% of the screen height there, so the editor stays visible.
@@ -201,7 +203,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.1...v1.1.2

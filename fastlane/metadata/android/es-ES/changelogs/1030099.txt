@@ -1,0 +1,1 @@
+El teclado ya no tapa la pantalla en horizontal: tiene su propia altura y nunca ocupa más del 60 % de la pantalla. Nueva opción de teclado dividido (Ajustes, Escritura) con espacio ajustable.
