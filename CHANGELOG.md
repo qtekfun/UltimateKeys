@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-11
+
 ### Changed
 
 - The default bottom row has two keys on each side of the space bar, so the space bar is centered and wider; the emoji key sits next to enter. The previous row stays available in the style editor.
@@ -194,7 +196,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.1.0...v1.1.1
