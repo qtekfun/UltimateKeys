@@ -1,0 +1,1 @@
+La barra espaciadora de la fila inferior por defecto queda centrada y más ancha: dos teclas a cada lado, con la tecla de emoji junto a intro.
