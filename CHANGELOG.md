@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Spanish: `¿` and `¡` on long press of the period (first in the list) and of `?` and `!` on the symbols page; `ª` and `º` on long press of `a` and `o`. The symbols page also offers « » „ “ ” on `"` and ‘ ’ ‚ ‹ › on `'`.
+
 ### Changed
 
 - Sideways, the keys now use the whole width by default (like the system keyboard of the Pixel), with a 42 dp strip and rows about 40 dp tall. The sideways height and width settings go back to these new defaults.
