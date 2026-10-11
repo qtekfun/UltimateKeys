@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- With the split keyboard on, the two halves now go to the edges of the screen when held sideways, instead of being pulled in by the width setting.
+
 ## [1.3.1] - 2026-10-11
 
 ### Changed

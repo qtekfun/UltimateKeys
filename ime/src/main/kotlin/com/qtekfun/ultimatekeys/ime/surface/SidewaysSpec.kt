@@ -42,9 +42,17 @@ object SidewaysSpec {
     fun sizing(settings: KeyboardSettings, landscape: Boolean): KeyboardSettings =
         if (landscape) settings.copy(bottomMarginDp = 0) else settings
 
-    /** Free space added at each side of the keys so that they take [percent] of the width, centered. */
-    fun extraSidePx(widthPx: Float, landscape: Boolean, percent: Int): Float =
-        if (landscape) widthPx * (PERCENT - percent) / (2f * PERCENT) else 0f
+    /**
+     * Free space added at each side of the keys so that they take [percent] of the width, centered. A split
+     * keyboard ignores it: its halves go to the edges of the screen, each one under a thumb.
+     */
+    fun extraSidePx(
+        widthPx: Float,
+        landscape: Boolean,
+        percent: Int,
+        splitGapPx: Float = 0f
+    ): Float =
+        if (landscape && splitGapPx == 0f) widthPx * (PERCENT - percent) / (2f * PERCENT) else 0f
 
     /** What the surface needs to know about the screen it is on. */
     data class Screen(val landscape: Boolean, val heightDp: Int)

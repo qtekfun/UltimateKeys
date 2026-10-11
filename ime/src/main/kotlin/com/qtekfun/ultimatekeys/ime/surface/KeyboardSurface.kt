@@ -112,7 +112,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         screen = SidewaysSpec.Screen(landscape, screenHeightDp)
     )
     val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
-    val extraSidePx = SidewaysSpec.extraSidePx(widthPx, landscape, settings.landscapeWidthPercent)
+    val extraSidePx = SidewaysSpec.extraSidePx(
+        widthPx,
+        landscape,
+        settings.landscapeWidthPercent,
+        splitGapPx
+    )
     val rowDp = SurfaceSpec.rowDp(heightPercent)
     val dimens = with(density) {
         SurfaceDimens(
