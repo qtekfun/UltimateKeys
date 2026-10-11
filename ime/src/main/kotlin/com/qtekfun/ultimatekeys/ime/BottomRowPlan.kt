@@ -16,6 +16,16 @@ object BottomRowPlan {
     fun slots(style: BottomRowStyle, features: BottomRowFeatures): List<BottomSlot> {
         val micInRow = features.voice && style.micPlacement == MicPlacement.BOTTOM_ROW
         return when (style.arrangement) {
+            BottomRowArrangement.SYMBOLS_GLOBE_COMMA_EMOJI_SPACE_PERIOD_ENTER -> buildList {
+                add(BottomSlot.SWITCH)
+                add(BottomSlot.GLOBE)
+                add(BottomSlot.COMMA)
+                if (features.emoji) add(BottomSlot.EMOJI)
+                add(BottomSlot.SPACE)
+                add(if (micInRow) BottomSlot.MIC else BottomSlot.PERIOD)
+                add(BottomSlot.ENTER)
+            }
+
             BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER -> listOf(
                 BottomSlot.SWITCH,
                 BottomSlot.GLOBE,
