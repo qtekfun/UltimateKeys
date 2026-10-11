@@ -18,7 +18,23 @@ class BottomRowPlanTest {
         BottomRowPlan.slots(BottomRowStyle(arrangement, mic), f)
 
     @Test
-    fun `the default has the globe, comma, emoji, space, period and enter`() {
+    fun `the default balances the space bar with two keys on each side`() {
+        assertEquals(
+            listOf(
+                BottomSlot.SWITCH,
+                BottomSlot.GLOBE,
+                BottomSlot.COMMA,
+                BottomSlot.SPACE,
+                BottomSlot.PERIOD,
+                BottomSlot.EMOJI,
+                BottomSlot.ENTER
+            ),
+            BottomRowPlan.slots(BottomRowStyle(), all.copy(voice = false))
+        )
+    }
+
+    @Test
+    fun `the emoji key can still sit left of the space bar`() {
         assertEquals(
             listOf(
                 BottomSlot.SWITCH,
@@ -29,7 +45,11 @@ class BottomRowPlanTest {
                 BottomSlot.PERIOD,
                 BottomSlot.ENTER
             ),
-            BottomRowPlan.slots(BottomRowStyle(), all.copy(voice = false))
+            slots(
+                BottomRowArrangement.SYMBOLS_GLOBE_COMMA_EMOJI_SPACE_PERIOD_ENTER,
+                MicPlacement.BOTTOM_MARGIN,
+                all.copy(voice = false)
+            )
         )
     }
 
