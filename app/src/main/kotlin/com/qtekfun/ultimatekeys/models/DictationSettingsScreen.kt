@@ -32,7 +32,9 @@ internal fun DictationSettingsScreen(
     update: ((KeyboardSettings) -> KeyboardSettings) -> Unit,
     onModels: () -> Unit,
     onBack: () -> Unit,
-    insets: ScreenInsets = ScreenInsets.current()
+    insets: ScreenInsets = ScreenInsets.current(),
+    /** On a foldable the sideways microphone choice belongs to the screen in use, and the note says so. */
+    foldable: Boolean = false
 ) {
     val sides = listOf(
         UkOption(KeyboardSettings.MIC_LEFT, stringResource(R.string.dictation_mic_left)),
@@ -67,7 +69,13 @@ internal fun DictationSettingsScreen(
                 update { it.copy(dictationMicSide = v) }
             }
         }
-        section(footer = R.string.dictation_mic_landscape_note) {
+        section(
+            footer = if (foldable) {
+                R.string.dictation_mic_landscape_note_foldable
+            } else {
+                R.string.dictation_mic_landscape_note
+            }
+        ) {
             choice(
                 R.string.dictation_mic_landscape,
                 landscapeMic,

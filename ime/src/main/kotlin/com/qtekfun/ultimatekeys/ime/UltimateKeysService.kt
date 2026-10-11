@@ -5,6 +5,7 @@ package com.qtekfun.ultimatekeys.ime
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.res.Configuration
 import android.inputmethodservice.InputMethodService
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.qtekfun.ultimatekeys.clipboard.SystemClipboardWatcher
 import com.qtekfun.ultimatekeys.clipboard.clipStore
+import com.qtekfun.ultimatekeys.core.ScreenProfileTracker
 import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.core.styleRepository
 import com.qtekfun.ultimatekeys.core.userWordsRepository
@@ -204,8 +206,15 @@ class UltimateKeysService :
 
     override fun onEvaluateFullscreenMode(): Boolean = false
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // A fold or an unfold changes the screen, and with it the size settings that apply.
+        ScreenProfileTracker.refresh(this)
+    }
+
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        ScreenProfileTracker.refresh(this)
         moveTo(Lifecycle.State.RESUMED)
         controller.privacy.onStartInput(info.inputType, info.imeOptions)
         val ic = currentInputConnection ?: return

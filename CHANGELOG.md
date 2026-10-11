@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Foldable phones: the keyboard height, margins, width, split and sideways settings (and the sideways microphone) are now kept separately for the unfolded and the cover screen, upright and sideways. The typing settings get a "Screen" selector on a foldable only; other phones are unchanged and a foldable starts with the values it already had.
+
 ## [1.4.0] - 2026-10-12
 
 ### Added

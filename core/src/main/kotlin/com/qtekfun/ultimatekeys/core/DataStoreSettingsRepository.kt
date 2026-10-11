@@ -9,14 +9,54 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
-class DataStoreSettingsRepository(private val store: DataStore<Preferences>) : SettingsRepository {
-    override val settings: Flow<KeyboardSettings> = store.data.map { it.toSettings() }
+/**
+ * Settings in a DataStore. The size-related ones are kept per [ScreenProfile]: [screenProfile] says which one
+ * is in use (a foldable's two screens each have their own, everything else only [ScreenProfile.NORMAL]).
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class DataStoreSettingsRepository(
+    private val store: DataStore<Preferences>,
+    override val screenProfile: Flow<ScreenProfile> = flowOf(ScreenProfile.NORMAL)
+) : SettingsRepository {
+    override val settings: Flow<KeyboardSettings> =
+        screenProfile.distinctUntilChanged().flatMapLatest { settingsOf(it) }
 
-    override suspend fun update(transform: (KeyboardSettings) -> KeyboardSettings) {
-        store.edit { prefs -> prefs.write(transform(prefs.toSettings()).sanitized()) }
+    override fun settingsOf(profile: ScreenProfile): Flow<KeyboardSettings> =
+        store.data.map { it.toSettings(profile) }
+
+    override suspend fun update(transform: (KeyboardSettings) -> KeyboardSettings) =
+        updateOf(screenProfile.first(), transform)
+
+    override suspend fun updateOf(
+        profile: ScreenProfile,
+        transform: (KeyboardSettings) -> KeyboardSettings
+    ) {
+        store.edit { prefs ->
+            val before = prefs.toSettings(profile)
+            val after = transform(before).sanitized()
+            val keys = ScreenProfileKeys.of(profile)
+            if (keys == null) {
+                prefs.write(after)
+            } else {
+                // Everything but the size settings is shared; those go to this screen's own keys.
+                prefs.write(after.withLayoutOf(prefs.toSettings(ScreenProfile.NORMAL)))
+                keys.write(prefs, before, after)
+            }
+        }
+    }
+
+    private fun Preferences.toSettings(profile: ScreenProfile): KeyboardSettings {
+        val shared = toSettings()
+        val keys = ScreenProfileKeys.of(profile) ?: return shared
+        return keys.read(this, shared).sanitized()
     }
 
     @Suppress("CyclomaticComplexMethod")

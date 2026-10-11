@@ -119,3 +119,7 @@ Things that need a physical device or human judgment. Tick when done.
 - [ ] Hold the phone sideways (Realme and Find X8 Pro) in an app with a text field: the keyboard takes less than 60% of the screen height and the editor stays visible; the height slider "Keyboard height, held sideways" changes it and the portrait height is unaffected.
 - [ ] Turn "Split the keys" on (always, then sideways only): the two halves sit near the edges with a free space in the middle, every row is reachable with both thumbs, the space bar shows on both halves, and a tap in the free space types the nearest key. Try gaps of 10%, 20% and 40%, and gesture typing across the gap.
 - [ ] Number and phone pads (a number field) are never split.
+
+## Foldable phones
+
+- [ ] On a real foldable (not available to the owner when this was written, so unverified): in Settings > Typing the "Screen" selector appears with Unfolded and Cover; set different heights, margins, split and sideways values for each, unfold and fold the phone with the keyboard open and check that each screen uses its own values upright and sideways, and that the sideways microphone setting (Dictation) follows the screen in use. On a phone that does not fold the selector does not appear and nothing changed.

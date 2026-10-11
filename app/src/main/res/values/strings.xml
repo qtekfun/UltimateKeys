@@ -253,6 +253,12 @@
     <string name="summary_on">On</string>
     <string name="summary_off">Off</string>
     <string name="try_it_note">Tap the field and type to test the keyboard.</string>
+    <string name="group_screen">Screen</string>
+    <string name="setting_screen">Settings for</string>
+    <string name="opt_screen_inner">Unfolded</string>
+    <string name="opt_screen_outer">Cover</string>
+    <string name="screen_note">This phone folds. The height, margins, split and sideways settings below are kept separately for each of its screens, upright and sideways. Pick the screen to edit; the other settings are shared.</string>
+    <string name="dictation_mic_landscape_note_foldable">Held sideways the screen is short, so the microphone is hidden by default. This is kept for the screen you are using now; the other screen of this phone has its own. It does not change where it sits upright (that is in the style).</string>
     <string name="group_size">Size</string>
     <string name="group_layout">Layout</string>
     <string name="group_typing_help">While typing</string>

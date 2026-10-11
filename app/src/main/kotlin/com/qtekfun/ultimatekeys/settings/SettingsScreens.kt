@@ -21,6 +21,7 @@ import com.qtekfun.ultimatekeys.AppVersion
 import com.qtekfun.ultimatekeys.ImeStatus
 import com.qtekfun.ultimatekeys.R
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
+import com.qtekfun.ultimatekeys.core.ScreenProfile
 import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 import com.qtekfun.ultimatekeys.ui.ScreenInsets
 import com.qtekfun.ultimatekeys.ui.UkChevron
@@ -164,11 +165,23 @@ internal fun TypingScreen(
     update: SettingsUpdate,
     onOpenLanguages: () -> Unit,
     onBack: () -> Unit,
-    insets: ScreenInsets = ScreenInsets.current()
+    insets: ScreenInsets = ScreenInsets.current(),
+    /** The screen being edited on a foldable (then [onScreenChange] picks the other one); null elsewhere. */
+    screen: ScreenProfile? = null,
+    onScreenChange: (ScreenProfile) -> Unit = {}
 ) {
     val languages = settings.enabledLanguages.mapNotNull { LanguageCatalog.find(it) }
         .joinToString(", ") { it.nativeName }
+    val screens = listOf(
+        UkOption(ScreenProfile.FOLDABLE_INNER, stringResource(R.string.opt_screen_inner)),
+        UkOption(ScreenProfile.FOLDABLE_OUTER, stringResource(R.string.opt_screen_outer))
+    )
     SubScreen(R.string.section_typing, onBack, insets) {
+        if (screen != null) {
+            section(header = R.string.group_screen, footer = R.string.screen_note) {
+                choice(R.string.setting_screen, screens, screen, onScreenChange)
+            }
+        }
         section(header = R.string.group_size) {
             intSlider(
                 R.string.setting_height,

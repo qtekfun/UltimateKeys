@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
+import com.qtekfun.ultimatekeys.core.ScreenProfileTracker
 import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.settings.rememberRouteStack
 import com.qtekfun.ultimatekeys.ui.setUkContent
@@ -39,6 +40,9 @@ class ModelsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The activity is recreated by a fold or an unfold, so this keeps the screen in use up to date.
+        ScreenProfileTracker.refresh(this)
+        val foldable = ScreenProfileTracker.isFoldableDevice(this)
         val start = if (intent.getBooleanExtra(EXTRA_SETTINGS, false)) {
             ModelsRoute.Dictation
         } else {
@@ -60,7 +64,8 @@ class ModelsActivity : ComponentActivity() {
                     settings = settings,
                     update = viewModel::update,
                     onModels = { stack = stack.open(ModelsRoute.Models) },
-                    onBack = back
+                    onBack = back,
+                    foldable = foldable
                 )
 
                 ModelsRoute.Models -> ModelsScreen(
