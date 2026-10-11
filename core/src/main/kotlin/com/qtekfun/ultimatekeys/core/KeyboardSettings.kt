@@ -9,6 +9,12 @@ import com.qtekfun.ultimatekeys.languages.LanguageCatalog
 /** User-facing keyboard settings. Values are always clamped through [sanitized]. */
 data class KeyboardSettings(
     val heightPercent: Int = DEFAULT_HEIGHT_PERCENT,
+    /** The same as [heightPercent] while the device is held sideways, where the screen has little height. */
+    val landscapeHeightPercent: Int = DEFAULT_LANDSCAPE_HEIGHT_PERCENT,
+    /** When the keys are split in two halves: [SPLIT_OFF], [SPLIT_LANDSCAPE] or [SPLIT_ALWAYS]. */
+    val splitMode: String = SPLIT_OFF,
+    /** Width of the empty space between the halves, in percent of the keyboard width. */
+    val splitGapPercent: Int = DEFAULT_SPLIT_GAP_PERCENT,
     val bottomMarginDp: Int = DEFAULT_BOTTOM_MARGIN_DP,
     /** Space kept free at each side of the keys, away from the screen edge and its gestures. */
     val sideMarginDp: Int = DEFAULT_SIDE_MARGIN_DP,
@@ -80,6 +86,9 @@ data class KeyboardSettings(
 
     fun sanitized(): KeyboardSettings = sanitizedLanguages().copy(
         heightPercent = heightPercent.coerceIn(HEIGHT_RANGE),
+        landscapeHeightPercent = landscapeHeightPercent.coerceIn(LANDSCAPE_HEIGHT_RANGE),
+        splitMode = splitMode.takeIf { it in SPLIT_MODES } ?: SPLIT_OFF,
+        splitGapPercent = splitGapPercent.coerceIn(SPLIT_GAP_RANGE),
         bottomMarginDp = bottomMarginDp.coerceIn(BOTTOM_MARGIN_RANGE),
         sideMarginDp = sideMarginDp.coerceIn(SIDE_MARGIN_RANGE),
         edgeKeyBoostPercent = edgeKeyBoostPercent.coerceIn(EDGE_BOOST_RANGE),
@@ -118,7 +127,15 @@ data class KeyboardSettings(
         const val DEFAULT_LONG_PRESS_MS = 350
         const val DEFAULT_HAPTIC = 50
         const val DEFAULT_GESTURE_SENSITIVITY = 50
+        const val DEFAULT_LANDSCAPE_HEIGHT_PERCENT = 60
+        const val DEFAULT_SPLIT_GAP_PERCENT = 20
+        const val SPLIT_OFF = "off"
+        const val SPLIT_LANDSCAPE = "landscape"
+        const val SPLIT_ALWAYS = "always"
+        val SPLIT_MODES = listOf(SPLIT_OFF, SPLIT_LANDSCAPE, SPLIT_ALWAYS)
         val HEIGHT_RANGE = 70..130
+        val LANDSCAPE_HEIGHT_RANGE = 40..130
+        val SPLIT_GAP_RANGE = 10..60
         val BOTTOM_MARGIN_RANGE = 0..48
         val SIDE_MARGIN_RANGE = 0..32
         val EDGE_BOOST_RANGE = 0..40

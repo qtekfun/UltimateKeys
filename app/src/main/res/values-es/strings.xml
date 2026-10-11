@@ -12,6 +12,14 @@
     <string name="step_selected">2. Seleccionado</string>
     <string name="try_it_here">Pruébalo aquí</string>
     <string name="setting_height">Altura del teclado</string>
+    <string name="setting_height_landscape">Altura del teclado en horizontal</string>
+    <string name="group_split">Teclado dividido</string>
+    <string name="setting_split">Dividir las teclas</string>
+    <string name="opt_split_off">No</string>
+    <string name="opt_split_landscape">Solo en horizontal</string>
+    <string name="opt_split_always">Siempre</string>
+    <string name="setting_split_gap">Espacio entre las mitades</string>
+    <string name="split_note">Dos mitades con un hueco libre en medio, cada una bajo un pulgar. Un hueco pequeño mantiene las teclas grandes; uno ancho hace cada mitad más compacta. Los teclados numérico y de teléfono nunca se dividen.</string>
     <string name="group_edges">Bordes</string>
     <string name="setting_side_margin">Margen lateral</string>
     <string name="setting_edge_boost">Teclas de los bordes más anchas</string>

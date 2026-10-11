@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- A height of its own for the keyboard when the phone is held sideways (60% by default), and the keyboard never takes more than 60% of the screen height there, so the editor stays visible.
+- Split keyboard: the keys in two halves with a free space in the middle, always or only when held sideways, with an adjustable gap (Settings, Typing). Off by default.
+
 ## [1.2.1] - 2026-10-11
 
 ### Changed
