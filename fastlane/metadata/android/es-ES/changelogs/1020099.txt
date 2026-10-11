@@ -1,0 +1,1 @@
+Añade una tecla de emoji a la fila inferior por defecto y completa las páginas de símbolos: < y > a los lados de la barra espaciadora de la segunda página y más monedas con pulsación larga.
