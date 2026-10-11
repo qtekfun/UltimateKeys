@@ -1,0 +1,1 @@
+Teclas en español con pulsación larga (¿ ¡ ª º y comillas) y teclado horizontal como el del sistema: las teclas usan todo el ancho y las mitades del teclado dividido van a los bordes.

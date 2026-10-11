@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-12
+
 ### Added
 
 - Spanish: `¿` and `¡` on long press of the period (first in the list) and of `?` and `!` on the symbols page; `ª` and `º` on long press of `a` and `o`. The symbols page also offers « » „ “ ” on `"` and ‘ ’ ‚ ‹ › on `'`.
@@ -224,7 +226,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.0...v1.2.1
