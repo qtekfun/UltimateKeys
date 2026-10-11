@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- The default bottom row now has an emoji key next to the comma and the space bar (a new "full" arrangement in the style editor; the older ones are still available).
+- The second symbols page has `<` and `>` on both sides of the space bar, `$` among the currencies and `§`; `(` and `)` offer `< [ {` and `> ] }` on long press, and `€` offers the other currencies on long press.
+
 ## [1.1.2] - 2026-10-10
 
 ### Fixed

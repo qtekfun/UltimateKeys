@@ -18,7 +18,23 @@ class BottomRowPlanTest {
         BottomRowPlan.slots(BottomRowStyle(arrangement, mic), f)
 
     @Test
-    fun `the default keeps the globe, comma and period`() {
+    fun `the default has the globe, comma, emoji, space, period and enter`() {
+        assertEquals(
+            listOf(
+                BottomSlot.SWITCH,
+                BottomSlot.GLOBE,
+                BottomSlot.COMMA,
+                BottomSlot.EMOJI,
+                BottomSlot.SPACE,
+                BottomSlot.PERIOD,
+                BottomSlot.ENTER
+            ),
+            BottomRowPlan.slots(BottomRowStyle(), all.copy(voice = false))
+        )
+    }
+
+    @Test
+    fun `the classic arrangement keeps the globe, comma and period`() {
         assertEquals(
             listOf(
                 BottomSlot.SWITCH,
@@ -28,7 +44,11 @@ class BottomRowPlanTest {
                 BottomSlot.PERIOD,
                 BottomSlot.ENTER
             ),
-            BottomRowPlan.slots(BottomRowStyle(), none)
+            slots(
+                BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
+                MicPlacement.BOTTOM_MARGIN,
+                none
+            )
         )
     }
 

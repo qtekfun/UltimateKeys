@@ -49,6 +49,24 @@ class BottomRowTest {
     }
 
     @Test
+    fun `angle brackets replace the comma and the period on the second symbols page`() {
+        val slots = listOf(
+            BottomSlot.SWITCH,
+            BottomSlot.COMMA,
+            BottomSlot.SPACE,
+            BottomSlot.PERIOD,
+            BottomSlot.ENTER
+        )
+        val result = BottomRow.withAngleBrackets(
+            BottomRow.apply(LayoutRepository.load("symbols_2"), slots)
+        )
+        assertEquals(
+            listOf("SWITCH_LETTERS", "<", "SPACE", ">", "ENTER"),
+            describe(bottom(result))
+        )
+    }
+
+    @Test
     fun `comma and period keep their long press alternatives`() {
         val result = BottomRow.apply(
             letters,

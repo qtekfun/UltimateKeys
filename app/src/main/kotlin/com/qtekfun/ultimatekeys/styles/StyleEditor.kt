@@ -471,6 +471,10 @@ private fun UkGroupScope.bottomRowRows(style: Style, onChange: (Style) -> Unit) 
     }) {
         listOf(
             opt(
+                BottomRowArrangement.SYMBOLS_GLOBE_COMMA_EMOJI_SPACE_PERIOD_ENTER,
+                R.string.opt_row_full
+            ),
+            opt(
                 BottomRowArrangement.SYMBOLS_GLOBE_COMMA_SPACE_PERIOD_ENTER,
                 R.string.opt_row_classic
             ),
