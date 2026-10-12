@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- The number and phone pads: every row now has the same height (they used to inherit the number-row and bottom-row heights of the letters), and the bottom row lines up with the columns above it.
+- With the number row on, the first row of the symbols pages is no longer shortened like the number row.
+
 ## [1.5.0] - 2026-10-12
 
 ### Added

@@ -103,6 +103,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
+    // Only the letters page has a number row, and the number and phone pads have rows of one height.
+    val numberRow = SurfaceSpec.showsNumberRow(settings.numberRow, state.page)
+    val uniformRows = SurfaceSpec.hasUniformRows(state.page)
     val micInMargin = SurfaceSpec.micInMargin(keyFeatures.voice, activeStyle)
     // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
     val heightPercent = SidewaysSpec.effectiveHeightPercent(
@@ -110,7 +113,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         style = activeStyle,
         settings = sizing,
         micInMargin = micInMargin,
-        screen = SidewaysSpec.Screen(landscape, screenHeightDp)
+        screen = SidewaysSpec.Screen(landscape, screenHeightDp),
+        numberRow = numberRow,
+        uniform = uniformRows
     )
     val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
     val extraSidePx = SidewaysSpec.extraSidePx(
@@ -137,7 +142,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             layout,
             widthPx,
             heightPercent,
-            settings.numberRow,
+            numberRow,
+            uniformRows,
             activeStyle,
             density,
             settings.sideMarginDp,
@@ -151,11 +157,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                 density.density,
                 heightPercent,
                 activeStyle,
-                settings.numberRow,
+                numberRow,
                 settings.sideMarginDp,
                 settings.edgeKeyBoostPercent,
                 splitGapPx,
-                extraSidePx
+                extraSidePx,
+                uniformRows
             )
         }
 
@@ -195,8 +202,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         heightPercent,
         sizing.bottomMarginDp,
         activeStyle,
-        settings.numberRow,
-        micInMargin
+        numberRow,
+        micInMargin,
+        uniformRows
     )
     val marginMic = MarginMic.forSurface(
         micInMargin,

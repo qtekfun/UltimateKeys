@@ -66,7 +66,9 @@ object SidewaysSpec {
         style: Style,
         settings: KeyboardSettings,
         micInMargin: Boolean,
-        screen: Screen
+        screen: Screen,
+        numberRow: Boolean = settings.numberRow,
+        uniform: Boolean = false
     ): Int {
         if (!screen.landscape) return settings.heightPercent
         val requested = settings.landscapeHeightPercent
@@ -77,14 +79,15 @@ object SidewaysSpec {
             requested,
             margin,
             style,
-            settings.numberRow,
-            micInMargin
+            numberRow,
+            micInMargin,
+            uniform
         )
         if (total <= maxTotalDp) return requested
         val fixed =
             style.suggestionBar.heightDp + SurfaceSpec.BOTTOM_PADDING_DP +
                 SurfaceSpec.marginDp(margin, micInMargin)
-        val scales = SurfaceSpec.rowScales(style, rows, settings.numberRow).sum()
+        val scales = SurfaceSpec.rowScales(style, rows, numberRow, uniform).sum()
         val rowDp = (maxTotalDp - fixed) / scales
         return (rowDp * PERCENT / SurfaceSpec.BASE_ROW_DP).toInt().coerceIn(
             SurfaceSpec.MIN_PERCENT,

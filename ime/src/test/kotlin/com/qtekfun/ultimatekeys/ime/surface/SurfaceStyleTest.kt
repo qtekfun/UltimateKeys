@@ -55,6 +55,21 @@ class SurfaceStyleTest {
     }
 
     @Test
+    fun `uniform pages have every row as tall as a letter row`() {
+        val style = Style(
+            keys = KeyShape(
+                numberRowHeightPercent = 60,
+                letterRowHeightPercent = 90,
+                bottomRowHeightPercent = 120
+            )
+        )
+        assertEquals(
+            listOf(0.9f, 0.9f, 0.9f, 0.9f),
+            SurfaceSpec.rowScales(style, 4, numberRow = true, uniform = true)
+        )
+    }
+
+    @Test
     fun `geometry stacks rows of different heights`() {
         val g =
             KeyGeometry(layout, width = 100f, rowHeight = 50f, rowScales = listOf(0.5f, 1f, 1f, 2f))
