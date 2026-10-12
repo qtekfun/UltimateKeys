@@ -1,0 +1,1 @@
+Foldable phones: the keyboard height, margins, width, split and sideways settings are now kept separately for the unfolded and the cover screen.

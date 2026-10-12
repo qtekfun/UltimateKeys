@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-12
+
 ### Added
 
 - Foldable phones: the keyboard height, margins, width, split and sideways settings (and the sideways microphone) are now kept separately for the unfolded and the cover screen, upright and sideways. The typing settings get a "Screen" selector on a foldable only; other phones are unchanged and a foldable starts with the values it already had.
@@ -230,7 +232,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.2.1...v1.3.0

@@ -1,0 +1,1 @@
+Plegables: la altura, los márgenes, el ancho, el teclado dividido y los ajustes en horizontal se guardan por separado para la pantalla desplegada y la exterior.
