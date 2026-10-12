@@ -3,6 +3,7 @@
 
 package com.qtekfun.ultimatekeys.ime.surface
 
+import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.layouts.KeyboardLayout
 import com.qtekfun.ultimatekeys.style.Presets
 import com.qtekfun.ultimatekeys.style.Style
@@ -20,6 +21,12 @@ object SurfaceSpec {
     private const val PERCENT = 100f
 
     fun rowDp(heightPercent: Int): Float = BASE_ROW_DP * heightPercent / PERCENT
+
+    /** Only the letters page has a number row; the setting means nothing on the other pages. */
+    fun showsNumberRow(numberRow: Boolean, page: Page): Boolean = numberRow && page == Page.LETTERS
+
+    /** The number and phone pads have no number row or bottom row: every row is of one height. */
+    fun hasUniformRows(page: Page): Boolean = page == Page.NUMERIC || page == Page.PHONE
 
     /**
      * Height multiplier of each row: the number row, the bottom row and the letter rows in between. A [uniform]

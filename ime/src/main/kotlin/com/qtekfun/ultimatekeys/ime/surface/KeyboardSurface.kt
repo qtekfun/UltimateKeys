@@ -40,7 +40,6 @@ import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
-import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.ime.panels.PanelHost
 import com.qtekfun.ultimatekeys.ime.panels.PanelKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
@@ -105,8 +104,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
     // Only the letters page has a number row, and the number and phone pads have rows of one height.
-    val numberRow = settings.numberRow && state.page == Page.LETTERS
-    val uniformRows = state.page == Page.NUMERIC || state.page == Page.PHONE
+    val numberRow = SurfaceSpec.showsNumberRow(settings.numberRow, state.page)
+    val uniformRows = SurfaceSpec.hasUniformRows(state.page)
     val micInMargin = SurfaceSpec.micInMargin(keyFeatures.voice, activeStyle)
     // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
     val heightPercent = SidewaysSpec.effectiveHeightPercent(
