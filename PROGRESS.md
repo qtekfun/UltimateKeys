@@ -4,13 +4,13 @@
 - None. Release signing secrets are in place and the published APKs are signed with the owner's certificate.
 
 ## Current phase / branch / open PR
-Phases 0 to 10 are merged on `master`. Released: v0.1.0 to v0.9.2, v1.0.0-rc.1 (pre-release) and v1.0.0. Gesture typing shipped inside 1.0.0 (the plan's v1.1.0 is only needed for later fixes).
+Phases 0 to 10 are merged on `master`. Released: v0.1.0 to v0.9.2, v1.0.0-rc.1 (pre-release) and v1.0.0. Gesture typing shipped inside 1.0.0. Since then 1.1.x to 1.5.0 added the emoji key, Spanish symbols, sideways and split layouts and per-screen settings for foldables (see CHANGELOG.md). Latest release: v1.5.0.
 
 ## Last completed task
 9.6 (1.0.0). Everything the plan lists as automatable is done.
 
 ## Next task
-Human items only: the device checks in `docs/HUMAN_VERIFICATION.md` (typing feel, autocorrect, dictation quality, gestures, TalkBack, performance numbers on a real phone), and the F-Droid submission (9.7, parked by the owner). Fix what those checks find and release patch versions (1.0.x) or v1.1.0.
+Human items only: the device checks in `docs/HUMAN_VERIFICATION.md` (typing feel, autocorrect, dictation quality, gestures, TalkBack, performance numbers on a real phone), and the F-Droid submission (9.7, parked by the owner). The sideways, split, Spanish-symbol and foldable (ADR 0023) checks are in the "Sideways and split keyboard" section there. Fix what those checks find and release patch versions.
 
 ## Build & check commands
 `./gradlew spotlessApply check assembleFullDebug assembleLiteDebug`
