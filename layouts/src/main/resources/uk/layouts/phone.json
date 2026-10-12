@@ -93,19 +93,23 @@
   ],
   [
    {
-    "l": ","
+    "l": ",",
+    "w": 0.5
    },
    {
-    "l": "+"
+    "l": "+",
+    "w": 0.5
    },
    {
     "type": "space"
    },
    {
-    "type": "delete"
+    "type": "delete",
+    "w": 0.5
    },
    {
-    "type": "enter"
+    "type": "enter",
+    "w": 0.5
    }
   ]
  ]

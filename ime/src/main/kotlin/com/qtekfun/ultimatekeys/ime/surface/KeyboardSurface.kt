@@ -40,6 +40,7 @@ import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.ime.panels.PanelHost
 import com.qtekfun.ultimatekeys.ime.panels.PanelKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
@@ -103,6 +104,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     var widthPx by remember { mutableFloatStateOf(0f) }
     var presses by remember { mutableStateOf(emptyList<PressView>()) }
 
+    // Only the letters page has a number row, and the number and phone pads have rows of one height.
+    val numberRow = settings.numberRow && state.page == Page.LETTERS
+    val uniformRows = state.page == Page.NUMERIC || state.page == Page.PHONE
     val micInMargin = SurfaceSpec.micInMargin(keyFeatures.voice, activeStyle)
     // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
     val heightPercent = SidewaysSpec.effectiveHeightPercent(
@@ -110,7 +114,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         style = activeStyle,
         settings = sizing,
         micInMargin = micInMargin,
-        screen = SidewaysSpec.Screen(landscape, screenHeightDp)
+        screen = SidewaysSpec.Screen(landscape, screenHeightDp),
+        numberRow = numberRow,
+        uniform = uniformRows
     )
     val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
     val extraSidePx = SidewaysSpec.extraSidePx(
@@ -137,7 +143,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             layout,
             widthPx,
             heightPercent,
-            settings.numberRow,
+            numberRow,
+            uniformRows,
             activeStyle,
             density,
             settings.sideMarginDp,
@@ -151,11 +158,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                 density.density,
                 heightPercent,
                 activeStyle,
-                settings.numberRow,
+                numberRow,
                 settings.sideMarginDp,
                 settings.edgeKeyBoostPercent,
                 splitGapPx,
-                extraSidePx
+                extraSidePx,
+                uniformRows
             )
         }
 
@@ -195,8 +203,9 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         heightPercent,
         sizing.bottomMarginDp,
         activeStyle,
-        settings.numberRow,
-        micInMargin
+        numberRow,
+        micInMargin,
+        uniformRows
     )
     val marginMic = MarginMic.forSurface(
         micInMargin,

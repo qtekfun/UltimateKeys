@@ -93,4 +93,14 @@ class LayoutParserTest {
     fun `unknown layout fails clearly`() {
         assertThrows(LayoutParseException::class.java) { LayoutRepository.load("missing") }
     }
+
+    @Test
+    fun `number and phone pads have rows of the same total width`() {
+        listOf("numeric", "phone").forEach { id ->
+            val widths = LayoutRepository.load(id).rows.map { row ->
+                row.keys.sumOf { it.width.toDouble() }
+            }
+            assertEquals(1, widths.distinct().size, "$id rows: $widths")
+        }
+    }
 }

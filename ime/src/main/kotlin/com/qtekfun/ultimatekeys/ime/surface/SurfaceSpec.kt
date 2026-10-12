@@ -21,9 +21,18 @@ object SurfaceSpec {
 
     fun rowDp(heightPercent: Int): Float = BASE_ROW_DP * heightPercent / PERCENT
 
-    /** Height multiplier of each row: the number row, the bottom row and the letter rows in between. */
-    fun rowScales(style: Style, rows: Int, numberRow: Boolean): List<Float> = List(rows) { index ->
+    /**
+     * Height multiplier of each row: the number row, the bottom row and the letter rows in between. A [uniform]
+     * page (the number and phone pads) has no such roles: every row is as tall as a letter row.
+     */
+    fun rowScales(
+        style: Style,
+        rows: Int,
+        numberRow: Boolean,
+        uniform: Boolean = false
+    ): List<Float> = List(rows) { index ->
         val percent = when {
+            uniform -> style.keys.letterRowHeightPercent
             numberRow && index == 0 -> style.keys.numberRowHeightPercent
             index == rows - 1 && rows > 1 -> style.keys.bottomRowHeightPercent
             else -> style.keys.letterRowHeightPercent
@@ -52,9 +61,10 @@ object SurfaceSpec {
         bottomMarginDp: Int = 0,
         style: Style = Presets.default,
         numberRow: Boolean = false,
-        micInMargin: Boolean = false
+        micInMargin: Boolean = false,
+        uniform: Boolean = false
     ): Float = style.suggestionBar.heightDp +
-        rowDp(heightPercent) * rowScales(style, rows, numberRow).sum() +
+        rowDp(heightPercent) * rowScales(style, rows, numberRow, uniform).sum() +
         BOTTOM_PADDING_DP + marginDp(bottomMarginDp, micInMargin)
 
     fun geometry(
@@ -67,7 +77,8 @@ object SurfaceSpec {
         sideMarginDp: Int = 0,
         edgeBoostPercent: Int = 0,
         splitGapPx: Float = 0f,
-        extraSidePx: Float = 0f
+        extraSidePx: Float = 0f,
+        uniform: Boolean = false
     ) = KeyGeometry(
         layout,
         width = widthPx,
@@ -75,7 +86,7 @@ object SurfaceSpec {
         gapX = style.keys.gapXDp * density,
         gapY = style.keys.gapYDp * density,
         top = style.suggestionBar.heightDp * density,
-        rowScales = rowScales(style, layout.rows.size, numberRow),
+        rowScales = rowScales(style, layout.rows.size, numberRow, uniform),
         sideInset = sideMarginDp * density + extraSidePx,
         edgeBoost = edgeBoostPercent / PERCENT,
         splitGap = splitGapPx
