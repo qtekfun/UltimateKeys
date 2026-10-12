@@ -13,8 +13,13 @@ fun Context.styleRepository(): com.qtekfun.ultimatekeys.style.StyleRepository =
     DataStoreStyleRepository(applicationContext.keyboardSettingsStore)
 
 /** The settings repository backed by the app's single DataStore file. */
-fun Context.settingsRepository(): SettingsRepository =
-    DataStoreSettingsRepository(applicationContext.keyboardSettingsStore)
+fun Context.settingsRepository(): SettingsRepository {
+    ScreenProfileTracker.refresh(this)
+    return DataStoreSettingsRepository(
+        applicationContext.keyboardSettingsStore,
+        ScreenProfileTracker.profile
+    )
+}
 
 private object UserWordsHolder {
     @Volatile

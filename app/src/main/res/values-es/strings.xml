@@ -253,6 +253,12 @@
     <string name="summary_on">Activado</string>
     <string name="summary_off">Desactivado</string>
     <string name="try_it_note">Toca el campo y escribe para probar el teclado.</string>
+    <string name="group_screen">Pantalla</string>
+    <string name="setting_screen">Ajustes de</string>
+    <string name="opt_screen_inner">Desplegada</string>
+    <string name="opt_screen_outer">Exterior</string>
+    <string name="screen_note">Este teléfono se pliega. La altura, los márgenes, la división y los ajustes en horizontal de abajo se guardan por separado para cada una de sus pantallas, en vertical y en horizontal. Elige la pantalla que quieres editar; el resto de ajustes son comunes.</string>
+    <string name="dictation_mic_landscape_note_foldable">En horizontal la pantalla es poco alta, así que el micrófono está oculto por defecto. Se guarda para la pantalla que estás usando ahora; la otra pantalla de este teléfono tiene el suyo. No cambia dónde está en vertical (eso se elige en el estilo).</string>
     <string name="group_size">Tamaño</string>
     <string name="group_layout">Distribución</string>
     <string name="group_typing_help">Al escribir</string>

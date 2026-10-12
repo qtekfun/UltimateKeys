@@ -12,17 +12,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
+import com.qtekfun.ultimatekeys.core.ScreenProfile
+import com.qtekfun.ultimatekeys.core.ScreenProfileTracker
 import com.qtekfun.ultimatekeys.core.SettingsRepository
 import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.ime.MainRoutes
@@ -62,6 +67,42 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** The screen whose size settings the typing screen edits: on a foldable one of its two, else the only one. */
+private class EditedScreen(
+    val foldable: Boolean,
+    val profile: ScreenProfile,
+    val settings: KeyboardSettings,
+    val update: ((KeyboardSettings) -> KeyboardSettings) -> Unit,
+    val select: (ScreenProfile) -> Unit
+)
+
+/** Starts on the screen in use; the user can pick the other one of a foldable. */
+@Composable
+private fun rememberEditedScreen(
+    repository: SettingsRepository,
+    active: KeyboardSettings
+): EditedScreen {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
+    // A fold or an unfold changes the configuration, and with it the screen in use.
+    LaunchedEffect(configuration) { ScreenProfileTracker.refresh(context) }
+    val foldable = remember(context) { ScreenProfileTracker.isFoldableDevice(context) }
+    val inUse by ScreenProfileTracker.profile.collectAsState()
+    var chosen by rememberSaveable { mutableStateOf<ScreenProfile?>(null) }
+    val profile = if (foldable) chosen ?: inUse else ScreenProfile.NORMAL
+    val settings by remember(repository, profile) {
+        repository.settingsOf(profile)
+    }.collectAsState(initial = active)
+    return EditedScreen(
+        foldable,
+        profile,
+        settings,
+        update = { transform -> scope.launch { repository.updateOf(profile, transform) } },
+        select = { chosen = it }
+    )
+}
+
 @Composable
 private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRoute>) {
     val context = LocalContext.current
@@ -79,6 +120,7 @@ private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRou
     val update: ((KeyboardSettings) -> KeyboardSettings) -> Unit = { transform ->
         scope.launch { repository.update(transform) }
     }
+    val edited = rememberEditedScreen(repository, settings)
     var stack by rememberRouteStack(SettingsRoute.Home, SettingsRoute.entries, start)
     BackHandler(enabled = stack.canGoBack) { stack = stack.back() }
     val back = { stack = stack.back() }
@@ -105,10 +147,12 @@ private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRou
         )
 
         SettingsRoute.Typing -> TypingScreen(
-            settings,
-            update,
+            edited.settings,
+            edited.update,
             onOpenLanguages = { stack = stack.open(SettingsRoute.Languages) },
-            onBack = back
+            onBack = back,
+            screen = edited.profile.takeIf { edited.foldable },
+            onScreenChange = edited.select
         )
 
         SettingsRoute.Languages -> LanguagesScreen(settings, update, back)

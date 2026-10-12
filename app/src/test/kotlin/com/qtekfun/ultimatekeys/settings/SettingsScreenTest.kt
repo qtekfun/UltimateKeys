@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import com.qtekfun.ultimatekeys.ImeStatus
 import com.qtekfun.ultimatekeys.core.KeyboardSettings
+import com.qtekfun.ultimatekeys.core.ScreenProfile
 import com.qtekfun.ultimatekeys.ui.ScreenInsets
 import com.qtekfun.ultimatekeys.ui.UkTheme
 import org.junit.Assert.assertEquals
@@ -189,6 +190,27 @@ class SettingsScreenTest {
                 it.config.getOrNull(SemanticsProperties.StateDescription) == "110%"
             }
         ).assertExists()
+    }
+
+    @Test
+    fun `the screen selector shows on a foldable only`() {
+        var foldable by mutableStateOf<ScreenProfile?>(null)
+        compose.setContent {
+            UkTheme(TestSchemes.light) {
+                TypingScreen(
+                    KeyboardSettings(),
+                    {},
+                    {},
+                    {},
+                    ScreenInsets.of(top = statusBar),
+                    screen = foldable
+                )
+            }
+        }
+        compose.onNodeWithText("Settings for").assertDoesNotExist()
+        foldable = ScreenProfile.FOLDABLE_OUTER
+        compose.waitForIdle()
+        compose.onNodeWithText("Settings for").assertExists()
     }
 
     @Test
