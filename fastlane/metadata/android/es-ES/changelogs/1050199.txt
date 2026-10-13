@@ -1,0 +1,1 @@
+Los teclados numérico y de teléfono tienen todas las filas de la misma altura y la fila inferior queda alineada con las columnas.

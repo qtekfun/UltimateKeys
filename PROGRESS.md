@@ -4,7 +4,7 @@
 - None. Release signing secrets are in place and the published APKs are signed with the owner's certificate.
 
 ## Current phase / branch / open PR
-Phases 0 to 10 are merged on `master`. Released: v0.1.0 to v0.9.2, v1.0.0-rc.1 (pre-release) and v1.0.0. Gesture typing shipped inside 1.0.0. Since then 1.1.x to 1.5.0 added the emoji key, Spanish symbols, sideways and split layouts and per-screen settings for foldables (see CHANGELOG.md). Latest release: v1.5.0.
+Phases 0 to 10 are merged on `master`. Released: v0.1.0 to v0.9.2, v1.0.0-rc.1 (pre-release) and v1.0.0. Gesture typing shipped inside 1.0.0. Since then 1.1.x to 1.5.x added the emoji key, Spanish symbols, sideways and split layouts and per-screen settings for foldables (see CHANGELOG.md). Latest release: v1.5.1.
 
 ## Last completed task
 9.6 (1.0.0). Everything the plan lists as automatable is done.
