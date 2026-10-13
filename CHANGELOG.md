@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-10-13
+
 ### Fixed
 
 - The number and phone pads: every row now has the same height (they used to inherit the number-row and bottom-row heights of the letters), and the bottom row lines up with the columns above it.
@@ -237,7 +239,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.3.0...v1.3.1
