@@ -123,3 +123,10 @@ Things that need a physical device or human judgment. Tick when done.
 ## Foldable phones
 
 - [ ] On a real foldable (not available to the owner when this was written, so unverified): in Settings > Typing the "Screen" selector appears with Unfolded and Cover; set different heights, margins, split and sideways values for each, unfold and fold the phone with the keyboard open and check that each screen uses its own values upright and sideways, and that the sideways microphone setting (Dictation) follows the screen in use. On a phone that does not fold the selector does not appear and nothing changed.
+
+## Backups
+
+- [ ] Export a backup from Settings > Backup, change a few settings and a style, restore the file, and check everything is back (settings, the active style, the custom styles, the dictionary words).
+- [ ] Restore the same backup on a second phone or after clearing the app's data: the keyboard comes up with the same look and settings.
+- [ ] Try to restore a file that is not a backup (a photo, a style export): it is refused with a clear message and nothing changes.
+

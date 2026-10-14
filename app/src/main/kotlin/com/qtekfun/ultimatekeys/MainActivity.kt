@@ -33,6 +33,7 @@ import com.qtekfun.ultimatekeys.core.settingsRepository
 import com.qtekfun.ultimatekeys.ime.MainRoutes
 import com.qtekfun.ultimatekeys.models.ModelsActivity
 import com.qtekfun.ultimatekeys.settings.AboutScreen
+import com.qtekfun.ultimatekeys.settings.BackupScreen
 import com.qtekfun.ultimatekeys.settings.ClipboardScreen
 import com.qtekfun.ultimatekeys.settings.FeedbackScreen
 import com.qtekfun.ultimatekeys.settings.GesturesScreen
@@ -103,6 +104,8 @@ private fun rememberEditedScreen(
     )
 }
 
+/** The route table of the settings: one branch per screen, so it is as long as the list. */
+@Suppress("CyclomaticComplexMethod")
 @Composable
 private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRoute>) {
     val context = LocalContext.current
@@ -171,6 +174,8 @@ private fun SettingsHost(repository: SettingsRepository, start: List<SettingsRou
         SettingsRoute.Clipboard -> ClipboardScreen(settings, update, back)
 
         SettingsRoute.Privacy -> PrivacyScreen(settings, update, back)
+
+        SettingsRoute.Backup -> BackupScreen(back)
 
         SettingsRoute.About -> {
             val version = remember(context) { AppVersion.read(context) }

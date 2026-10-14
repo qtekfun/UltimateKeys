@@ -282,4 +282,19 @@
     <string name="user_dictionary_language">Language</string>
     <string name="model_import_dismiss">OK</string>
     <string name="app_version">Version %1$s (build %2$d)</string>
+    <string name="section_backup">Backup</string>
+    <string name="backup_export">Export a backup</string>
+    <string name="backup_restore">Restore from a backup</string>
+    <string name="backup_note">A backup file holds your settings, your own styles and the words you added to the dictionary. It does not include what the keyboard learned while you typed, your clipboard history, speech models or dictionaries. Restoring replaces your current settings and styles and adds the words you do not have yet.</string>
+    <string name="backup_confirm_title">Restore this backup?</string>
+    <string name="backup_confirm_body">Made on %1$s with version %2$s. Settings: %3$d. Dictionary words: %4$d. Your current settings and styles are replaced.</string>
+    <string name="backup_confirm_restore">Restore</string>
+    <string name="backup_confirm_cancel">Cancel</string>
+    <string name="backup_exported">Backup saved.</string>
+    <string name="backup_restored">Backup restored. Settings: %1$d. New words: %2$d.</string>
+    <string name="backup_error_not_backup">That file is not an UltimateKeys backup.</string>
+    <string name="backup_error_newer">That backup was made with a newer version of the app.</string>
+    <string name="backup_error_too_large">That backup is too large.</string>
+    <string name="backup_error_invalid">That backup file is damaged.</string>
+    <string name="backup_error_write">The backup could not be saved.</string>
 </resources>
