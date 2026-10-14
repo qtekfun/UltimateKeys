@@ -1,0 +1,1 @@
+Settings > Backup exports your settings, your own styles and the words you add to a file, and restores them from one.
