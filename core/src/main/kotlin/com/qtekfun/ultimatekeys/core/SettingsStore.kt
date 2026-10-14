@@ -21,6 +21,10 @@ fun Context.settingsRepository(): SettingsRepository {
     )
 }
 
+/** Backups of the settings, styles and the user dictionary. */
+fun Context.settingsBackup(): SettingsBackup =
+    SettingsBackup(applicationContext.keyboardSettingsStore, userWordsRepository())
+
 private object UserWordsHolder {
     @Volatile
     private var repository: UserWordsRepository? = null

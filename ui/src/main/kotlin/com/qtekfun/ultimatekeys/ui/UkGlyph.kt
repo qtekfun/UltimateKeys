@@ -37,6 +37,7 @@ enum class UkGlyph {
     Mic,
     Clipboard,
     Lock,
+    Backup,
     Info
 }
 
@@ -169,6 +170,15 @@ private fun DrawScope.drawGlyph(glyph: UkGlyph, c: Color) {
             line(c, 8.5f, 7f, 8.5f, 10.5f)
             line(c, 15.5f, 7f, 15.5f, 10.5f)
             dot(c, 12f, 15.5f, 1.4f)
+        }
+
+        UkGlyph.Backup -> {
+            line(c, 5f, 14f, 5f, 19f)
+            line(c, 5f, 19f, 19f, 19f)
+            line(c, 19f, 19f, 19f, 14f)
+            line(c, 12f, 4f, 12f, 14f)
+            line(c, 8f, 10.5f, 12f, 14.5f)
+            line(c, 16f, 10.5f, 12f, 14.5f)
         }
 
         UkGlyph.Info -> {

@@ -21,6 +21,7 @@ enum class SettingsRoute(@StringRes val title: Int) {
     Feedback(R.string.section_feedback),
     Clipboard(R.string.section_clipboard),
     Privacy(R.string.section_privacy),
+    Backup(R.string.section_backup),
     About(R.string.section_about)
 }
 
@@ -38,6 +39,7 @@ enum class HomeTarget(@param:StringRes val title: Int, val route: SettingsRoute?
     Dictation(R.string.section_dictation, null),
     Clipboard(R.string.section_clipboard, SettingsRoute.Clipboard),
     Privacy(R.string.section_privacy, SettingsRoute.Privacy),
+    Backup(R.string.section_backup, SettingsRoute.Backup),
     About(R.string.section_about, SettingsRoute.About)
 }
 
@@ -95,7 +97,10 @@ object HomeModel {
             HomeEntry(HomeTarget.Clipboard, UkGlyph.Clipboard, BadgeAccent.Tertiary),
             HomeEntry(HomeTarget.Privacy, UkGlyph.Lock, BadgeAccent.Secondary)
         ),
-        listOf(HomeEntry(HomeTarget.About, UkGlyph.Info, BadgeAccent.Primary))
+        listOf(
+            HomeEntry(HomeTarget.Backup, UkGlyph.Backup, BadgeAccent.Secondary),
+            HomeEntry(HomeTarget.About, UkGlyph.Info, BadgeAccent.Primary)
+        )
     )
 
     private fun onOff(on: Boolean) = if (on) Summary.On else Summary.Off

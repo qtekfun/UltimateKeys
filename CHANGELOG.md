@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+
+- Backups: Settings > Backup exports your settings, your own styles (and the active one) and the words you added to the dictionary to a `.ukbackup` file, and restores them from one. A restore replaces the current settings and styles and adds the words you do not have yet; it never includes what the keyboard learned, the clipboard history, models or dictionaries.
+
+
 ## [1.5.1] - 2026-10-13
 
 ### Fixed

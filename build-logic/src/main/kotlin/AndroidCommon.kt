@@ -32,6 +32,10 @@ internal fun Project.configureAndroidCommon(android: CommonExtension) {
     tasks.withType<Test>().configureEach {
         // Deterministic, quiet unit-test runs.
         systemProperty("junit.jupiter.execution.parallel.enabled", "false")
+        // Temporary files of the tests go under the build directory, not the system temp (often RAM).
+        val tmp = layout.buildDirectory.dir("tmp/test-files").get().asFile
+        doFirst { tmp.mkdirs() }
+        systemProperty("java.io.tmpdir", tmp.path)
     }
     dependencies {
         add("testImplementation", platform(libs.findLibrary("junit-bom").get()))
