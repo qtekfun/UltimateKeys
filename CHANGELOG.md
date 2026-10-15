@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- The keyboard keeps the same height on every page (letters, symbols, number and phone pads), so the app behind it no longer resizes, scrolls or hides the field you are typing in each time you switch page
+
 ## [1.6.1] - 2026-10-15
 
 ### Fixed

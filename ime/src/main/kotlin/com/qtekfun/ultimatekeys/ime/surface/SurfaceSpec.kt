@@ -47,6 +47,27 @@ object SurfaceSpec {
         percent / PERCENT
     }
 
+    /** The rows of one page: how many, whether the first is the number row, and whether all are of one height. */
+    data class PageShape(val rows: Int, val numberRow: Boolean, val uniform: Boolean = false)
+
+    /**
+     * The key height percent that makes [page] exactly as tall as the letters page ([reference], drawn at
+     * [referencePercent]); the letters page itself gets [referencePercent] back. The window must not change
+     * height when the page does, or the app behind it resizes and scrolls on every switch and can hide the
+     * field being typed in.
+     */
+    fun matchedHeightPercent(
+        style: Style,
+        reference: PageShape,
+        referencePercent: Int,
+        page: PageShape
+    ): Int {
+        val target = rowDp(referencePercent) *
+            rowScales(style, reference.rows, reference.numberRow, reference.uniform).sum()
+        val mine = rowScales(style, page.rows, page.numberRow, page.uniform).sum()
+        return Math.round(target / mine * PERCENT / BASE_ROW_DP).coerceAtLeast(MIN_PERCENT)
+    }
+
     /** True when dictation exists and the style puts its button in the bottom margin. */
     fun micInMargin(voice: Boolean, style: Style): Boolean = voice &&
         style.bottomRow.micPlacement ==

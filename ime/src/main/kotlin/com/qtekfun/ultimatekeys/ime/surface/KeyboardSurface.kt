@@ -40,6 +40,7 @@ import com.qtekfun.ultimatekeys.core.KeyboardSettings
 import com.qtekfun.ultimatekeys.ime.KeyboardController
 import com.qtekfun.ultimatekeys.ime.R
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
+import com.qtekfun.ultimatekeys.ime.logic.Page
 import com.qtekfun.ultimatekeys.ime.panels.PanelHost
 import com.qtekfun.ultimatekeys.ime.panels.PanelKind
 import com.qtekfun.ultimatekeys.ime.panels.PanelTheme
@@ -108,14 +109,30 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
     val uniformRows = SurfaceSpec.hasUniformRows(state.page)
     val micInMargin = SurfaceSpec.micInMargin(keyFeatures.voice, activeStyle)
     // Sideways the screen has little height: the keyboard has its own height and never covers most of it.
-    val heightPercent = SidewaysSpec.effectiveHeightPercent(
-        rows = layout.rows.size,
+    // The window keeps the height of the letters page on every page, so the app behind it does not resize
+    // each time the page changes.
+    val lettersRows = remember(
+        settings.letterLayoutId,
+        settings.numberRow,
+        activeStyle.bottomRow,
+        keyFeatures
+    ) {
+        controller.layoutFor(Page.LETTERS, settings, activeStyle, keyFeatures).rows.size
+    }
+    val lettersPercent = SidewaysSpec.effectiveHeightPercent(
+        rows = lettersRows,
         style = activeStyle,
         settings = sizing,
         micInMargin = micInMargin,
         screen = SidewaysSpec.Screen(landscape, screenHeightDp),
-        numberRow = numberRow,
-        uniform = uniformRows
+        numberRow = settings.numberRow,
+        uniform = false
+    )
+    val heightPercent = SurfaceSpec.matchedHeightPercent(
+        activeStyle,
+        SurfaceSpec.PageShape(lettersRows, settings.numberRow),
+        lettersPercent,
+        SurfaceSpec.PageShape(layout.rows.size, numberRow, uniformRows)
     )
     val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
     val extraSidePx = SidewaysSpec.extraSidePx(
