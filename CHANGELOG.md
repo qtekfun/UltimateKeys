@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-10-15
+
 ### Fixed
 
 - Typing accuracy: a tap whose finger drifts a little before lifting no longer types the neighbouring key; it keeps the key it landed on unless the finger really slides away
@@ -250,7 +252,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.4.0...v1.5.0

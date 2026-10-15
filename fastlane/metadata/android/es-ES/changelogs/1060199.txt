@@ -1,0 +1,1 @@
+Precisión al escribir: una pulsación en la que el dedo se desplaza un poco ya no escribe la tecla vecina.
