@@ -9,6 +9,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Fixed
+
+- Typing accuracy: a tap whose finger drifts a little before lifting no longer types the neighbouring key; it keeps the key it landed on unless the finger really slides away
+
 ## [1.6.0] - 2026-10-14
 
 ### Added
