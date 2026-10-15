@@ -57,7 +57,9 @@ class SurfaceGestures(
     var stripToolsVisible = false
     var metrics = GestureMetrics(slop = 1f, dragStep = 1f, chooserMinCell = 1f, chooserHeight = 1f)
 
-    private class Press(var key: PlacedKey, val downX: Float) {
+    private class Press(var key: PlacedKey, val downX: Float, val downY: Float) {
+        /** The key under the finger when it landed: a tap that barely moves stays on it. */
+        val downKey = key
         var lastX = downX
         var mode = PressMode.NORMAL
         var chooser: ChooserView? = null
@@ -95,7 +97,7 @@ class SurfaceGestures(
         // A finger gliding over the letters owns the keyboard until it lifts: other fingers are ignored.
         if (presses.values.any { it.mode == PressMode.GESTURE }) return
         val placed = geo.keyAt(x, y) ?: return
-        val press = Press(placed, x)
+        val press = Press(placed, x, y)
         press.dragSteps = DragSteps(metrics.dragStep)
         if (gestureAllowed(placed)) {
             val unit = placed.width * GestureSensitivity.startDistanceUnits(
@@ -250,9 +252,16 @@ class SurfaceGestures(
         }
     }
 
-    /** Lets a finger that landed slightly wrong slide onto the intended character key. */
+    /**
+     * Lets a finger that landed slightly wrong slide onto the intended character key. A finger that
+     * has moved less than the slop is still tapping: the jitter of a fast tap must not turn the key
+     * it landed on into its neighbour, so it stays on (or goes back to) the key it landed on.
+     */
     private fun slideToNeighbour(press: Press, x: Float, y: Float) {
-        val next = geometry?.keyAt(x, y) ?: return
+        val dx = x - press.downX
+        val dy = y - press.downY
+        val tapping = dx * dx + dy * dy <= metrics.slop * metrics.slop
+        val next = if (tapping) press.downKey else geometry?.keyAt(x, y) ?: return
         val nextKey = next.key
         if (next == press.key || nextKey !is CharKey) return
         press.key = next

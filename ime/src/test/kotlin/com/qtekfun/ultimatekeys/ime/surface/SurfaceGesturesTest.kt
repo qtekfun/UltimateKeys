@@ -100,6 +100,30 @@ class SurfaceGesturesTest {
     }
 
     @Test
+    fun `a tap that drifts across the edge of its key still types that key`() = runTest {
+        val r = Rig(this)
+        val h = r.key("h")
+        val y = (h.top + h.bottom) / 2
+        r.gestures.down(1, h.right - 2f, y)
+        // Lifts a few pixels into the neighbour: well inside the slop, so still a tap on h.
+        r.gestures.move(1, h.right + 8f, y)
+        r.gestures.up(1)
+        assertEquals("h", r.editor.text.toString())
+    }
+
+    @Test
+    fun `a slide past the slop still lands on the neighbour`() = runTest {
+        val r = Rig(this)
+        val h = r.key("h")
+        val j = r.key("j")
+        val y = (h.top + h.bottom) / 2
+        r.gestures.down(1, h.right - 2f, y)
+        r.gestures.move(1, j.centerX, y)
+        r.gestures.up(1)
+        assertEquals("j", r.editor.text.toString())
+    }
+
+    @Test
     fun `two fingers type independently`() = runTest {
         val r = Rig(this)
         val a = r.key("a")
