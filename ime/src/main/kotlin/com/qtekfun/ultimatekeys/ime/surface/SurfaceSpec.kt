@@ -47,22 +47,24 @@ object SurfaceSpec {
         percent / PERCENT
     }
 
+    /** The rows of one page: how many, whether the first is the number row, and whether all are of one height. */
+    data class PageShape(val rows: Int, val numberRow: Boolean, val uniform: Boolean = false)
+
     /**
-     * The key height percent that makes a page of [rows] rows exactly as tall as the letters page (of
-     * [referenceRows] rows, drawn at [referencePercent]). The window must not change height when the page
-     * does, or the app behind it resizes and scrolls on every switch and can hide the field being typed in.
+     * The key height percent that makes [page] exactly as tall as the letters page ([reference], drawn at
+     * [referencePercent]); the letters page itself gets [referencePercent] back. The window must not change
+     * height when the page does, or the app behind it resizes and scrolls on every switch and can hide the
+     * field being typed in.
      */
     fun matchedHeightPercent(
         style: Style,
-        referenceRows: Int,
-        referenceNumberRow: Boolean,
+        reference: PageShape,
         referencePercent: Int,
-        rows: Int,
-        uniform: Boolean
+        page: PageShape
     ): Int {
         val target = rowDp(referencePercent) *
-            rowScales(style, referenceRows, referenceNumberRow).sum()
-        val mine = rowScales(style, rows, numberRow = false, uniform = uniform).sum()
+            rowScales(style, reference.rows, reference.numberRow, reference.uniform).sum()
+        val mine = rowScales(style, page.rows, page.numberRow, page.uniform).sum()
         return Math.round(target / mine * PERCENT / BASE_ROW_DP).coerceAtLeast(MIN_PERCENT)
     }
 

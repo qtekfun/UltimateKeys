@@ -24,7 +24,12 @@ class PageHeightTest {
     @Test
     fun `a page with fewer rows is stretched to the height of the letters page`() {
         val letters = total(5, 100, numberRow = true, uniform = false)
-        val percent = SurfaceSpec.matchedHeightPercent(style, 5, true, 100, 4, false)
+        val percent = SurfaceSpec.matchedHeightPercent(
+            style,
+            SurfaceSpec.PageShape(5, true),
+            100,
+            SurfaceSpec.PageShape(4, false)
+        )
         assertTrue(percent > 100)
         assertTrue(abs(letters - total(4, percent, numberRow = false, uniform = false)) < 1.5f)
     }
@@ -32,7 +37,12 @@ class PageHeightTest {
     @Test
     fun `the number pad matches the letters page too`() {
         val letters = total(4, 100, numberRow = false, uniform = false)
-        val percent = SurfaceSpec.matchedHeightPercent(style, 4, false, 100, 4, true)
+        val percent = SurfaceSpec.matchedHeightPercent(
+            style,
+            SurfaceSpec.PageShape(4, false),
+            100,
+            SurfaceSpec.PageShape(4, false, uniform = true)
+        )
         assertTrue(abs(letters - total(4, percent, numberRow = false, uniform = true)) < 1.5f)
     }
 }

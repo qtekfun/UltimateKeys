@@ -128,18 +128,12 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         numberRow = settings.numberRow,
         uniform = false
     )
-    val heightPercent = if (state.page == Page.LETTERS) {
-        lettersPercent
-    } else {
-        SurfaceSpec.matchedHeightPercent(
-            activeStyle,
-            lettersRows,
-            settings.numberRow,
-            lettersPercent,
-            layout.rows.size,
-            uniformRows
-        )
-    }
+    val heightPercent = SurfaceSpec.matchedHeightPercent(
+        activeStyle,
+        SurfaceSpec.PageShape(lettersRows, settings.numberRow),
+        lettersPercent,
+        SurfaceSpec.PageShape(layout.rows.size, numberRow, uniformRows)
+    )
     val splitGapPx = SidewaysSpec.splitGapPx(settings, landscape, state.page, widthPx)
     val extraSidePx = SidewaysSpec.extraSidePx(
         widthPx,
