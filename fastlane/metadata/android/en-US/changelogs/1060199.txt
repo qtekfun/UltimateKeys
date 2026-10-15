@@ -1,0 +1,1 @@
+Typing accuracy: a tap whose finger drifts a little no longer types the neighbouring key.
