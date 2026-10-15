@@ -1,0 +1,1 @@
+El teclado mantiene la misma altura en todas las páginas, así que la app de detrás ya no se redimensiona ni oculta el campo en el que escribes.
