@@ -1,0 +1,1 @@
+The keyboard keeps the same height on every page, so the app behind it no longer resizes or hides the field you type in.

@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-10-15
+
 ### Fixed
 
 - The keyboard keeps the same height on every page (letters, symbols, number and phone pads), so the app behind it no longer resizes, scrolls or hides the field you are typing in each time you switch page
@@ -256,7 +258,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.0...v1.5.1
