@@ -1,0 +1,1 @@
+Released keys fade back instead of snapping, and the long-press alternatives keep the edge margin.

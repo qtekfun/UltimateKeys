@@ -1,0 +1,1 @@
+Las teclas al soltarlas vuelven suavemente a su aspecto normal, y las variantes de la pulsación larga respetan el margen del borde.
