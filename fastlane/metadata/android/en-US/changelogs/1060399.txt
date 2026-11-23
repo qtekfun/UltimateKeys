@@ -1,0 +1,1 @@
+The buttons in the emoji and clipboard panels now share the corner of the keys, and key labels are centred for any font.

@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-11-23
+
 ### Changed
 
 - The buttons in the emoji and clipboard panels now use the same corner as the keys, so the panels look like part of the keyboard; cards and rows keep the panel corner
@@ -263,7 +265,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/qtekfun/UltimateKeys/compare/v1.5.1...v1.6.0
