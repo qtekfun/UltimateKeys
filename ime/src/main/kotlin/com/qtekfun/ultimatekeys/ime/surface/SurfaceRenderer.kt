@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import com.qtekfun.ultimatekeys.ime.logic.EnterKind
@@ -57,6 +58,9 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
     /** The case rules of the language being typed: the dotted capital I of Turkish. */
     var locale: java.util.Locale = java.util.Locale.ROOT
 
+    /** Fades the pressed look of released keys; the surface reads [PressFade.animating]. */
+    val fade = PressFade()
+
     private var loadedFont: FontChoice? = null
     private var loadedWeight = 0
 
@@ -75,7 +79,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         style: SurfaceStyle,
         labels: SurfaceLabels,
         dimens: SurfaceDimens,
-        strip: StripState = StripState()
+        strip: StripState = StripState(),
+        frameNanos: Long = 0L
     ) {
         if (style.font != loadedFont || style.fontWeight != loadedWeight) {
             text.typeface = fonts.typeface(style.font, style.fontWeight)
@@ -86,8 +91,10 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         scope.drawRect(style.background)
         drawStrip(scope, geometry, strip, style, dimens)
         val pressedKeys = presses.filter { it.mode != PressMode.GESTURE }.map { it.key }.toSet()
+        if (style.pressAnimation != PressAnimation.NONE) fade.update(pressedKeys, frameNanos)
         geometry.keys.forEach { placed ->
-            drawKey(scope, placed, state, placed in pressedKeys, style, labels, dimens)
+            val level = if (placed in pressedKeys) 1f else fade.level(placed)
+            drawKey(scope, placed, state, level, style, labels, dimens)
         }
         presses.forEach { press ->
             drawTrail(scope, press.trail, style, dimens)
@@ -230,7 +237,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         scope: DrawScope,
         placed: PlacedKey,
         state: KeyboardState,
-        pressed: Boolean,
+        pressed: Float,
         style: SurfaceStyle,
         labels: SurfaceLabels,
         dimens: SurfaceDimens
@@ -238,8 +245,8 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         val key = placed.key
         val isEnter = key is ActionKey && key.action == KeyAction.ENTER
         val fill = keyFill(key, pressed, style)
-        val shrink = if (pressed && style.pressAnimation == PressAnimation.SCALE) {
-            placed.height * PRESS_SHRINK
+        val shrink = if (style.pressAnimation == PressAnimation.SCALE) {
+            placed.height * PRESS_SHRINK * pressed
         } else {
             0f
         }
@@ -274,14 +281,20 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         }
     }
 
-    private fun keyFill(key: LayoutKey, pressed: Boolean, style: SurfaceStyle): Color {
+    private fun keyFill(key: LayoutKey, pressed: Float, style: SurfaceStyle): Color {
         val base = when {
             key is ActionKey && key.action == KeyAction.ENTER -> style.actionKey
             key is ActionKey && key.action == KeyAction.SPACE -> style.spaceKey
             key is CharKey -> style.letterKey
             else -> style.functionKey
         }
-        return if (pressed && style.pressAnimation != PressAnimation.SCALE) style.pressed else base
+        return if (style.pressAnimation ==
+            PressAnimation.SCALE
+        ) {
+            base
+        } else {
+            lerp(base, style.pressed, pressed)
+        }
     }
 
     private fun drawShadow(

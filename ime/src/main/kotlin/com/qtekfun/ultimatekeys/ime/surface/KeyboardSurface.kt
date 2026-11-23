@@ -21,10 +21,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToDown
@@ -201,7 +203,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
             slop = 12.dp.toPx(),
             dragStep = 14.dp.toPx(),
             chooserMinCell = 44.dp.toPx(),
-            chooserHeight = (rowDp * PREVIEW_RATIO).dp.toPx()
+            chooserHeight = (rowDp * PREVIEW_RATIO).dp.toPx(),
+            chooserInset = 6.dp.toPx()
         )
     }
     DisposableEffect(layout) { onDispose { gestures.cancelAll() } }
@@ -210,7 +213,7 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
 
     val fonts = remember(context) { FontCatalog(context.assets) }
     val renderer = remember(fonts) { SurfaceRenderer(fonts) }
-    renderer.locale = settings.activeLanguage.locale
+    val frameNanos = rememberFadeClock(presses, renderer.fade)
     val panelTheme = remember(activeStyle, systemDark, tones, fonts, rowDp) {
         PanelTheme.resolve(activeStyle, systemDark, tones, fonts, rowDp)
     }
@@ -291,7 +294,8 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
                             showMic,
                             showTools,
                             marginMic
-                        )
+                        ),
+                        frameNanos
                     )
                 }
             }
@@ -315,6 +319,20 @@ fun KeyboardSurface(controller: KeyboardController, modifier: Modifier = Modifie
         }
         PanelHost(controller, panelTheme, keysHeightDp - sizing.bottomMarginDp)
     }
+}
+
+/** A frame clock that only runs while a released key is still fading back, so an idle keyboard draws nothing. */
+@Composable
+private fun rememberFadeClock(presses: List<PressView>, fade: PressFade): Long {
+    var frameNanos by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(presses) {
+        var frames = 0
+        while (frames < FADE_START_FRAMES || fade.animating) {
+            frameNanos = withFrameNanos { it }
+            frames++
+        }
+    }
+    return frameNanos
 }
 
 private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.trackPointers(
@@ -367,4 +385,5 @@ private val IdleDictation = MutableStateFlow<DictationState>(DictationState.Idle
 
 private const val LABEL_RATIO = 0.4f
 private const val PERCENT = 100f
+private const val FADE_START_FRAMES = 2
 private const val PREVIEW_RATIO = 1.0f
