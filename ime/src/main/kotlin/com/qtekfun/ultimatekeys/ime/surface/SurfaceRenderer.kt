@@ -81,7 +81,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             text.typeface = fonts.typeface(style.font, style.fontWeight)
             loadedFont = style.font
             loadedWeight = style.fontWeight
-            capHeight = measureCapHeight()
+            capHeight = capHeightOf(text)
         }
         scope.drawRect(style.background)
         drawStrip(scope, geometry, strip, style, dimens)
@@ -327,7 +327,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             scope,
             label,
             placed.centerX,
-            middle(placed.top + placed.height / 2f, dimens.labelSize),
+            middle(capHeight, placed.top + placed.height / 2f, dimens.labelSize),
             dimens.labelSize,
             style.text
         )
@@ -367,13 +367,13 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
 
             KeyAction.SPACE -> if (labels.spaceIsLanguage) {
                 val size = fitted(labels.space, small, placed.width * SPACE_FIT)
-                drawText(scope, labels.space, cx, middle(cy, size), size, hintInk)
+                drawText(scope, labels.space, cx, middle(capHeight, cy, size), size, hintInk)
             } else {
                 drawText(
                     scope,
                     labels.space,
                     cx,
-                    middle(cy, small),
+                    middle(capHeight, cy, small),
                     small,
                     ink.copy(alpha = SPACE_ALPHA)
                 )
@@ -389,7 +389,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 scope,
                 key.label ?: labels.letters,
                 cx,
-                middle(cy, small),
+                middle(capHeight, cy, small),
                 small,
                 ink
             )
@@ -398,7 +398,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 scope,
                 key.label ?: labels.symbols,
                 cx,
-                middle(cy, small),
+                middle(capHeight, cy, small),
                 small,
                 ink
             )
@@ -407,7 +407,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 scope,
                 key.label ?: labels.moreSymbols,
                 cx,
-                middle(cy, small),
+                middle(capHeight, cy, small),
                 small,
                 ink
             )
@@ -437,7 +437,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             scope.drawPath(p, ink, style = Stroke(width = unit * STROKE))
         } else {
             val size = dimens.labelSize * SMALL_LABEL
-            drawText(scope, labels.enter.getValue(kind), cx, middle(cy, size), size, ink)
+            drawText(scope, labels.enter.getValue(kind), cx, middle(capHeight, cy, size), size, ink)
         }
     }
 
@@ -461,7 +461,7 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
             scope,
             label,
             left + w / 2f,
-            middle(top + h / 2f, dimens.labelSize * PREVIEW_TEXT),
+            middle(capHeight, top + h / 2f, dimens.labelSize * PREVIEW_TEXT),
             dimens.labelSize * PREVIEW_TEXT,
             style.popupText
         )
@@ -499,21 +499,11 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
                 scope,
                 item,
                 x + chooser.cellWidth / 2f,
-                middle(chooser.top + chooser.cellHeight / 2f, size),
+                middle(capHeight, chooser.top + chooser.cellHeight / 2f, size),
                 size,
                 ink
             )
         }
-    }
-
-    /** The baseline that puts the capitals of a [size] text on the middle line [cy], in any font. */
-    private fun middle(cy: Float, size: Float): Float = cy + size * capHeight / 2f
-
-    private fun measureCapHeight(): Float {
-        val bounds = android.graphics.Rect()
-        text.textSize = CAP_PROBE_SIZE
-        text.getTextBounds("H", 0, 1, bounds)
-        return if (bounds.height() > 0) bounds.height() / CAP_PROBE_SIZE else DEFAULT_CAP_HEIGHT
     }
 
     /** [size], reduced when [value] would be wider than [maxWidth]. */
@@ -542,8 +532,6 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
 
     private companion object {
         const val ICON_SCALE = 0.4f
-        const val CAP_PROBE_SIZE = 100f
-        const val DEFAULT_CAP_HEIGHT = 0.7f
         const val DIVIDER_ALPHA = 0.4f
         const val DIVIDER_INSET = 0.25f
         const val STRIP_TEXT = 0.9f
@@ -569,4 +557,18 @@ class SurfaceRenderer(private val fonts: FontProvider = SystemFonts) {
         const val TRAIL_MIN_ALPHA = 0.15f
         const val TRAIL_MIN_WIDTH = 0.3f
     }
+}
+
+/** The baseline that puts the capitals of a [size] text on the middle line [cy], in any font. */
+private fun middle(capHeight: Float, cy: Float, size: Float): Float = cy + size * capHeight / 2f
+
+private const val CAP_PROBE_SIZE = 100f
+private const val DEFAULT_CAP_HEIGHT = 0.7f
+
+/** The height of a capital as a fraction of the text size, for the font [paint] holds. */
+private fun capHeightOf(paint: Paint): Float {
+    val bounds = android.graphics.Rect()
+    paint.textSize = CAP_PROBE_SIZE
+    paint.getTextBounds("H", 0, 1, bounds)
+    return if (bounds.height() > 0) bounds.height() / CAP_PROBE_SIZE else DEFAULT_CAP_HEIGHT
 }
