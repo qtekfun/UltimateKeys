@@ -262,7 +262,7 @@ private fun SearchKeys(
                             .weight(key.width)
                             .fillMaxHeight()
                             .padding(2.dp)
-                            .clip(theme.shape())
+                            .clip(theme.controlShape())
                             .background(theme.surface)
                             .clickable(role = Role.Button) { actions.onType(key.output) },
                         contentAlignment = Alignment.Center
@@ -274,7 +274,7 @@ private fun SearchKeys(
                             .weight(1.5f)
                             .fillMaxHeight()
                             .padding(2.dp)
-                            .clip(theme.shape())
+                            .clip(theme.controlShape())
                             .background(theme.surface)
                             .clickable(role = Role.Button, onClick = actions.onDeleteQuery)
                             .semantics { contentDescription = deleteLabel },

@@ -57,6 +57,9 @@ import kotlinx.coroutines.launch
 
 internal fun PanelTheme.shape() = RoundedCornerShape(cornerDp.dp)
 
+/** The shape of a button or key-like cell: the keyboard's own corner, not the cards'. */
+internal fun PanelTheme.controlShape() = RoundedCornerShape(keyCornerDp.dp)
+
 /** Text in the style's font. */
 @Composable
 internal fun PanelText(
@@ -99,7 +102,7 @@ internal fun PanelButton(
 ) {
     Box(
         modifier = modifier
-            .clip(theme.shape())
+            .clip(theme.controlShape())
             .background(if (selected) theme.surface else Color.Transparent)
             .clickable(onClick = onClick)
             .semantics {
@@ -207,7 +210,7 @@ private fun RepeatingButton(
     Box(
         modifier = Modifier
             .size(52.dp, 40.dp)
-            .clip(theme.shape())
+            .clip(theme.controlShape())
             .pointerInput(Unit) {
                 detectTapGestures(onPress = {
                     tick.value()

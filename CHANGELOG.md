@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- The buttons in the emoji and clipboard panels now use the same corner as the keys, so the panels look like part of the keyboard; cards and rows keep the panel corner
+- Key labels are centred on the capital height of the style's font, so they sit in the middle of the key with any font
+
 ## [1.6.2] - 2026-10-15
 
 ### Fixed

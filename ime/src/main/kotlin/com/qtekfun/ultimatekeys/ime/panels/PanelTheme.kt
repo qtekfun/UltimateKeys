@@ -29,7 +29,10 @@ data class PanelTheme(
     val onAccent: Color,
     val divider: Color,
     val privateTint: Color,
+    /** Corner of cards and rows. */
     val cornerDp: Float,
+    /** Corner of the keys: buttons in a panel share it so they read as the same keys. */
+    val keyCornerDp: Float,
     val font: FontFamily,
     val fontWeight: FontWeight,
     val motion: MotionStyle,
@@ -62,6 +65,7 @@ data class PanelTheme(
                 divider = p.barDivider.color(),
                 privateTint = p.privateTint.color(),
                 cornerDp = style.panels.cornerRadiusDp,
+                keyCornerDp = style.keys.cornerRadiusDp,
                 font = FontFamily(fonts.typeface(style.labels.font, style.labels.weight)),
                 fontWeight = FontWeight(style.labels.weight),
                 motion = style.motion,
