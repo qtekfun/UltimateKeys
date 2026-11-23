@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [1.6.4] - 2026-11-23
+
 ### Changed
 
 - A key you release now fades back to its normal look instead of snapping; pressing is still instant
@@ -270,7 +272,8 @@ First build of the project: an empty keyboard app with the full build, test and 
 
 - Two builds: `full` (no network permission) and `lite`.
 
-[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.4...HEAD
+[1.6.4]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/qtekfun/UltimateKeys/compare/v1.6.0...v1.6.1
