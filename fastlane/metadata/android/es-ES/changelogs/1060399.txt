@@ -1,0 +1,1 @@
+Los botones de los paneles de emoji y portapapeles comparten la esquina de las teclas, y las etiquetas de las teclas se centran con cualquier fuente.
