@@ -26,7 +26,9 @@ data class GestureMetrics(
     val slop: Float,
     val dragStep: Float,
     val chooserMinCell: Float,
-    val chooserHeight: Float
+    val chooserHeight: Float,
+    /** The least distance between the alternatives strip and the screen edge, like the key margin. */
+    val chooserInset: Float = 0f
 )
 
 /**
@@ -189,7 +191,11 @@ class SurfaceGestures(
             geo.width / items.size
         )
         val total = cell * items.size
-        val left = (press.key.centerX - total / 2f).coerceIn(0f, max(0f, geo.width - total))
+        val inset = metrics.chooserInset
+        val left = (press.key.centerX - total / 2f).coerceIn(
+            inset,
+            max(inset, geo.width - total - inset)
+        )
         val top = max(0f, press.key.top - metrics.chooserHeight - 2f)
         val scale = if (press.key.key is ActionKey) MENU_TEXT_SCALE else 1f
         press.chooser = ChooserView(

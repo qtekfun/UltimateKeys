@@ -9,6 +9,11 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+
+- A key you release now fades back to its normal look instead of snapping; pressing is still instant
+- The long-press alternatives strip keeps the same margin from the screen edge as the keys
+
 ## [1.6.3] - 2026-11-23
 
 ### Changed
